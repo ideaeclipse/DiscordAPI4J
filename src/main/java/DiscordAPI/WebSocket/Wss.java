@@ -1,14 +1,18 @@
 package DiscordAPI.WebSocket;
 
-import DiscordAPI.Bot.BotImpl;
+import DiscordAPI.DiscordBot;
 import DiscordAPI.Objects.DMessage;
+import DiscordAPI.Objects.DStatus;
 import DiscordAPI.WebSocket.JsonData.OpCodes;
 import DiscordAPI.WebSocket.Utils.ConvertJSON;
+import DiscordAPI.WebSocket.Utils.DiscordLogger;
 import DiscordAPI.WebSocket.Utils.HeartBeat;
 import DiscordAPI.WebSocket.Utils.Parsers.ChannelData;
+import DiscordAPI.WebSocket.Utils.Parsers.GameData;
 import DiscordAPI.WebSocket.Utils.Parsers.UserData;
 import DiscordAPI.listener.Dispatcher.ListenerEvents.Message_Create;
 import DiscordAPI.listener.Dispatcher.ListenerEvents.Presence_Update;
+import DiscordAPI.listener.Dispatcher.TListener;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -16,37 +20,45 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import org.json.simple.JSONObject;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Timer;
 
 public class Wss {
+    private static DiscordLogger logger = new DiscordLogger(String.valueOf(Wss.class));
     static final Timer timer = new Timer();
 
-    public static WebSocket connect(final BotImpl botImpl) throws IOException, WebSocketException {
+    public static WebSocket connect(final DiscordBot bot) throws IOException, WebSocketException {
         return new WebSocketFactory()
                 .setConnectionTimeout(5000)
                 .createSocket(DefaultLinks.WEBSOCKET)
                 .addListener(new WebSocketAdapter() {
-                    public void onTextMessage(WebSocket webSocket1, String message) {
+                    public void onTextMessage(WebSocket webSocket1, String message) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
                         JSONObject payload = (JSONObject) Objects.requireNonNull(ConvertJSON.convertToJSONOBJECT(message));
                         OpCodes opCodes = OpCodes.values()[Integer.parseInt(String.valueOf(payload.get("op")))];
                         switch (opCodes) {
                             case Dispatch:
-                                System.out.println("MESSAGE RECIEVED: " + message);
                                 String currentEvent = String.valueOf(payload.get("t"));
-                                if (currentEvent.equals("PRESENCE_UPDATE")) {
-                                    JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-                                    JSONObject user = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(d.get("user")));
-                                    UserData pd = new UserData(String.valueOf(user.get("id")), botImpl).logic();
-                                    botImpl.getDispatcher().notify(new Presence_Update(botImpl));
-                                } else if (currentEvent.equals("MESSAGE_CREATE")) {
-                                    JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-                                    JSONObject user = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(d.get("author")));
-                                    UserData pd = new UserData(String.valueOf(user.get("id")), botImpl).logic();
-                                    ChannelData cd = new ChannelData((String) d.get("channel_id"), botImpl).logic();
-                                    DMessage mes = new DMessage(pd.getUser(), cd.getChannel(), Long.parseLong(String.valueOf(d.get("guild_id"))), String.valueOf(d.get("content")));
-                                    botImpl.getDispatcher().notify(new Message_Create(botImpl, mes));
+                                for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
+                                    if (currentEvent.equals(webSocket_events.toString())) {
+                                        Class<?> cl = webSocket_events.getaClass();
+                                        Constructor constructor = cl.getConstructor(DiscordBot.class, JSONObject.class);
+                                        Object t = constructor.newInstance(bot, payload);
+                                        bot.getDispatcher().notify(t);
+                                    }
                                 }
+                                /*
+
+                                } else if (currentEvent.equals("MESSAGE_CREATE")) {
+
+                                } else if (currentEvent.equals("CHANNEL_CREATE") || currentEvent.equals("CHANNEL_UPDATE") || currentEvent.equals("CHANNEL_DELETE")) {
+                                    JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
+                                    ChannelData cd = new ChannelData(d).logic();
+                                    System.out.println(cd.getChannel().getName());
+                                    DiscordBot.updateChannels();
+                                }
+                                 */
                                 break;
                             case Heartbeat:
                                 break;
@@ -67,12 +79,16 @@ public class Wss {
                             case Invalid_Session:
                                 break;
                             case Hello:
+                                logger.info("Connected to WebSocket");
+                                logger.info("Received initial Message");
                                 JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-                                timer.schedule(new HeartBeat(webSocket1, botImpl), 0, Long.parseLong(String.valueOf(d.get("heartbeat_interval"))));
-                                webSocket1.sendText(String.valueOf(botImpl.getIdentity()));
+                                logger.info("Sending HeartBeast task every: " + Long.parseLong(String.valueOf(d.get("heartbeat_interval"))) + " milliseconds");
+                                timer.schedule(new HeartBeat(webSocket1, bot), 0, Long.parseLong(String.valueOf(d.get("heartbeat_interval"))));
+                                logger.info("Bot's Identity is Sent");
+                                webSocket1.sendText(String.valueOf(bot.getIdentity()));
                                 break;
                             case HeartBeat_ACK:
-                                System.out.println("pulse");
+                                logger.info("HeartBeat returned");
                                 break;
                         }
                     }

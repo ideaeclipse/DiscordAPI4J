@@ -1,4 +1,4 @@
-Query all dm channels of start
+dm channel functionality
 format recieved messages
 add voice functionality
 implement rest of api (dm's\guild commands)

@@ -1,15 +1,16 @@
 package DiscordAPI.listener.listenerTypes;
 
-import DiscordAPI.Bot.BotImpl;
+
+import DiscordAPI.DiscordBot;
 
 public abstract class ListenerEvent {
-    private BotImpl botImpl;
+    private DiscordBot DiscordBot;
 
-    public ListenerEvent(BotImpl b) {
-        this.botImpl = b;
+    public ListenerEvent(DiscordBot b) {
+        this.DiscordBot = b;
     }
 
-    public BotImpl getBotImpl(){
-        return this.botImpl;
+    public DiscordBot getDiscordBot(){
+        return this.DiscordBot;
     }
 }

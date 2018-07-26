@@ -1,18 +1,21 @@
 package DiscordAPI.WebSocket.JsonData.Identity;
 
-import DiscordAPI.Bot.BotImpl;
+import DiscordAPI.DiscordBot;
 import DiscordAPI.WebSocket.JsonData.IJSONObject;
+import DiscordAPI.WebSocket.Utils.DiscordLogger;
 import org.json.simple.JSONObject;
 
 public class IdentityObject {
+    private DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private JSONObject identity;
     private IDENTITY[] values;
-    private BotImpl botImpl;
+    private DiscordBot DiscordBot;
 
-    public IdentityObject(BotImpl botImpl) {
+    public IdentityObject(DiscordBot DiscordBot) {
+        logger.info("Creating Bot's Identity");
         this.identity = new JSONObject();
         this.values = IDENTITY.values();
-        this.botImpl = botImpl;
+        this.DiscordBot = DiscordBot;
         identity = logic(values);
     }
 
@@ -20,7 +23,7 @@ public class IdentityObject {
         JSONObject object = new JSONObject();
         for (IJSONObject d : values) {
             if (d == IDENTITY.token) {
-                object.put(d, botImpl.getToken());
+                object.put(d, DiscordBot.getToken());
             } else if (!d.getaClass().isEnum()) {
                 object.put(d, d.getDefaultValue());
             } else if (d.getaClass().isEnum()) {

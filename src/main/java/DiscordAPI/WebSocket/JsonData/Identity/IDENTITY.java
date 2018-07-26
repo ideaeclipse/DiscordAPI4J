@@ -12,7 +12,6 @@ public enum IDENTITY implements IJSONObject {
     properties(PROPERTIES.class, null),
     compress(Boolean.class, true),
     large_threshold(Integer.class, 250),
-    shard(ArrayList.class, null),
     //PRESENCE.class
     presence(PRESENCE.class, null);
 

@@ -1,5 +1,6 @@
-package DiscordAPI.Bot;
+package DiscordAPI;
 
+import DiscordAPI.Bot.Shards;
 import DiscordAPI.HttpApi.HttpRequests;
 import DiscordAPI.Objects.DChannel;
 import DiscordAPI.Objects.DUser;
@@ -7,6 +8,7 @@ import DiscordAPI.WebSocket.JsonData.Identity.IdentityObject;
 import DiscordAPI.WebSocket.JsonData.PAYLOAD;
 import DiscordAPI.WebSocket.Utils.BuildJSON;
 import DiscordAPI.WebSocket.Utils.ConvertJSON;
+import DiscordAPI.WebSocket.Utils.DiscordLogger;
 import DiscordAPI.WebSocket.Utils.Parsers.ChannelData;
 import DiscordAPI.WebSocket.Utils.Parsers.UserData;
 import DiscordAPI.WebSocket.Wss;
@@ -19,7 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotImpl {
+public class DiscordBot {
+    DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private String token;
     private JSONObject identity;
     private HttpRequests requests;
@@ -28,13 +31,12 @@ public class BotImpl {
     private List<DChannel> channels;
     private List<DUser> users;
 
-    public BotImpl(String token, long guildID) {
+    public DiscordBot(String token, long guildID) {
         this.token = token;
         this.guildId = guildID;
         Shards shards = new Shards();
         IdentityObject identityObject = new IdentityObject(this);
         identity = identityObject.getIdentity();
-        identity.remove("shard");
         identity.put("shard", shards.getShards());
         requests = new HttpRequests(this);
         dispatcher = new TDispatcher(this);
@@ -44,8 +46,9 @@ public class BotImpl {
         return guildId;
     }
 
-    public BotImpl login() {
+    public DiscordBot login() {
         try {
+            logger.info("Connecting to WebSocket");
             Wss.connect(this);
             updateChannels();
             updateUsers();
@@ -55,7 +58,7 @@ public class BotImpl {
         return this;
     }
 
-    private void updateChannels() {
+    public void updateChannels() {
         channels = new ArrayList<>();
         JSONArray array = (JSONArray) getRequests().get("guilds/" + guildId + "/channels");
         for (Object o : array) {
@@ -75,7 +78,6 @@ public class BotImpl {
             UserData userData = new UserData(object).logic();
             users.add(userData.getUser());
         }
-        System.out.println(users.size());
     }
 
     public List<DChannel> getChannels() {
@@ -104,4 +106,5 @@ public class BotImpl {
     public TDispatcher getDispatcher() {
         return this.dispatcher;
     }
+
 }

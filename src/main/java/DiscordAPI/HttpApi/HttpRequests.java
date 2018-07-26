@@ -1,6 +1,6 @@
 package DiscordAPI.HttpApi;
 
-import DiscordAPI.Bot.BotImpl;
+import DiscordAPI.DiscordBot;
 import DiscordAPI.WebSocket.DefaultLinks;
 import DiscordAPI.WebSocket.Utils.ConvertJSON;
 import org.json.simple.JSONObject;
@@ -10,14 +10,14 @@ import java.io.*;
 import java.net.URL;
 
 public class HttpRequests {
-    private BotImpl botImpl;
+    private DiscordBot DiscordBot;
 
-    public HttpRequests(BotImpl botImpl) {
-        this.botImpl = botImpl;
+    public HttpRequests(DiscordBot DiscordBot) {
+        this.DiscordBot = DiscordBot;
     }
 
     private HttpsURLConnection authenticate(HttpsURLConnection con) {
-        con.setRequestProperty("Authorization", "Bot " + botImpl.getToken());
+        con.setRequestProperty("Authorization", "Bot " + DiscordBot.getToken());
         return con;
     }
 

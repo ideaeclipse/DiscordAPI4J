@@ -1,7 +1,7 @@
 package DiscordAPI.listener.Dispatcher;
 
 
-import DiscordAPI.Bot.BotImpl;
+import DiscordAPI.DiscordBot;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 
 import java.util.ArrayList;
@@ -10,9 +10,9 @@ import java.util.List;
 
 public class TDispatcher {
     private List<TListener<?>> listeners;
-    private BotImpl botImpl;
-    public TDispatcher(BotImpl botImpl) {
-        this.botImpl = botImpl;
+    private DiscordBot DiscordBot;
+    public TDispatcher(DiscordBot DiscordBot) {
+        this.DiscordBot = DiscordBot;
         listeners = new ArrayList<>();
     }
 
@@ -20,10 +20,10 @@ public class TDispatcher {
         listeners.add(listener);
     }
 
-    public <T extends ListenerEvent> void notify(T listenerType) {
+    public void notify(Object listenerType) {
         for (TListener ev : listeners) {
             try {
-                ev.handle(listenerType);
+                ev.handle((ListenerEvent) listenerType);
             } catch (ClassCastException ignored) {
 
             }

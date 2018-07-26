@@ -1,6 +1,6 @@
 package DiscordAPI.Objects;
 
-import DiscordAPI.Bot.BotImpl;
+import DiscordAPI.DiscordBot;
 import org.json.simple.JSONObject;
 
 public class DChannel {
@@ -8,14 +8,14 @@ public class DChannel {
     private String name;
     private Integer position;
     private Boolean nsfw;
-    private BotImpl botImpl;
+    private DiscordBot DiscordBot;
 
-    public DChannel(Long id, String name, Integer position, Boolean nsfw, BotImpl botImpl) {
+    public DChannel(Long id, String name, Integer position, Boolean nsfw, DiscordBot DiscordBot) {
         this.id = id;
         this.name = name;
         this.position = position;
         this.nsfw = nsfw;
-        this.botImpl = botImpl;
+        this.DiscordBot = DiscordBot;
     }
 
     public Long getId() {
@@ -38,6 +38,6 @@ public class DChannel {
         JSONObject object = new JSONObject();
         object.put("content", messageContent);
         object.put("file", "file");
-        botImpl.getRequests().sendJson("channels/" + id + "/messages",object);
+        DiscordBot.getRequests().sendJson("channels/" + id + "/messages",object);
     }
 }
