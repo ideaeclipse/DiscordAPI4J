@@ -19,11 +19,12 @@ public class Presence_Update extends ListenerEvent implements ListenerFeatures {
         JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
         JSONObject user = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(d.get("user")));
         UserData pd = new UserData(String.valueOf(user.get("id")), t).logic();
-        GameData gd = new GameData((JSONObject) d.get("game")).logic();
-        status = new DStatus(gd.getGame(), pd.getUser(), String.valueOf(d.get("status")));
-        logger.info("Presence Update: User: " + status.getUser().getName() + " Status: " + status.getStatus() + " Game: " + ((status.getGame().getType() == 0) ?
+        //GameData gd = d.get("game")!=null?new GameData((JSONObject) d.get("game")).logic():null;
+        GameData gd = null;
+        status = new DStatus(gd!=null?gd.getGame():null, pd.getUser(), String.valueOf(d.get("status")));
+        logger.info("Presence Update: User: " + status.getUser().getName() + " Status: " + status.getStatus() + (status.getGame()!=null?" Game: " + ((status.getGame().getType() == 0) ?
                 "Playing " + status.getGame().getName() + " Details: " + status.getGame().getState() + " " + status.getGame().getDetails()
-                : "Listening to " + status.getGame().getState() + " Song: " + status.getGame().getDetails() + " on " + status.getGame().getName()));
+                : "Listening to " + status.getGame().getState() + " Song: " + status.getGame().getDetails() + " on " + status.getGame().getName()):""));
     }
 
     public DStatus getStatus() {

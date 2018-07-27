@@ -8,6 +8,7 @@ public class GameData {
     private JSONObject object;
 
     public GameData(JSONObject object) {
+        System.out.println("called");
         this.object = object;
     }
 

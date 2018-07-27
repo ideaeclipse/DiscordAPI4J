@@ -48,17 +48,6 @@ public class Wss {
                                         bot.getDispatcher().notify(t);
                                     }
                                 }
-                                /*
-
-                                } else if (currentEvent.equals("MESSAGE_CREATE")) {
-
-                                } else if (currentEvent.equals("CHANNEL_CREATE") || currentEvent.equals("CHANNEL_UPDATE") || currentEvent.equals("CHANNEL_DELETE")) {
-                                    JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-                                    ChannelData cd = new ChannelData(d).logic();
-                                    System.out.println(cd.getChannel().getName());
-                                    DiscordBot.updateChannels();
-                                }
-                                 */
                                 break;
                             case Heartbeat:
                                 break;
@@ -88,7 +77,7 @@ public class Wss {
                                 webSocket1.sendText(String.valueOf(bot.getIdentity()));
                                 break;
                             case HeartBeat_ACK:
-                                logger.info("HeartBeat returned");
+                                //logger.info("HeartBeat returned");
                                 break;
                         }
                     }
