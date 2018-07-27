@@ -73,7 +73,6 @@ public class Wss {
                                 JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
                                 logger.info("Sending HeartBeast task every: " + Long.parseLong(String.valueOf(d.get("heartbeat_interval"))) + " milliseconds");
                                 timer.schedule(new HeartBeat(webSocket1, bot), 0, Long.parseLong(String.valueOf(d.get("heartbeat_interval"))));
-                                logger.info("Bot's Identity is Sent");
                                 webSocket1.sendText(String.valueOf(bot.getIdentity()));
                                 break;
                             case HeartBeat_ACK:
