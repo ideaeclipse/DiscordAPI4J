@@ -1,5 +1,5 @@
 dm channel functionality
-format recieved messages
+auto place json data into payload format ******
 add voice functionality
 implement rest of api (dm's\guild commands)
 implement custom terminal
