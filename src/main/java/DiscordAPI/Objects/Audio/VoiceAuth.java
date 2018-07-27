@@ -1,9 +1,8 @@
 package DiscordAPI.Objects.Audio;
 
 import DiscordAPI.DiscordBot;
-import DiscordAPI.WebSocket.VoiceWss;
+import DiscordAPI.WebSocket.Voice.VoiceWss;
 import com.neovisionaries.ws.client.WebSocketException;
-import org.json.simple.JSONObject;
 
 import java.io.IOException;
 
@@ -47,6 +46,7 @@ public class VoiceAuth {
     public void setToken(String token) {
         this.token = token;
     }
+
     public void authenticate(AudioManager audioManager){
         try {
             VoiceWss.connect(bot,audioManager);
