@@ -11,7 +11,10 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import org.json.simple.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Timer;
 
@@ -27,13 +30,26 @@ public class VoiceWss {
                     public void onTextMessage(WebSocket webSocket1, String message) {
                         JSONObject p = (JSONObject) Objects.requireNonNull(ConvertJSON.convertToJSONOBJECT(message));
                         VoiceOpCodes opCodes = VoiceOpCodes.values()[Integer.parseInt(String.valueOf(p.get("op")))];
-
-                        switch (opCodes){
+                        JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(p.get("d")));
+                        System.out.println(message);
+                        switch (opCodes) {
                             case Ready:
-                                JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(p.get("d")));
+                                audioManager.setVoiceSocket(webSocket1);
                                 logger.info("Sending HeartBeast task every: " + Long.parseLong(String.valueOf(d.get("heartbeat_interval"))) + " milliseconds");
-                                timer.schedule(new VoiceHeartBeat(webSocket1, bot,Long.parseLong(String.valueOf(d.get("heartbeat_interval")))), 0, Long.parseLong(String.valueOf(d.get("heartbeat_interval"))));
-                                System.out.println("Ready: " + d);
+                                timer.schedule(new VoiceHeartBeat(webSocket1, bot, Long.parseLong(String.valueOf(d.get("heartbeat_interval")))), 0, Long.parseLong(String.valueOf(d.get("heartbeat_interval"))));
+                                audioManager.ready(d);
+                                break;
+                            case Four:
+                                try {
+                                    audioManager.getUDPsocket().setSecret(String.valueOf(d.get("secret_key")).getBytes("UTF-8"));
+                                    try {
+                                        audioManager.getUDPsocket().send(audioManager.getUDPsocket().play());
+                                    } catch (FileNotFoundException e) {
+                                        e.printStackTrace();
+                                    }
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
                                 break;
                             case HeartBeatACK:
                                 System.out.println(message);
@@ -41,12 +57,12 @@ public class VoiceWss {
                             case Initial:
                                 JSONObject payload = new JSONObject();
                                 JSONObject object = new JSONObject();
-                                object.put("server_id",audioManager.getVoiceAuth().getGuild_id());
-                                object.put("user_id",bot.getId());
-                                object.put("session_id",audioManager.getVoiceAuth().getSession());
-                                object.put("token",audioManager.getVoiceAuth().getToken());
-                                payload.put("op",0);
-                                payload.put("d",object);
+                                object.put("server_id", audioManager.getVoiceAuth().getGuild_id());
+                                object.put("user_id", bot.getId());
+                                object.put("session_id", audioManager.getVoiceAuth().getSession());
+                                object.put("token", audioManager.getVoiceAuth().getToken());
+                                payload.put("op", 0);
+                                payload.put("d", object);
                                 webSocket1.sendText(String.valueOf(payload));
                                 break;
                         }

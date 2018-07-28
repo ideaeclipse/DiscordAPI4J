@@ -2,11 +2,11 @@ package DiscordAPI.WebSocket.Voice;
 
 public enum VoiceOpCodes {
     Zero(0,true),
-    One(1,true),
+    Protocol(1,true),
     Ready(2,true),
     HeartBeat(3,true),
     Four(4,true),
-    Five(5,true),
+    Speaking(5,true),
     HeartBeatACK(6,false),
     Seven(7,true),
     Initial(8,true);

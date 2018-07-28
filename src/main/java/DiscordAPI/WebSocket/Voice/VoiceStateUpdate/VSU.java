@@ -1,4 +1,4 @@
-package DiscordAPI.WebSocket.JsonData.VoiceStateUpdate;
+package DiscordAPI.WebSocket.Voice.VoiceStateUpdate;
 
 import DiscordAPI.WebSocket.JsonData.IJSONObject;
 

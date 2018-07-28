@@ -1,5 +1,6 @@
-dm channel functionality
+
+finished VoiceReadyObject
 auto place json data into payload format ******
-add voice functionality
+dm channel functionality
 implement rest of api (dm's\guild commands)
 implement custom terminal
