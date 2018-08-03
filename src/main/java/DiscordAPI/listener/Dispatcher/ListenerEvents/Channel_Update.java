@@ -2,10 +2,9 @@ package DiscordAPI.listener.Dispatcher.ListenerEvents;
 
 import DiscordAPI.DiscordBot;
 import DiscordAPI.Objects.DChannel;
-import DiscordAPI.WebSocket.Utils.ConvertJSON;
 import DiscordAPI.WebSocket.Utils.DiscordLogger;
-import DiscordAPI.WebSocket.Utils.Parsers.ChannelData;
-import DiscordAPI.WebSocket.Utils.Search;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
+import DiscordAPI.WebSocket.Utils.Parsers.ChannelP;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.listener.listenerTypes.ListenerFeatures;
 import org.json.simple.JSONObject;
@@ -16,9 +15,9 @@ public class Channel_Update extends ListenerEvent implements ListenerFeatures {
     private DChannel newC;
     public Channel_Update(DiscordBot b, JSONObject payload) {
         super(b);
-        JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-        ChannelData cd = new ChannelData(d).logic();
-        oldC = Search.CHANNEL(b.getChannels(),cd.getChannel().getName());
+        JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
+        ChannelP cd = new ChannelP(d).logic();
+        oldC = DiscordUtils.Search.CHANNEL(b.getChannels(),cd.getChannel().getName());
         newC = cd.getChannel();
         b.updateChannels();
         logger.info("Channel Update Old: Name: " + oldC.getName() + " NSFW: " + oldC.getNsfw() + " Position: " + oldC.getPosition());

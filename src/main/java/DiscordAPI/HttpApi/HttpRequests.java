@@ -1,8 +1,7 @@
 package DiscordAPI.HttpApi;
 
 import DiscordAPI.DiscordBot;
-import DiscordAPI.WebSocket.DefaultLinks;
-import DiscordAPI.WebSocket.Utils.ConvertJSON;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -29,7 +28,7 @@ public class HttpRequests {
 
     public Object get(String url) {
         try {
-            HttpsURLConnection con = initialize(new URL(DefaultLinks.APIBASE + url));
+            HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
             return printOutput(con.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,7 +38,7 @@ public class HttpRequests {
 
     public void post(String url) {
         try {
-            HttpsURLConnection con = initialize(new URL(DefaultLinks.APIBASE + url));
+            HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             con.setFixedLengthStreamingMode(0);
@@ -51,7 +50,7 @@ public class HttpRequests {
 
     public void sendJson(String url, JSONObject object) {
         try {
-            HttpsURLConnection con = initialize(new URL(DefaultLinks.APIBASE + url));
+            HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
             con.setDoOutput(true);
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -73,6 +72,6 @@ public class HttpRequests {
             response.append(string);
         }
         in.close();
-        return ConvertJSON.convertToJSONOBJECT(response.toString());
+        return DiscordUtils.convertToJSONOBJECT(response.toString());
     }
 }

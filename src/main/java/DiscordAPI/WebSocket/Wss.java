@@ -1,18 +1,11 @@
 package DiscordAPI.WebSocket;
 
 import DiscordAPI.DiscordBot;
-import DiscordAPI.Objects.DMessage;
-import DiscordAPI.Objects.DStatus;
 import DiscordAPI.WebSocket.JsonData.OpCodes;
-import DiscordAPI.WebSocket.Utils.ConvertJSON;
 import DiscordAPI.WebSocket.Utils.DiscordLogger;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import DiscordAPI.WebSocket.Utils.HeartBeat;
-import DiscordAPI.WebSocket.Utils.Parsers.ChannelData;
-import DiscordAPI.WebSocket.Utils.Parsers.GameData;
-import DiscordAPI.WebSocket.Utils.Parsers.UserData;
-import DiscordAPI.listener.Dispatcher.ListenerEvents.Message_Create;
-import DiscordAPI.listener.Dispatcher.ListenerEvents.Presence_Update;
-import DiscordAPI.listener.Dispatcher.TListener;
+import DiscordAPI.WebSocket.Utils.Parsers.Payloads;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -32,10 +25,10 @@ public class Wss {
     public static WebSocket connect(final DiscordBot bot) throws IOException, WebSocketException {
         return new WebSocketFactory()
                 .setConnectionTimeout(5000)
-                .createSocket(DefaultLinks.WEBSOCKET)
+                .createSocket(DiscordUtils.DefaultLinks.WEBSOCKET)
                 .addListener(new WebSocketAdapter() {
                     public void onTextMessage(WebSocket webSocket1, String message) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-                        JSONObject payload = (JSONObject) Objects.requireNonNull(ConvertJSON.convertToJSONOBJECT(message));
+                        JSONObject payload = (JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(message));
                         OpCodes opCodes = OpCodes.values()[Integer.parseInt(String.valueOf(payload.get("op")))];
                         switch (opCodes) {
                             case Dispatch:
@@ -70,8 +63,9 @@ public class Wss {
                             case Hello:
                                 logger.info("Connected to WebSocket");
                                 logger.info("Received initial Message");
-                                JSONObject d = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-                                logger.info("Sending HeartBeast task every: " + Long.parseLong(String.valueOf(d.get("heartbeat_interval"))) + " milliseconds");
+                                JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
+                                Payloads.Welcome w = DiscordUtils.Parser.convertToJSON(d,Payloads.Welcome.class);
+                                logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
                                 timer.schedule(new HeartBeat(webSocket1, bot), 0, Long.parseLong(String.valueOf(d.get("heartbeat_interval"))));
                                 webSocket1.sendText(String.valueOf(bot.getIdentity()));
                                 break;

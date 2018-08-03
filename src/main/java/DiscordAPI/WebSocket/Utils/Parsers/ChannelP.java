@@ -2,26 +2,30 @@ package DiscordAPI.WebSocket.Utils.Parsers;
 
 import DiscordAPI.DiscordBot;
 import DiscordAPI.Objects.DChannel;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
-public class ChannelData {
-    private String id;
+public class ChannelP {
+    private Long id;
     private DChannel channel;
     private DiscordBot DiscordBot;
     private JSONObject object;
-    public ChannelData(String id, DiscordBot DiscordBot) {
+
+    public ChannelP(Long id, DiscordBot DiscordBot) {
         this.id = id;
         this.DiscordBot = DiscordBot;
     }
-    public ChannelData(JSONObject object){
+
+    public ChannelP(JSONObject object) {
         this.object = object;
     }
 
-    public ChannelData logic() {
-        if(object==null) {
+    public ChannelP logic() {
+        if (object == null) {
             object = (JSONObject) DiscordBot.getRequests().get("channels/" + id);
         }
-        channel = new DChannel(Long.parseLong(String.valueOf(object.get("id"))), String.valueOf(object.get("name")), Integer.parseInt(String.valueOf(object.get("position"))), Boolean.valueOf(String.valueOf(object.get("nsfw"))), DiscordBot);
+        Payloads.Channel c = DiscordUtils.Parser.convertToJSON(object, Payloads.Channel.class);
+        channel = new DChannel(c.id, c.name, c.position, c.nsfw, DiscordBot);
         return this;
     }
 

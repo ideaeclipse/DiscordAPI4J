@@ -2,18 +2,16 @@ package DiscordAPI;
 
 import DiscordAPI.Bot.Shards;
 import DiscordAPI.HttpApi.HttpRequests;
-import DiscordAPI.Objects.Audio.AudioManager;
 import DiscordAPI.Objects.DChannel;
 import DiscordAPI.Objects.DRole;
 import DiscordAPI.Objects.DUser;
 import DiscordAPI.WebSocket.JsonData.Identity.IdentityObject;
 import DiscordAPI.WebSocket.JsonData.PAYLOAD;
-import DiscordAPI.WebSocket.Utils.BuildJSON;
-import DiscordAPI.WebSocket.Utils.ConvertJSON;
 import DiscordAPI.WebSocket.Utils.DiscordLogger;
-import DiscordAPI.WebSocket.Utils.Parsers.ChannelData;
-import DiscordAPI.WebSocket.Utils.Parsers.RoleData;
-import DiscordAPI.WebSocket.Utils.Parsers.UserData;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
+import DiscordAPI.WebSocket.Utils.Parsers.ChannelP;
+import DiscordAPI.WebSocket.Utils.Parsers.RoleP;
+import DiscordAPI.WebSocket.Utils.Parsers.UserP;
 import DiscordAPI.WebSocket.Wss;
 import DiscordAPI.listener.Dispatcher.TDispatcher;
 import com.neovisionaries.ws.client.WebSocket;
@@ -36,7 +34,6 @@ public class DiscordBot {
     private List<DUser> users;
     private List<DRole> roles;
     private WebSocket socket;
-    private AudioManager audioManager;
     private Long id;
 
     public DiscordBot(String token, long guildID) {
@@ -55,9 +52,9 @@ public class DiscordBot {
     }
 
     public DiscordBot login() {
+        logger.info("Connecting to WebSocket");
         try {
-            logger.info("Connecting to WebSocket");
-            audioManager = new AudioManager(this,Wss.connect(this),guildId);
+            socket = Wss.connect(this);
             getBotId();
             updateRoles();
             updateChannels();
@@ -65,6 +62,7 @@ public class DiscordBot {
         } catch (IOException | WebSocketException e) {
             e.printStackTrace();
         }
+
         return this;
     }
 
@@ -74,7 +72,7 @@ public class DiscordBot {
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             if (Integer.parseInt(String.valueOf(object.get("type"))) == 0) {
-                ChannelData cd = new ChannelData(object).logic();
+                ChannelP cd = new ChannelP(object).logic();
                 channels.add(cd.getChannel());
             }
         }
@@ -85,26 +83,24 @@ public class DiscordBot {
         JSONArray array = (JSONArray) getRequests().get("guilds/" + guildId + "/members?limit=1000");
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
-            UserData userData = new UserData(object,this).logic();
+            UserP userData = new UserP(object, this).logic();
             users.add(userData.getUser());
         }
     }
-    private void updateRoles(){
+
+    private void updateRoles() {
         roles = new ArrayList<>();
         JSONArray array = (JSONArray) getRequests().get("guilds/" + guildId + "/roles");
-        for(Object o : array){
+        for (Object o : array) {
             JSONObject object = (JSONObject) o;
-            RoleData rd = new RoleData(object).logic();
+            RoleP rd = new RoleP(object).logic();
             roles.add(rd.getRole());
         }
     }
-    private void getBotId(){
+
+    private void getBotId() {
         JSONObject object = (JSONObject) getRequests().get("users/@me");
         id = Long.parseUnsignedLong(String.valueOf(object.get("id")));
-    }
-
-    public AudioManager getAudioManager() {
-        return audioManager;
     }
 
     public List<DChannel> getChannels() {
@@ -124,7 +120,7 @@ public class DiscordBot {
     }
 
     public JSONObject getIdentity() {
-        JSONObject object = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(BuildJSON.BuildJSON(PAYLOAD.values(), this)));
+        JSONObject object = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(DiscordUtils.BuildJSON.BuildJSON(PAYLOAD.values(), this)));
         object.put("op", 2);
         object.put("d", identity);
         return object;

@@ -20,7 +20,7 @@ public class HeartBeat extends TimerTask {
 
     @Override
     public void run() {
-        JSONObject object = (JSONObject) ConvertJSON.convertToJSONOBJECT(String.valueOf(BuildJSON.BuildJSON(PAYLOAD.values(), this.DiscordBot)));
+        JSONObject object = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(DiscordUtils.BuildJSON.BuildJSON(PAYLOAD.values(), this.DiscordBot)));
         object.put("op", 1);
         object.put("d", 251);
         webSocket.sendText(String.valueOf(object));

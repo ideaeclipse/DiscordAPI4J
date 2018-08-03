@@ -3,40 +3,41 @@ package DiscordAPI.WebSocket.Utils.Parsers;
 import DiscordAPI.DiscordBot;
 import DiscordAPI.Objects.DRole;
 import DiscordAPI.Objects.DUser;
-import DiscordAPI.WebSocket.Utils.Search;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserData {
-    private String id;
+public class UserP {
+    private Long id;
     private DUser user;
     private DiscordBot bot;
     private JSONObject object;
 
-    public UserData(String id, DiscordBot DiscordBot) {
+    public UserP(Long id, DiscordBot DiscordBot) {
         this.id = id;
         this.bot = DiscordBot;
     }
 
-    public UserData(JSONObject object,DiscordBot bot) {
+    public UserP(JSONObject object, DiscordBot bot) {
         this.object = object;
         this.bot = bot;
     }
 
-    public UserData logic() {
+    public UserP logic() {
         if (object == null) {
             object = (JSONObject) bot.getRequests().get("guilds/" + bot.getGuildId() + "/members/" + id);
         }
         List<DRole> roles = new ArrayList<>();
-        for(String s: (List<String>) object.get("roles")){
-            roles.add(Search.ROLES(bot.getRoles(),Long.parseUnsignedLong(s)));
+        for (String s : (List<String>) object.get("roles")) {
+            roles.add(DiscordUtils.Search.ROLES(bot.getRoles(), Long.parseUnsignedLong(s)));
         }
+        Payloads.User u = null;
         if (object.get("user") != null) {
-            object = (JSONObject) object.get("user");
+            u = DiscordUtils.Parser.convertToJSON((JSONObject) object.get("user"),Payloads.User.class);
         }
-        user = new DUser(Long.parseLong(String.valueOf(object.get("id"))), String.valueOf(object.get("username")), Integer.parseInt(String.valueOf(object.get("discriminator"))),roles);
+        user = new DUser(u.id, u.username, u.discriminator, roles);
         return this;
     }
 
