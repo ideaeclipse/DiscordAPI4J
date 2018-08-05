@@ -10,14 +10,78 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 public class DiscordUtils {
+    public static class HttpRequests {
+        private static HttpsURLConnection authenticate(HttpsURLConnection con) {
+            con.setRequestProperty("Authorization", "Bot " + DiscordUtils.DefaultLinks.token);
+            return con;
+        }
+
+        private static HttpsURLConnection initialize(URL url) throws IOException {
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            con = authenticate(con);
+            return con;
+        }
+
+        public static Object get(String url) {
+            try {
+                HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
+                return printOutput(con.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        public static void post(String url) {
+            try {
+                HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
+                con.setDoOutput(true);
+                con.setRequestMethod("POST");
+                con.setFixedLengthStreamingMode(0);
+                printOutput(con.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public static void sendJson(String url, JSONObject object) {
+            try {
+                HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
+                con.setDoOutput(true);
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                con.setRequestProperty("Accept", "application/json");
+                OutputStream os = con.getOutputStream();
+                os.write(String.valueOf(object).getBytes("UTF-8"));
+                os.close();
+                printOutput(con.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private static Object printOutput(InputStream inputStream) throws IOException {
+            BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+            String string;
+            StringBuffer response = new StringBuffer();
+            while ((string = in.readLine()) != null) {
+                response.append(string);
+            }
+            in.close();
+            return DiscordUtils.convertToJSONOBJECT(response.toString());
+        }
+    }
+
     public static Object convertToJSONOBJECT(String message) {
         JSONParser parser = new JSONParser();
         try {
@@ -113,7 +177,7 @@ public class DiscordUtils {
             JSONObject object = new JSONObject();
             for (IJSONObject d : values) {
                 if (d == IDENTITY.token) {
-                    object.put(d, DiscordBot.getToken());
+                    object.put(d, DefaultLinks.token);
                 } else if (!d.getaClass().isEnum()) {
                     object.put(d, d.getDefaultValue());
                 } else if (d.getaClass().isEnum()) {
@@ -125,9 +189,14 @@ public class DiscordUtils {
     }
 
     public static class DefaultLinks {
+        public static String token;
         public static final String APIBASE = "https://discordapp.com/api/v6/";
         public static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
-        public static final String USERAPI = APIBASE + "users/";
-        public static final String USERME = USERAPI + "@me";
+        public static final String USER = "users/";
+        public static final String GUILD = "guilds/";
+        public static final String CHANNEL = "channels";
+        public static final String MEMBER = "/members";
+        public static final String ROLE = "/roles";
+        public static final String USERME = USER + "@me";
     }
 }

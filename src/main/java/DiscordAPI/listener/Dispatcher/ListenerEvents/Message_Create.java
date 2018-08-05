@@ -22,7 +22,7 @@ public class Message_Create extends ListenerEvent implements ListenerFeatures {
         Payloads.User u = DiscordUtils.Parser.convertToJSON(user, Payloads.User.class);
         Payloads.Message m = DiscordUtils.Parser.convertToJSON(d, Payloads.Message.class);
         UserP pd = new UserP(u.id, b).logic();
-        ChannelP cd = new ChannelP(m.channel_id, b).logic();
+        ChannelP cd = new ChannelP(m.channel_id).logic();
         message = new DMessage(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
         logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent() + " Channel: " + message.getChannel().getName());
     }

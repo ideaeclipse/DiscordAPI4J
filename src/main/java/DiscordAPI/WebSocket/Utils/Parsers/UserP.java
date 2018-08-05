@@ -27,7 +27,7 @@ public class UserP {
 
     public UserP logic() {
         if (object == null) {
-            object = (JSONObject) bot.getRequests().get("guilds/" + bot.getGuildId() + "/members/" + id);
+            object = (JSONObject) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + bot.getGuildId() + DiscordUtils.DefaultLinks.MEMBER + "/" + id);
         }
         List<DRole> roles = new ArrayList<>();
         for (String s : (List<String>) object.get("roles")) {
@@ -35,8 +35,9 @@ public class UserP {
         }
         Payloads.User u = null;
         if (object.get("user") != null) {
-            u = DiscordUtils.Parser.convertToJSON((JSONObject) object.get("user"),Payloads.User.class);
+            u = DiscordUtils.Parser.convertToJSON((JSONObject) object.get("user"), Payloads.User.class);
         }
+        assert u != null;
         user = new DUser(u.id, u.username, u.discriminator, roles);
         return this;
     }

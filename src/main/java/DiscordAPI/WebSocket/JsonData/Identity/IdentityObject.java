@@ -3,6 +3,7 @@ package DiscordAPI.WebSocket.JsonData.Identity;
 import DiscordAPI.DiscordBot;
 import DiscordAPI.WebSocket.JsonData.IJSONObject;
 import DiscordAPI.WebSocket.Utils.DiscordLogger;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 public class IdentityObject {
@@ -23,7 +24,7 @@ public class IdentityObject {
         JSONObject object = new JSONObject();
         for (IJSONObject d : values) {
             if (d == IDENTITY.token) {
-                object.put(d, DiscordBot.getToken());
+                object.put(d, DiscordUtils.DefaultLinks.token);
             } else if (!d.getaClass().isEnum()) {
                 object.put(d, d.getDefaultValue());
             } else if (d.getaClass().isEnum()) {

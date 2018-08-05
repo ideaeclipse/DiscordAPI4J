@@ -11,9 +11,8 @@ public class ChannelP {
     private DiscordBot DiscordBot;
     private JSONObject object;
 
-    public ChannelP(Long id, DiscordBot DiscordBot) {
+    public ChannelP(Long id) {
         this.id = id;
-        this.DiscordBot = DiscordBot;
     }
 
     public ChannelP(JSONObject object) {
@@ -22,10 +21,10 @@ public class ChannelP {
 
     public ChannelP logic() {
         if (object == null) {
-            object = (JSONObject) DiscordBot.getRequests().get("channels/" + id);
+            object = (JSONObject) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.CHANNEL + "/" + id);
         }
         Payloads.Channel c = DiscordUtils.Parser.convertToJSON(object, Payloads.Channel.class);
-        channel = new DChannel(c.id, c.name, c.position, c.nsfw, DiscordBot);
+        channel = new DChannel(c.id, c.name, c.position, c.nsfw);
         return this;
     }
 

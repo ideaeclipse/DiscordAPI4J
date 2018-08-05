@@ -1,7 +1,6 @@
 package DiscordAPI;
 
 import DiscordAPI.Bot.Shards;
-import DiscordAPI.HttpApi.HttpRequests;
 import DiscordAPI.Objects.DChannel;
 import DiscordAPI.Objects.DRole;
 import DiscordAPI.Objects.DUser;
@@ -25,9 +24,7 @@ import java.util.List;
 
 public class DiscordBot {
     DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-    private String token;
     private JSONObject identity;
-    private HttpRequests requests;
     private TDispatcher dispatcher;
     private long guildId;
     private List<DChannel> channels;
@@ -37,13 +34,12 @@ public class DiscordBot {
     private Long id;
 
     public DiscordBot(String token, long guildID) {
-        this.token = token;
+        DiscordUtils.DefaultLinks.token = token;
         this.guildId = guildID;
         Shards shards = new Shards();
         IdentityObject identityObject = new IdentityObject(this);
         identity = identityObject.getIdentity();
         identity.put("shard", shards.getShards());
-        requests = new HttpRequests(this);
         dispatcher = new TDispatcher(this);
     }
 
@@ -68,7 +64,7 @@ public class DiscordBot {
 
     public void updateChannels() {
         channels = new ArrayList<>();
-        JSONArray array = (JSONArray) getRequests().get("guilds/" + guildId + "/channels");
+        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + guildId + "/" + DiscordUtils.DefaultLinks.CHANNEL);
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             if (Integer.parseInt(String.valueOf(object.get("type"))) == 0) {
@@ -80,7 +76,7 @@ public class DiscordBot {
 
     private void updateUsers() {
         users = new ArrayList<>();
-        JSONArray array = (JSONArray) getRequests().get("guilds/" + guildId + "/members?limit=1000");
+        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + guildId + DiscordUtils.DefaultLinks.MEMBER + "?limit=1000");
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             UserP userData = new UserP(object, this).logic();
@@ -90,7 +86,7 @@ public class DiscordBot {
 
     private void updateRoles() {
         roles = new ArrayList<>();
-        JSONArray array = (JSONArray) getRequests().get("guilds/" + guildId + "/roles");
+        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + guildId + DiscordUtils.DefaultLinks.ROLE);
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             RoleP rd = new RoleP(object).logic();
@@ -99,7 +95,7 @@ public class DiscordBot {
     }
 
     private void getBotId() {
-        JSONObject object = (JSONObject) getRequests().get("users/@me");
+        JSONObject object = (JSONObject) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.USERME);
         id = Long.parseUnsignedLong(String.valueOf(object.get("id")));
     }
 
@@ -115,19 +111,11 @@ public class DiscordBot {
         return roles;
     }
 
-    public String getToken() {
-        return token;
-    }
-
     public JSONObject getIdentity() {
         JSONObject object = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(DiscordUtils.BuildJSON.BuildJSON(PAYLOAD.values(), this)));
         object.put("op", 2);
         object.put("d", identity);
         return object;
-    }
-
-    public HttpRequests getRequests() {
-        return requests;
     }
 
     public TDispatcher getDispatcher() {

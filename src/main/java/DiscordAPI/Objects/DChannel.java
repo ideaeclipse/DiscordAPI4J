@@ -1,6 +1,7 @@
 package DiscordAPI.Objects;
 
 import DiscordAPI.DiscordBot;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 public class DChannel {
@@ -8,14 +9,12 @@ public class DChannel {
     private String name;
     private Integer position;
     private Boolean nsfw;
-    private DiscordBot DiscordBot;
 
-    public DChannel(Long id, String name, Integer position, Boolean nsfw, DiscordBot DiscordBot) {
+    public DChannel(Long id, String name, Integer position, Boolean nsfw) {
         this.id = id;
         this.name = name;
         this.position = position;
         this.nsfw = nsfw;
-        this.DiscordBot = DiscordBot;
     }
 
     public Long getId() {
@@ -38,6 +37,6 @@ public class DChannel {
         JSONObject object = new JSONObject();
         object.put("content", messageContent);
         object.put("file", "file");
-        DiscordBot.getRequests().sendJson("channels/" + id + "/messages",object);
+        DiscordUtils.HttpRequests.sendJson("channels/" + id + "/messages", object);
     }
 }
