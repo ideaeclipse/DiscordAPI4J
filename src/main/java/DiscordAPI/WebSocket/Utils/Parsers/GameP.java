@@ -1,6 +1,8 @@
 package DiscordAPI.WebSocket.Utils.Parsers;
 
 import DiscordAPI.Objects.SubObjects.DGame;
+import DiscordAPI.WebSocket.JsonData.Payloads;
+import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 public class GameP {
@@ -12,7 +14,8 @@ public class GameP {
     }
 
     public GameP logic() {
-        game = new DGame(String.valueOf(object.get("name")), String.valueOf(object.get("state")), String.valueOf(object.get("details")), Integer.parseInt(String.valueOf(object.get("type"))));
+        Payloads.Game g = DiscordUtils.Parser.convertToJSON(object,Payloads.Game.class);
+        game = new DGame(g.name, g.state, g.details, g.type);
         return this;
     }
 

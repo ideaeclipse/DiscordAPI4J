@@ -5,7 +5,7 @@ import DiscordAPI.WebSocket.JsonData.OpCodes;
 import DiscordAPI.WebSocket.Utils.DiscordLogger;
 import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import DiscordAPI.WebSocket.Utils.HeartBeat;
-import DiscordAPI.WebSocket.Utils.Parsers.Payloads;
+import DiscordAPI.WebSocket.JsonData.Payloads;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -37,7 +37,7 @@ public class Wss {
                                     if (currentEvent.equals(webSocket_events.toString())) {
                                         Class<?> cl = webSocket_events.getaClass();
                                         Constructor constructor = cl.getConstructor(DiscordBot.class, JSONObject.class);
-                                        Object t = constructor.newInstance(bot, payload);
+                                        Object t = constructor.newInstance(bot, payload.get("d"));
                                         bot.getDispatcher().notify(t);
                                     }
                                 }

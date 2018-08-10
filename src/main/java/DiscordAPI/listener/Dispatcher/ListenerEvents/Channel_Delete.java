@@ -15,8 +15,7 @@ public class Channel_Delete extends ListenerEvent implements ListenerFeatures {
 
     public Channel_Delete(DiscordBot b, JSONObject payload) {
         super(b);
-        JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-        ChannelP cd = new ChannelP(d).logic();
+        ChannelP cd = new ChannelP(payload).logic();
         channel = cd.getChannel();
         b.updateChannels();
         logger.info("Channel Delete: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());

@@ -5,7 +5,7 @@ import DiscordAPI.Objects.DMessage;
 import DiscordAPI.WebSocket.Utils.DiscordLogger;
 import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import DiscordAPI.WebSocket.Utils.Parsers.ChannelP;
-import DiscordAPI.WebSocket.Utils.Parsers.Payloads;
+import DiscordAPI.WebSocket.JsonData.Payloads;
 import DiscordAPI.WebSocket.Utils.Parsers.UserP;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.listener.listenerTypes.ListenerFeatures;
@@ -17,10 +17,9 @@ public class Message_Create extends ListenerEvent implements ListenerFeatures {
 
     public Message_Create(DiscordBot b, JSONObject object) {
         super(b);
-        JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(object.get("d")));
-        JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(d.get("author")));
+        JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(object.get("author")));
         Payloads.User u = DiscordUtils.Parser.convertToJSON(user, Payloads.User.class);
-        Payloads.Message m = DiscordUtils.Parser.convertToJSON(d, Payloads.Message.class);
+        Payloads.Message m = DiscordUtils.Parser.convertToJSON(object, Payloads.Message.class);
         UserP pd = new UserP(u.id, b).logic();
         ChannelP cd = new ChannelP(m.channel_id).logic();
         message = new DMessage(pd.getUser(), cd.getChannel(), m.guild_id, m.content);

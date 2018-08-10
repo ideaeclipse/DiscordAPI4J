@@ -1,4 +1,4 @@
-package DiscordAPI.WebSocket.Utils.Parsers;
+package DiscordAPI.WebSocket.JsonData;
 
 public class Payloads {
     public class Channel {
@@ -28,7 +28,12 @@ public class Payloads {
         public Integer color;
         public Long id;
     }
-
+    public class Game{
+        public String name;
+        public String state;
+        public String details;
+        public Integer type;
+    }
     public class Welcome {
         public String _trace;
         public Long heartbeat_interval;

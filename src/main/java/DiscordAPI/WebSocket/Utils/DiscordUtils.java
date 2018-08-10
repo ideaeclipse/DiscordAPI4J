@@ -5,7 +5,7 @@ import DiscordAPI.Objects.DChannel;
 import DiscordAPI.Objects.DRole;
 import DiscordAPI.WebSocket.JsonData.IJSONObject;
 import DiscordAPI.WebSocket.JsonData.Identity.IDENTITY;
-import DiscordAPI.WebSocket.Utils.Parsers.Payloads;
+import DiscordAPI.WebSocket.JsonData.Payloads;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,11 +18,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import static DiscordAPI.WebSocket.Utils.DiscordUtils.DefaultLinks.*;
 
 public class DiscordUtils {
     public static class HttpRequests {
         private static HttpsURLConnection authenticate(HttpsURLConnection con) {
-            con.setRequestProperty("Authorization", "Bot " + DiscordUtils.DefaultLinks.token);
+            con.setRequestProperty("Authorization", "Bot " + token);
             return con;
         }
 
@@ -34,7 +35,7 @@ public class DiscordUtils {
 
         public static Object get(String url) {
             try {
-                HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
+                HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 return printOutput(con.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -44,7 +45,7 @@ public class DiscordUtils {
 
         public static void post(String url) {
             try {
-                HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
+                HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 con.setDoOutput(true);
                 con.setRequestMethod("POST");
                 con.setFixedLengthStreamingMode(0);
@@ -56,7 +57,7 @@ public class DiscordUtils {
 
         public static void sendJson(String url, JSONObject object) {
             try {
-                HttpsURLConnection con = initialize(new URL(DiscordUtils.DefaultLinks.APIBASE + url));
+                HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 con.setDoOutput(true);
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -177,7 +178,7 @@ public class DiscordUtils {
             JSONObject object = new JSONObject();
             for (IJSONObject d : values) {
                 if (d == IDENTITY.token) {
-                    object.put(d, DefaultLinks.token);
+                    object.put(d, token);
                 } else if (!d.getaClass().isEnum()) {
                     object.put(d, d.getDefaultValue());
                 } else if (d.getaClass().isEnum()) {

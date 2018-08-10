@@ -3,11 +3,13 @@ package DiscordAPI.WebSocket.Utils.Parsers;
 import DiscordAPI.DiscordBot;
 import DiscordAPI.Objects.DRole;
 import DiscordAPI.Objects.DUser;
+import DiscordAPI.WebSocket.JsonData.Payloads;
 import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import static DiscordAPI.WebSocket.Utils.DiscordUtils.DefaultLinks.*;
 
 public class UserP {
     private Long id;
@@ -27,7 +29,7 @@ public class UserP {
 
     public UserP logic() {
         if (object == null) {
-            object = (JSONObject) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + bot.getGuildId() + DiscordUtils.DefaultLinks.MEMBER + "/" + id);
+            object = (JSONObject) DiscordUtils.HttpRequests.get(GUILD + bot.getGuildId() + MEMBER + "/" + id);
         }
         List<DRole> roles = new ArrayList<>();
         for (String s : (List<String>) object.get("roles")) {

@@ -21,6 +21,7 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import static DiscordAPI.WebSocket.Utils.DiscordUtils.DefaultLinks.*;
 
 public class DiscordBot {
     DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
@@ -30,7 +31,6 @@ public class DiscordBot {
     private List<DChannel> channels;
     private List<DUser> users;
     private List<DRole> roles;
-    private WebSocket socket;
     private Long id;
 
     public DiscordBot(String token, long guildID) {
@@ -50,7 +50,7 @@ public class DiscordBot {
     public DiscordBot login() {
         logger.info("Connecting to WebSocket");
         try {
-            socket = Wss.connect(this);
+            WebSocket socket = Wss.connect(this);
             getBotId();
             updateRoles();
             updateChannels();
@@ -64,7 +64,7 @@ public class DiscordBot {
 
     public void updateChannels() {
         channels = new ArrayList<>();
-        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + guildId + "/" + DiscordUtils.DefaultLinks.CHANNEL);
+        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(GUILD + guildId + "/" + CHANNEL);
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             if (Integer.parseInt(String.valueOf(object.get("type"))) == 0) {
@@ -76,7 +76,7 @@ public class DiscordBot {
 
     private void updateUsers() {
         users = new ArrayList<>();
-        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + guildId + DiscordUtils.DefaultLinks.MEMBER + "?limit=1000");
+        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(GUILD + guildId + MEMBER + "?limit=1000");
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             UserP userData = new UserP(object, this).logic();
@@ -86,7 +86,7 @@ public class DiscordBot {
 
     private void updateRoles() {
         roles = new ArrayList<>();
-        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.GUILD + guildId + DiscordUtils.DefaultLinks.ROLE);
+        JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(GUILD + guildId + ROLE);
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             RoleP rd = new RoleP(object).logic();
@@ -95,7 +95,7 @@ public class DiscordBot {
     }
 
     private void getBotId() {
-        JSONObject object = (JSONObject) DiscordUtils.HttpRequests.get(DiscordUtils.DefaultLinks.USERME);
+        JSONObject object = (JSONObject) DiscordUtils.HttpRequests.get(USERME);
         id = Long.parseUnsignedLong(String.valueOf(object.get("id")));
     }
 

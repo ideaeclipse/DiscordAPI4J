@@ -15,8 +15,7 @@ public class Channel_Create extends ListenerEvent implements ListenerFeatures {
 
     public Channel_Create(DiscordBot b, JSONObject payload) {
         super(b);
-        JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-        ChannelP cd = new ChannelP(d).logic();
+        ChannelP cd = new ChannelP(payload).logic();
         channel = cd.getChannel();
         b.updateChannels();
         logger.info("Channel Create: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());

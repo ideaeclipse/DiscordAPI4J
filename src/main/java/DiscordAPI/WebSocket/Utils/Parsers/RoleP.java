@@ -1,6 +1,7 @@
 package DiscordAPI.WebSocket.Utils.Parsers;
 
 import DiscordAPI.Objects.DRole;
+import DiscordAPI.WebSocket.JsonData.Payloads;
 import DiscordAPI.WebSocket.Utils.DiscordUtils;
 import org.json.simple.JSONObject;
 

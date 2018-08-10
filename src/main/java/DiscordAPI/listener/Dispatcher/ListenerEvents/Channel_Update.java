@@ -15,8 +15,7 @@ public class Channel_Update extends ListenerEvent implements ListenerFeatures {
     private DChannel newC;
     public Channel_Update(DiscordBot b, JSONObject payload) {
         super(b);
-        JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-        ChannelP cd = new ChannelP(d).logic();
+        ChannelP cd = new ChannelP(payload).logic();
         oldC = DiscordUtils.Search.CHANNEL(b.getChannels(),cd.getChannel().getName());
         newC = cd.getChannel();
         b.updateChannels();
