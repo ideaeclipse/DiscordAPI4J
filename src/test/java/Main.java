@@ -1,9 +1,8 @@
 
 import DiscordAPI.DiscordBot;
-import DiscordAPI.Objects.DMessage;
-import DiscordAPI.listener.Dispatcher.ListenerEvents.Message_Create;
-import DiscordAPI.listener.Dispatcher.ListenerEvents.Presence_Update;
-import DiscordAPI.listener.Dispatcher.TListener;
+import DiscordAPI.objects.DMessage;
+import DiscordAPI.listener.dispatcher.listenerEvents.Message_Create;
+import DiscordAPI.listener.dispatcher.TListener;
 
 public class Main {
     private Main(String token, Long guildId) {

@@ -1,18 +1,18 @@
 package DiscordAPI;
 
-import DiscordAPI.Bot.Shards;
-import DiscordAPI.Objects.DChannel;
-import DiscordAPI.Objects.DRole;
-import DiscordAPI.Objects.DUser;
-import DiscordAPI.WebSocket.JsonData.Identity.IdentityObject;
-import DiscordAPI.WebSocket.JsonData.PAYLOAD;
-import DiscordAPI.WebSocket.Utils.DiscordLogger;
-import DiscordAPI.WebSocket.Utils.DiscordUtils;
-import DiscordAPI.WebSocket.Utils.Parsers.ChannelP;
-import DiscordAPI.WebSocket.Utils.Parsers.RoleP;
-import DiscordAPI.WebSocket.Utils.Parsers.UserP;
-import DiscordAPI.WebSocket.Wss;
-import DiscordAPI.listener.Dispatcher.TDispatcher;
+import DiscordAPI.bot.Shards;
+import DiscordAPI.objects.DChannel;
+import DiscordAPI.objects.DRole;
+import DiscordAPI.objects.DUser;
+import DiscordAPI.webSocket.jsonData.identity.IdentityObject;
+import DiscordAPI.webSocket.jsonData.PAYLOAD;
+import DiscordAPI.webSocket.utils.DiscordLogger;
+import DiscordAPI.webSocket.utils.DiscordUtils;
+import DiscordAPI.webSocket.utils.parsers.ChannelP;
+import DiscordAPI.webSocket.utils.parsers.RoleP;
+import DiscordAPI.webSocket.utils.parsers.UserP;
+import DiscordAPI.webSocket.Wss;
+import DiscordAPI.listener.dispatcher.TDispatcher;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 import org.json.simple.JSONArray;
@@ -21,7 +21,7 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import static DiscordAPI.WebSocket.Utils.DiscordUtils.DefaultLinks.*;
+import static DiscordAPI.webSocket.utils.DiscordUtils.DefaultLinks.*;
 
 public class DiscordBot {
     DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
@@ -48,7 +48,7 @@ public class DiscordBot {
     }
 
     public DiscordBot login() {
-        logger.info("Connecting to WebSocket");
+        logger.info("Connecting to webSocket");
         try {
             WebSocket socket = Wss.connect(this);
             getBotId();
