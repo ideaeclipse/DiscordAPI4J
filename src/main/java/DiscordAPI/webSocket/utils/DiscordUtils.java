@@ -6,6 +6,7 @@ import DiscordAPI.objects.DRole;
 import DiscordAPI.webSocket.jsonData.IJSONObject;
 import DiscordAPI.webSocket.jsonData.identity.IDENTITY;
 import DiscordAPI.webSocket.jsonData.Payloads;
+import DiscordAPI.webSocket.utils.parsers.permissions.Permissions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -15,9 +16,11 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
 import static DiscordAPI.webSocket.utils.DiscordUtils.DefaultLinks.*;
 
 public class DiscordUtils {
@@ -106,7 +109,7 @@ public class DiscordUtils {
     public static class Parser {
 
         public static <T> T convertToJSON(JSONObject object, Class<?> c) {
-            Object o = getObject(c);
+            T o = getObject(c);
             try {
                 for (Object s : object.keySet()) {
                     Field f;
@@ -118,33 +121,34 @@ public class DiscordUtils {
                     String value = String.valueOf(object.get(s));
                     if (f.getType().equals(String.class)) {
                         f.set(o, value);
-                    }
-                    if (f.getType().equals(Integer.class)) {
+                    } else if (f.getType().equals(Integer.class)) {
                         f.set(o, Integer.parseInt(value));
 
-                    }
-                    if (f.getType().equals(Float.class)) {
+                    } else if (f.getType().equals(Float.class)) {
                         f.set(o, Float.parseFloat(value));
-                    }
-                    if (f.getType().equals(Long.class)) {
+                    } else if (f.getType().equals(Long.class)) {
                         f.set(o, Long.parseUnsignedLong(value));
+                    } else if (f.getType().equals(Boolean.class)) {
+                        f.set(o, Boolean.parseBoolean(value));
+                    } else if (f.getType().isEnum()) {
+                        f.set(o, f.getType().getEnumConstants()[Integer.parseInt(value)]);
                     }
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
-            return (T) o;
+            return o;
         }
 
-        private static Object getObject(Class<?> c) {
-            Object o = null;
+        private static <T> T getObject(Class<?> c) {
+            T o = null;
             try {
                 if (c.getName().contains("$")) {
                     Class<?> a = Payloads.class;
                     Object superC = a.getConstructor().newInstance();
-                    o = c.getConstructor(superC.getClass()).newInstance(superC);
+                    o = (T) c.getConstructor(superC.getClass()).newInstance(superC);
                 } else {
-                    o = c.getConstructor().newInstance();
+                    o = (T) c.getConstructor().newInstance();
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 e.printStackTrace();
@@ -174,7 +178,7 @@ public class DiscordUtils {
     }
 
     public static class BuildJSON {
-        public static JSONObject BuildJSON(IJSONObject[] values, DiscordBot DiscordBot) {
+        public static JSONObject BuildJSON(IJSONObject[] values) {
             JSONObject object = new JSONObject();
             for (IJSONObject d : values) {
                 if (d == IDENTITY.token) {
@@ -182,13 +186,27 @@ public class DiscordUtils {
                 } else if (!d.getaClass().isEnum()) {
                     object.put(d, d.getDefaultValue());
                 } else if (d.getaClass().isEnum()) {
-                    object.put(d, BuildJSON((IJSONObject[]) d.getaClass().getEnumConstants(), DiscordBot));
+                    object.put(d, BuildJSON((IJSONObject[]) d.getaClass().getEnumConstants()));
                 }
             }
             return object;
         }
     }
-
+    public static class PermissionId{
+        public static List<String> convertPermissions(Long p){
+            List<String> perms = new ArrayList<>();
+            System.out.println(p);
+            for(Permissions permissions: Permissions.values()){
+                System.out.print(permissions.name() + " " + p%permissions.getPermissionValue());
+                if ((p % permissions.getPermissionValue() == 0)) {
+                    System.out.print(" yes");
+                    perms.add(permissions.name());
+                }
+                System.out.print("\n");
+            }
+            return perms;
+        }
+    }
     public static class DefaultLinks {
         public static String token;
         public static final String APIBASE = "https://discordapp.com/api/v6/";
