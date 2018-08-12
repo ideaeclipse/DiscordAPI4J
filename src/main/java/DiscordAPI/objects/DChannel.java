@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.webSocket.jsonData.Payloads;
 import DiscordAPI.webSocket.utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
@@ -8,12 +9,14 @@ public class DChannel {
     private String name;
     private Integer position;
     private Boolean nsfw;
+    private Payloads.ChannelTypes type;
 
-    public DChannel(Long id, String name, Integer position, Boolean nsfw) {
+    public DChannel(Long id, String name, Integer position, Boolean nsfw, Payloads.ChannelTypes type) {
         this.id = id;
         this.name = name;
         this.position = position;
         this.nsfw = nsfw;
+        this.type = type;
     }
 
     public Long getId() {
@@ -30,6 +33,10 @@ public class DChannel {
 
     public Boolean getNsfw() {
         return nsfw;
+    }
+
+    public Payloads.ChannelTypes getType() {
+        return type;
     }
 
     public void sendMessage(String messageContent) {

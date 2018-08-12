@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import static DiscordAPI.webSocket.utils.DiscordUtils.DefaultLinks.*;
 
 public class UserP {
@@ -33,7 +34,10 @@ public class UserP {
         }
         List<DRole> roles = new ArrayList<>();
         for (String s : (List<String>) object.get("roles")) {
-            roles.add(DiscordUtils.Search.ROLES(bot.getRoles(), Long.parseUnsignedLong(s)));
+            DRole role = DiscordUtils.Search.ROLES(bot.getRoles(), Long.parseUnsignedLong(s));
+            if (role != null) {
+                roles.add(role);
+            }
         }
         Payloads.User u = null;
         if (object.get("user") != null) {

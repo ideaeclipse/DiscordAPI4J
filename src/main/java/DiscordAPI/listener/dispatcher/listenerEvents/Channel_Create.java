@@ -2,6 +2,7 @@ package DiscordAPI.listener.dispatcher.listenerEvents;
 
 import DiscordAPI.DiscordBot;
 import DiscordAPI.objects.DChannel;
+import DiscordAPI.webSocket.jsonData.Payloads;
 import DiscordAPI.webSocket.utils.DiscordLogger;
 import DiscordAPI.webSocket.utils.parsers.ChannelP;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
@@ -16,8 +17,12 @@ public class Channel_Create extends ListenerEvent implements ListenerFeatures {
         super(b);
         ChannelP cd = new ChannelP(payload).logic();
         channel = cd.getChannel();
-        b.updateChannels();
-        logger.info("Channel Create: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
+        if(channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
+            b.updateChannels();
+            logger.info("Text Channel Create: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
+        }else if(channel.getType().equals(Payloads.ChannelTypes.dmChannel)){
+            logger.info("Dm Channel Created");
+        }
     }
 
     public DChannel getChannel() {

@@ -24,7 +24,7 @@ public class ChannelP {
             object = (JSONObject) DiscordUtils.HttpRequests.get(CHANNEL + "/" + id);
         }
         Payloads.Channel c = DiscordUtils.Parser.convertToJSON(object, Payloads.Channel.class);
-        channel = new DChannel(c.id, c.name, c.position, c.nsfw);
+        channel = new DChannel(c.id, c.name, c.position, c.nsfw,c.type);
         return this;
     }
 

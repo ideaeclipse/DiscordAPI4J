@@ -10,7 +10,10 @@ import DiscordAPI.webSocket.utils.parsers.UserP;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.listener.listenerTypes.ListenerFeatures;
 import org.json.simple.JSONObject;
-
+/*
+When adding the listener you need to getChannel().getType() and compare it to
+DiscordAPI.webSocket.jsonData.Payloads.ChannelTypes
+ */
 public class Message_Create extends ListenerEvent implements ListenerFeatures {
     private DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private DMessage message;
@@ -23,8 +26,13 @@ public class Message_Create extends ListenerEvent implements ListenerFeatures {
         UserP pd = new UserP(u.id, b).logic();
         ChannelP cd = new ChannelP(m.channel_id).logic();
         message = new DMessage(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
-        logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent() + " Channel: " + message.getChannel().getName());
+        if(message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
+            logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent() + " Channel: " + message.getChannel().getName());
+        }else{
+            logger.info("Dm Sent: User: " + message.getUser().getName() + " Content: " + message.getContent());
+        }
     }
+
 
     public DMessage getMessage() {
         return this.message;
