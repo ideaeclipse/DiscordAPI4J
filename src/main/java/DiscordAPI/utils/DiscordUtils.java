@@ -33,7 +33,7 @@ public class DiscordUtils {
 
         public static Object get(final String url) {
             try {
-                final HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 return printOutput(con.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -43,7 +43,7 @@ public class DiscordUtils {
 
         public static void post(final String url) {
             try {
-                final HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 con.setDoOutput(true);
                 con.setRequestMethod("POST");
                 con.setFixedLengthStreamingMode(0);
@@ -55,7 +55,7 @@ public class DiscordUtils {
 
         public static void sendJson(final String url, final JSONObject object) {
             try {
-                final HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 con.setDoOutput(true);
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -70,7 +70,7 @@ public class DiscordUtils {
         }
 
         private static Object printOutput(final InputStream inputStream) throws IOException {
-            final BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+            BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
             String string;
             StringBuffer response = new StringBuffer();
             while ((string = in.readLine()) != null) {
@@ -82,7 +82,7 @@ public class DiscordUtils {
     }
 
     public static Object convertToJSONOBJECT(final String message) {
-        final JSONParser parser = new JSONParser();
+        JSONParser parser = new JSONParser();
         try {
             return parser.parse(message);
         } catch (ParseException e) {

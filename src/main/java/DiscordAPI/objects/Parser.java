@@ -11,7 +11,7 @@ import java.util.Objects;
 public class Parser {
     public static class CC {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private Channel channel;
+        private volatile Channel channel;
 
         public CC(final DiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
@@ -31,7 +31,7 @@ public class Parser {
 
     public static class CD {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private Channel channel;
+        private volatile Channel channel;
 
         public CD(final DiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
@@ -47,8 +47,8 @@ public class Parser {
 
     public static class CU {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private Channel oldC;
-        private Channel newC;
+        private volatile Channel oldC;
+        private volatile Channel newC;
 
         public CU(final DiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
@@ -70,7 +70,7 @@ public class Parser {
 
     public static class MC {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private Message message;
+        private volatile Message message;
 
         public MC(final DiscordBot b, final JSONObject object) {
             JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(object.get("author")));
@@ -94,7 +94,7 @@ public class Parser {
 
     public static class PU {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private Status status;
+        private volatile Status status;
 
         public PU(final DiscordBot t, final JSONObject payload) {
             final Payloads.DUser user = convertToJSON((JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("user")))),Payloads.DUser.class);
@@ -111,7 +111,7 @@ public class Parser {
         }
     }
 
-    public static <T> T convertToJSON(JSONObject object, Class<?> c) {
+    public static <T> T convertToJSON(final JSONObject object, final Class<?> c) {
         T o = getObject(c);
         try {
             for (Object s : object.keySet()) {
@@ -127,7 +127,6 @@ public class Parser {
                     f.set(o, value);
                 } else if (f.getType().equals(Integer.class)) {
                     f.set(o, Integer.parseInt(value));
-
                 } else if (f.getType().equals(Float.class)) {
                     f.set(o, Float.parseFloat(value));
                 } else if (f.getType().equals(Long.class)) {
@@ -146,7 +145,7 @@ public class Parser {
     /*
     Refactor to not use static class indexing
      */
-    private static <T> T getObject(Class<?> c) {
+    private static <T> T getObject(final Class<?> c) {
         T o = null;
         try {
             if (c.getName().contains("$")) {
