@@ -4,11 +4,9 @@ import DiscordAPI.webSocket.jsonData.IJSONObject;
 
 public enum IDENTITY implements IJSONObject {
     token(String.class, null),
-    //PROPERTIES.class
     properties(PROPERTIES.class, null),
     compress(Boolean.class, true),
     large_threshold(Integer.class, 250),
-    //PRESENCE.class
     presence(PRESENCE.class, null);
 
     private Class<?> aClass;
@@ -28,8 +26,8 @@ public enum IDENTITY implements IJSONObject {
     public Object getDefaultValue() {
         return this.o;
     }
+
     public enum PRESENCE implements IJSONObject {
-        //GAME.class
         game(GAME.class, null),
         status(String.class, "online"),
         since(long.class, null),
@@ -53,6 +51,7 @@ public enum IDENTITY implements IJSONObject {
             return o;
         }
     }
+
     public enum PROPERTIES implements IJSONObject {
         $os(String.class, System.getProperty("os.name")),
         $browser(String.class, "D4J"),
@@ -65,15 +64,18 @@ public enum IDENTITY implements IJSONObject {
             this.aClass = stringClass;
             this.o = o;
         }
+
         @Override
         public Object getDefaultValue() {
             return this.o;
         }
+
         @Override
         public Class<?> getaClass() {
             return aClass;
         }
     }
+
     public enum GAME implements IJSONObject {
         name(String.class, "cm help for commands"),
         type(Integer.class, 0);

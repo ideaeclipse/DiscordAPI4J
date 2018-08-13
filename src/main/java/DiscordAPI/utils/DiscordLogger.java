@@ -1,4 +1,4 @@
-package DiscordAPI.webSocket.utils;
+package DiscordAPI.utils;
 
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;

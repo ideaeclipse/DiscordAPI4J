@@ -1,27 +1,22 @@
-package DiscordAPI.webSocket.utils;
+package DiscordAPI.utils;
 
-import DiscordAPI.DiscordBot;
-import DiscordAPI.objects.DChannel;
-import DiscordAPI.objects.DRole;
+import DiscordAPI.objects.Channel;
+import DiscordAPI.objects.Role;
 import DiscordAPI.webSocket.jsonData.IJSONObject;
 import DiscordAPI.webSocket.jsonData.identity.IDENTITY;
-import DiscordAPI.webSocket.jsonData.Payloads;
-import DiscordAPI.webSocket.utils.parsers.permissions.Permissions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import static DiscordAPI.webSocket.utils.DiscordUtils.DefaultLinks.*;
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 
 public class DiscordUtils {
     public static class HttpRequests {
@@ -30,15 +25,15 @@ public class DiscordUtils {
             return con;
         }
 
-        private static HttpsURLConnection initialize(URL url) throws IOException {
+        private static HttpsURLConnection initialize(final URL url) throws IOException {
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con = authenticate(con);
             return con;
         }
 
-        public static Object get(String url) {
+        public static Object get(final String url) {
             try {
-                HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                final HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 return printOutput(con.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -46,9 +41,9 @@ public class DiscordUtils {
             return null;
         }
 
-        public static void post(String url) {
+        public static void post(final String url) {
             try {
-                HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                final HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 con.setDoOutput(true);
                 con.setRequestMethod("POST");
                 con.setFixedLengthStreamingMode(0);
@@ -58,9 +53,9 @@ public class DiscordUtils {
             }
         }
 
-        public static void sendJson(String url, JSONObject object) {
+        public static void sendJson(final String url, final JSONObject object) {
             try {
-                HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                final HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 con.setDoOutput(true);
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -74,8 +69,8 @@ public class DiscordUtils {
             }
         }
 
-        private static Object printOutput(InputStream inputStream) throws IOException {
-            BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+        private static Object printOutput(final InputStream inputStream) throws IOException {
+            final BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
             String string;
             StringBuffer response = new StringBuffer();
             while ((string = in.readLine()) != null) {
@@ -86,8 +81,8 @@ public class DiscordUtils {
         }
     }
 
-    public static Object convertToJSONOBJECT(String message) {
-        JSONParser parser = new JSONParser();
+    public static Object convertToJSONOBJECT(final String message) {
+        final JSONParser parser = new JSONParser();
         try {
             return parser.parse(message);
         } catch (ParseException e) {
@@ -106,60 +101,10 @@ public class DiscordUtils {
         };
     }
 
-    public static class Parser {
-
-        public static <T> T convertToJSON(JSONObject object, Class<?> c) {
-            T o = getObject(c);
-            try {
-                for (Object s : object.keySet()) {
-                    Field f;
-                    try {
-                        f = c.getField(String.valueOf(s));
-                    } catch (NoSuchFieldException ignored) {
-                        continue;
-                    }
-                    String value = String.valueOf(object.get(s));
-                    if (f.getType().equals(String.class)) {
-                        f.set(o, value);
-                    } else if (f.getType().equals(Integer.class)) {
-                        f.set(o, Integer.parseInt(value));
-
-                    } else if (f.getType().equals(Float.class)) {
-                        f.set(o, Float.parseFloat(value));
-                    } else if (f.getType().equals(Long.class)) {
-                        f.set(o, Long.parseUnsignedLong(value));
-                    } else if (f.getType().equals(Boolean.class)) {
-                        f.set(o, Boolean.parseBoolean(value));
-                    } else if (f.getType().isEnum()) {
-                        f.set(o, f.getType().getEnumConstants()[Integer.parseInt(value)]);
-                    }
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return o;
-        }
-
-        private static <T> T getObject(Class<?> c) {
-            T o = null;
-            try {
-                if (c.getName().contains("$")) {
-                    Class<?> a = Payloads.class;
-                    Object superC = a.getConstructor().newInstance();
-                    o = (T) c.getConstructor(superC.getClass()).newInstance(superC);
-                } else {
-                    o = (T) c.getConstructor().newInstance();
-                }
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-            return o;
-        }
-    }
 
     public static class Search {
-        public static DChannel CHANNEL(List<DChannel> channels, String channelName) {
-            for (DChannel channel : channels) {
+        public static Channel CHANNEL(final List<Channel> channels, final String channelName) {
+            for (Channel channel : channels) {
                 if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
                     return channel;
                 }
@@ -167,8 +112,8 @@ public class DiscordUtils {
             return null;
         }
 
-        public static DRole ROLES(List<DRole> roles, Long id) {
-            for (DRole role : roles) {
+        public static Role ROLES(final List<Role> roles, final Long id) {
+            for (Role role : roles) {
                 if (role.getId().equals(id)) {
                     return role;
                 }
@@ -178,7 +123,7 @@ public class DiscordUtils {
     }
 
     public static class BuildJSON {
-        public static JSONObject BuildJSON(IJSONObject[] values) {
+        public static JSONObject BuildJSON(final IJSONObject[] values) {
             JSONObject object = new JSONObject();
             for (IJSONObject d : values) {
                 if (d == IDENTITY.token) {

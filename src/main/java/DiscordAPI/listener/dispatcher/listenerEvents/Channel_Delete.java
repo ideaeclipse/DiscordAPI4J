@@ -1,26 +1,23 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
-import DiscordAPI.DiscordBot;
-import DiscordAPI.objects.DChannel;
-import DiscordAPI.webSocket.utils.DiscordLogger;
-import DiscordAPI.webSocket.utils.parsers.ChannelP;
+import DiscordAPI.objects.DiscordBot;
+import DiscordAPI.objects.Channel;
+import DiscordAPI.objects.Parser;
+import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.listener.listenerTypes.ListenerFeatures;
 import org.json.simple.JSONObject;
 
 public class Channel_Delete extends ListenerEvent implements ListenerFeatures {
     private DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-    private DChannel channel;
+    private Channel channel;
 
-    public Channel_Delete(DiscordBot b, JSONObject payload) {
+    public Channel_Delete(final DiscordBot b, final JSONObject payload) {
         super(b);
-        ChannelP cd = new ChannelP(payload).logic();
-        channel = cd.getChannel();
-        b.updateChannels();
-        logger.info("Channel Delete: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
+        channel = new Parser.CD(b, payload).getChannel();
     }
 
-    public DChannel getChannel() {
+    public Channel getChannel() {
         return channel;
     }
 

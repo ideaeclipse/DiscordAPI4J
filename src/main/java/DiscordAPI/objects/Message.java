@@ -1,23 +1,23 @@
 package DiscordAPI.objects;
 
-public class DMessage {
-    private DUser user;
-    private DChannel channel;
-    private Long guildId;
-    private String content;
+public class Message {
+    private final User user;
+    private final Channel channel;
+    private final Long guildId;
+    private final String content;
 
-    public DMessage(DUser user, DChannel channel, Long guildId, String content) {
+    Message(final User user, final Channel channel, final Long guildId, final String content) {
         this.user = user;
         this.channel = channel;
         this.guildId = guildId;
         this.content = content;
     }
 
-    public DChannel getChannel() {
+    public Channel getChannel() {
         return channel;
     }
 
-    public DUser getUser() {
+    public User getUser() {
         return user;
     }
 

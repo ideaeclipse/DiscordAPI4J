@@ -1,11 +1,13 @@
 package DiscordAPI.webSocket;
 
-import DiscordAPI.DiscordBot;
+import DiscordAPI.listener.listenerTypes.ListenerEvent;
+import DiscordAPI.objects.DiscordBot;
+import DiscordAPI.objects.Parser;
 import DiscordAPI.webSocket.jsonData.OpCodes;
-import DiscordAPI.webSocket.utils.DiscordLogger;
-import DiscordAPI.webSocket.utils.DiscordUtils;
-import DiscordAPI.webSocket.utils.HeartBeat;
-import DiscordAPI.webSocket.jsonData.Payloads;
+import DiscordAPI.utils.DiscordLogger;
+import DiscordAPI.utils.DiscordUtils;
+import DiscordAPI.utils.HeartBeat;
+import DiscordAPI.objects.Payloads;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
@@ -16,11 +18,13 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
-import java.util.Timer;
+
 
 public class Wss {
     private static DiscordLogger logger = new DiscordLogger(String.valueOf(Wss.class));
-    static final Timer timer = new Timer();
+    private static Thread heartbeat;
+    private static Payloads.DWelcome w;
+    private static Long startTime;
 
     public static WebSocket connect(final DiscordBot bot) throws IOException, WebSocketException {
         return new WebSocketFactory()
@@ -38,7 +42,7 @@ public class Wss {
                                         Class<?> cl = webSocket_events.getaClass();
                                         Constructor constructor = cl.getConstructor(DiscordBot.class, JSONObject.class);
                                         Object t = constructor.newInstance(bot, payload.get("d"));
-                                        bot.getDispatcher().notify(t);
+                                        bot.getDispatcher().notify((ListenerEvent) t);
                                     }
                                 }
                                 break;
@@ -64,13 +68,23 @@ public class Wss {
                                 logger.info("Connected to webSocket");
                                 logger.info("Received initial Message");
                                 JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-                                Payloads.Welcome w = DiscordUtils.Parser.convertToJSON(d,Payloads.Welcome.class);
+                                w = Parser.convertToJSON(d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
-                                timer.schedule(new HeartBeat(webSocket1, bot), 0, Long.parseLong(String.valueOf(d.get("heartbeat_interval"))));
+                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new HeartBeat(webSocket1, w.heartbeat_interval));
+                                startTime = System.currentTimeMillis();
+                                heartbeat.start();
                                 webSocket1.sendText(String.valueOf(bot.getIdentity()));
                                 break;
                             case HeartBeat_ACK:
-                                //logger.info("HeartBeat returned");
+                                if (heartbeat.isAlive()) {
+                                    if ((System.currentTimeMillis() - startTime > (w.heartbeat_interval + 1000)) && heartbeat.isAlive()) {
+                                        heartbeat.interrupt();
+                                        logger.error("Heartbeat return took to long");
+                                        break;
+                                    }
+                                    startTime = System.currentTimeMillis();
+
+                                }
                                 break;
                         }
                     }

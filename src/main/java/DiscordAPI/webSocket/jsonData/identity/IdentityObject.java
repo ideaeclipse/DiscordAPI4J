@@ -1,22 +1,19 @@
 package DiscordAPI.webSocket.jsonData.identity;
 
-import DiscordAPI.DiscordBot;
 import DiscordAPI.webSocket.jsonData.IJSONObject;
-import DiscordAPI.webSocket.utils.DiscordLogger;
-import DiscordAPI.webSocket.utils.DiscordUtils;
+import DiscordAPI.utils.DiscordLogger;
+import DiscordAPI.utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 public class IdentityObject {
-    private DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-    private JSONObject identity;
-    private IDENTITY[] values;
-    private DiscordBot DiscordBot;
+    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private volatile JSONObject identity;
+    private final IDENTITY[] values;
 
-    public IdentityObject(DiscordBot DiscordBot) {
+    public IdentityObject() {
         logger.info("Creating bot's identity");
         this.identity = new JSONObject();
         this.values = IDENTITY.values();
-        this.DiscordBot = DiscordBot;
         identity = logic(values);
     }
 

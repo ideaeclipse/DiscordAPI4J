@@ -1,20 +1,13 @@
-package DiscordAPI;
+package DiscordAPI.objects;
 
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.bot.Shards;
-import DiscordAPI.objects.DChannel;
-import DiscordAPI.objects.DRole;
-import DiscordAPI.objects.DUser;
-import DiscordAPI.webSocket.jsonData.Payloads;
 import DiscordAPI.webSocket.jsonData.identity.IdentityObject;
 import DiscordAPI.webSocket.jsonData.PAYLOAD;
-import DiscordAPI.webSocket.utils.DiscordLogger;
-import DiscordAPI.webSocket.utils.DiscordUtils;
-import DiscordAPI.webSocket.utils.parsers.ChannelP;
-import DiscordAPI.webSocket.utils.parsers.RoleP;
-import DiscordAPI.webSocket.utils.parsers.UserP;
+import DiscordAPI.utils.DiscordLogger;
+import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.webSocket.Wss;
 import DiscordAPI.listener.dispatcher.TDispatcher;
-import DiscordAPI.webSocket.utils.parsers.permissions.Permissions;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 import org.json.simple.JSONArray;
@@ -23,32 +16,35 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import static DiscordAPI.webSocket.utils.DiscordUtils.DefaultLinks.*;
 
-public class DiscordBot {
-    DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-    private JSONObject identity;
-    private TDispatcher dispatcher;
-    private long guildId;
-    private List<DChannel> channels;
-    private List<DUser> users;
-    private List<DRole> roles;
-    private DUser user;
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 
-    public DiscordBot(String token, long guildID) {
+public class DiscordBot implements IDiscordBot {
+    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final JSONObject identity;
+    private final TDispatcher dispatcher;
+    private final long guildId;
+    private List<Channel> channels;
+    private List<User> users;
+    private List<Role> roles;
+    private User user;
+
+    public DiscordBot(final String token, final long guildID) {
         DiscordUtils.DefaultLinks.token = token;
         this.guildId = guildID;
         Shards shards = new Shards();
-        IdentityObject identityObject = new IdentityObject(this);
+        IdentityObject identityObject = new IdentityObject();
         identity = identityObject.getIdentity();
         identity.put("shard", shards.getShards());
-        dispatcher = new TDispatcher(this);
+        dispatcher = new TDispatcher();
     }
 
+    @Override
     public long getGuildId() {
         return guildId;
     }
 
+    @Override
     public DiscordBot login() {
         logger.info("Connecting to webSocket");
         try {
@@ -63,14 +59,14 @@ public class DiscordBot {
 
         return this;
     }
-
+    @Override
     public void updateChannels() {
         channels = new ArrayList<>();
         JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(GUILD + guildId + "/" + CHANNEL);
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
             if (Integer.parseInt(String.valueOf(object.get("type"))) == 0) {
-                ChannelP cd = new ChannelP(object).logic();
+                Channel.ChannelP cd = new Channel.ChannelP(object).logic();
                 channels.add(cd.getChannel());
             }
         }
@@ -81,7 +77,7 @@ public class DiscordBot {
         JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(GUILD + guildId + MEMBER + "?limit=1000");
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
-            UserP userData = new UserP(object, this).logic();
+            User.UserP userData = new User.UserP(object, this).logic();
             users.add(userData.getUser());
         }
     }
@@ -91,31 +87,35 @@ public class DiscordBot {
         JSONArray array = (JSONArray) DiscordUtils.HttpRequests.get(GUILD + guildId + ROLE);
         for (Object o : array) {
             JSONObject object = (JSONObject) o;
-            RoleP rd = new RoleP(object).logic();
+            Role.RoleP rd = new Role.RoleP(object).logic();
             roles.add(rd.getRole());
-            System.out.println(rd.getRole().getName());
-            System.out.println(DiscordUtils.PermissionId.convertPermissions(rd.getRole().getPermission()));
+            //System.out.println(rd.getRole().getName());
+            //System.out.println(DiscordUtils.PermissionId.convertPermissions(rd.getRole().getPermission()));
         }
     }
+
     private void getBot() {
         JSONObject object = (JSONObject) DiscordUtils.HttpRequests.get(USERME);
-        Payloads.User u = DiscordUtils.Parser.convertToJSON(object,Payloads.User.class);
-        UserP us = new UserP(u.id,this).logic();
+        User.UserP us = new User.UserP(Long.parseUnsignedLong(String.valueOf(object.get("id"))), this).logic();
         user = us.getUser();
     }
 
-    public List<DChannel> getChannels() {
+    @Override
+    public List<Channel> getChannels() {
         return channels;
     }
 
-    public List<DUser> getUsers() {
+    @Override
+    public List<User> getUsers() {
         return users;
     }
 
-    public List<DRole> getRoles() {
+    @Override
+    public List<Role> getRoles() {
         return roles;
     }
 
+    @Override
     public JSONObject getIdentity() {
         JSONObject object = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(DiscordUtils.BuildJSON.BuildJSON(PAYLOAD.values())));
         object.put("op", 2);
@@ -123,11 +123,13 @@ public class DiscordBot {
         return object;
     }
 
+    @Override
     public TDispatcher getDispatcher() {
         return this.dispatcher;
     }
 
-    public DUser getUser() {
+    @Override
+    public User getUser() {
         return user;
     }
 }

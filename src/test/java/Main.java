@@ -1,15 +1,16 @@
 
-import DiscordAPI.DiscordBot;
-import DiscordAPI.objects.DMessage;
+import DiscordAPI.objects.DiscordBot;
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.dispatcher.listenerEvents.Message_Create;
 import DiscordAPI.listener.dispatcher.TListener;
-import DiscordAPI.webSocket.jsonData.Payloads;
+import DiscordAPI.objects.Message;
+import DiscordAPI.objects.Payloads;
 
 public class Main {
     private Main(String token, Long guildId) {
-        DiscordBot bot = new DiscordBot(token, guildId).login();
+        IDiscordBot bot = new DiscordBot(token, guildId).login();
         bot.getDispatcher().addListener((TListener<Message_Create>) a -> {
-            DMessage message = a.getMessage();
+            Message message = a.getMessage();
             if(message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
                 if (!message.getUser().getName().equals(bot.getUser().getName()) && message.getChannel().getName().toLowerCase().equals("bot")) {
                     StringBuilder builder = new StringBuilder();

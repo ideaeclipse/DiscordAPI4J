@@ -1,4 +1,4 @@
-package DiscordAPI.webSocket.utils.parsers.permissions;
+package DiscordAPI.utils;
 
 public enum Permissions {
     Administrator(0x8),
@@ -33,6 +33,7 @@ public enum Permissions {
     PrioritySpeaking(0x100);
 
     private int permissionValue;
+
     Permissions(int i) {
         this.permissionValue = i;
     }
