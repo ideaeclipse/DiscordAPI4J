@@ -1,16 +1,17 @@
 package DiscordAPI.utils;
 
+import DiscordAPI.webSocket.Wss;
 import DiscordAPI.webSocket.jsonData.PAYLOAD;
 import com.neovisionaries.ws.client.WebSocket;
 import org.json.simple.JSONObject;
 
 public class HeartBeat implements Runnable {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-    private final WebSocket webSocket;
+    private final Wss webSocket;
     private volatile Long heartbeat;
     private volatile boolean run;
 
-    public HeartBeat(final WebSocket ws, final Long heartbeat) {
+    public HeartBeat(final Wss ws, final Long heartbeat) {
         logger.info("Initializing heartbeat function");
         this.webSocket = ws;
         this.heartbeat = heartbeat;

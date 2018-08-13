@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
@@ -41,16 +42,16 @@ public class User {
 
     static class UserP {
         private final Long id;
-        private final  DiscordBot bot;
+        private final IDiscordBot bot;
         private User user;
         private JSONObject object;
 
-        UserP(final Long id, final DiscordBot DiscordBot) {
+        UserP(final Long id, final IDiscordBot DiscordBot) {
             this.id = id;
             this.bot = DiscordBot;
         }
 
-        UserP(JSONObject object, DiscordBot bot) {
+        UserP(JSONObject object, IDiscordBot bot) {
             this.object = object;
             this.bot = bot;
             this.id = null;

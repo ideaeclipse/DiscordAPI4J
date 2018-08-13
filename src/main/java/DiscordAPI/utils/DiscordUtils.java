@@ -32,11 +32,13 @@ public class DiscordUtils {
         }
 
         public static Object get(final String url) {
-            try {
-                HttpsURLConnection con = initialize(new URL(APIBASE + url));
-                return printOutput(con.getInputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(rateLimitRecorder.updateHttpCount()) {
+                try {
+                    HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                    return printOutput(con.getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             return null;
         }
@@ -54,18 +56,20 @@ public class DiscordUtils {
         }
 
         public static void sendJson(final String url, final JSONObject object) {
-            try {
-                HttpsURLConnection con = initialize(new URL(APIBASE + url));
-                con.setDoOutput(true);
-                con.setRequestMethod("POST");
-                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                con.setRequestProperty("Accept", "application/json");
-                OutputStream os = con.getOutputStream();
-                os.write(String.valueOf(object).getBytes("UTF-8"));
-                os.close();
-                printOutput(con.getInputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(rateLimitRecorder.updateHttpCount()) {
+                try {
+                    HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                    con.setDoOutput(true);
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    con.setRequestProperty("Accept", "application/json");
+                    OutputStream os = con.getOutputStream();
+                    os.write(String.valueOf(object).getBytes("UTF-8"));
+                    os.close();
+                    printOutput(con.getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -154,6 +158,7 @@ public class DiscordUtils {
     }
     public static class DefaultLinks {
         public static String token;
+        public static RateLimitRecorder rateLimitRecorder;
         public static final String APIBASE = "https://discordapp.com/api/v6/";
         public static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
         public static final String USER = "users/";

@@ -1,16 +1,16 @@
 package DiscordAPI.listener.listenerTypes;
 
 
-import DiscordAPI.objects.DiscordBot;
+import DiscordAPI.IDiscordBot;
 
 public abstract class ListenerEvent {
-    private DiscordBot DiscordBot;
+    private IDiscordBot DiscordBot;
 
-    public ListenerEvent(final DiscordBot b) {
+    public ListenerEvent(final IDiscordBot b) {
         this.DiscordBot = b;
     }
 
-    public DiscordBot getDiscordBot(){
+    public IDiscordBot getDiscordBot(){
         return this.DiscordBot;
     }
 }

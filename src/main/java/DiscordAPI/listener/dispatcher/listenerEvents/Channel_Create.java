@@ -1,6 +1,6 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
-import DiscordAPI.objects.DiscordBot;
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.Channel;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
@@ -10,7 +10,7 @@ import org.json.simple.JSONObject;
 public class Channel_Create extends ListenerEvent implements ListenerFeatures {
     private Channel channel;
 
-    public Channel_Create(final DiscordBot b, final JSONObject payload) {
+    public Channel_Create(final IDiscordBot b, final JSONObject payload) {
         super(b);
         channel = new Parser.CC(b, payload).getChannel();
     }

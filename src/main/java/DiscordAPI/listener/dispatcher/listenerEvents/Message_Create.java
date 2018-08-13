@@ -1,6 +1,7 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
-import DiscordAPI.objects.DiscordBot;
+
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.*;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.listener.listenerTypes.ListenerFeatures;
@@ -11,7 +12,7 @@ When adding the listener you need to getChannel().getType() and compare it to Ch
 public class Message_Create extends ListenerEvent implements ListenerFeatures {
     private Message message;
 
-    public Message_Create(final DiscordBot b, final JSONObject object) {
+    public Message_Create(final IDiscordBot b, final JSONObject object) {
         super(b);
         message = new Parser.MC(b,object).getMessage();
     }

@@ -2,7 +2,6 @@ package DiscordAPI;
 
 import DiscordAPI.listener.dispatcher.TDispatcher;
 import DiscordAPI.objects.Channel;
-import DiscordAPI.objects.DiscordBot;
 import DiscordAPI.objects.Role;
 import DiscordAPI.objects.User;
 import org.json.simple.JSONObject;
@@ -10,7 +9,7 @@ import org.json.simple.JSONObject;
 import java.util.List;
 
 public interface IDiscordBot {
-    DiscordBot login();
+    IDiscordBot login();
 
     long getGuildId();
 

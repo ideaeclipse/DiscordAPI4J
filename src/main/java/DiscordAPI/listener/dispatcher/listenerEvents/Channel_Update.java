@@ -1,6 +1,6 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
-import DiscordAPI.objects.DiscordBot;
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.Channel;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
@@ -11,7 +11,7 @@ public class Channel_Update extends ListenerEvent implements ListenerFeatures {
     private Channel oldC;
     private Channel newC;
 
-    public Channel_Update(final DiscordBot b, final JSONObject payload) {
+    public Channel_Update(final IDiscordBot b, final JSONObject payload) {
         super(b);
         Parser.CU parser = new Parser.CU(b, payload);
         oldC = parser.getOldChannel();

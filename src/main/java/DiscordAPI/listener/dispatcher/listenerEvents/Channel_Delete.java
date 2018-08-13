@@ -1,6 +1,6 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
-import DiscordAPI.objects.DiscordBot;
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.Channel;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.utils.DiscordLogger;
@@ -12,7 +12,7 @@ public class Channel_Delete extends ListenerEvent implements ListenerFeatures {
     private DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private Channel channel;
 
-    public Channel_Delete(final DiscordBot b, final JSONObject payload) {
+    public Channel_Delete(final IDiscordBot b, final JSONObject payload) {
         super(b);
         channel = new Parser.CD(b, payload).getChannel();
     }

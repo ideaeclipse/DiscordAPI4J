@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.IDiscordBot;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
 import org.json.simple.JSONObject;
@@ -13,7 +14,7 @@ public class Parser {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel channel;
 
-        public CC(final DiscordBot b, final JSONObject payload) {
+        public CC(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
@@ -33,7 +34,7 @@ public class Parser {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel channel;
 
-        public CD(final DiscordBot b, final JSONObject payload) {
+        public CD(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             b.updateChannels();
@@ -50,7 +51,7 @@ public class Parser {
         private volatile Channel oldC;
         private volatile Channel newC;
 
-        public CU(final DiscordBot b, final JSONObject payload) {
+        public CU(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             oldC = DiscordUtils.Search.CHANNEL(b.getChannels(), cd.getChannel().getName());
             newC = cd.getChannel();
@@ -72,7 +73,7 @@ public class Parser {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Message message;
 
-        public MC(final DiscordBot b, final JSONObject object) {
+        public MC(final IDiscordBot b, final JSONObject object) {
             JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(object.get("author")));
             Payloads.DUser u = convertToJSON(user, Payloads.DUser.class);
             Payloads.DMessage m = convertToJSON(object, Payloads.DMessage.class);
@@ -96,7 +97,7 @@ public class Parser {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Status status;
 
-        public PU(final DiscordBot t, final JSONObject payload) {
+        public PU(final IDiscordBot t, final JSONObject payload) {
             final Payloads.DUser user = convertToJSON((JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("user")))),Payloads.DUser.class);
             final User.UserP pd = new User.UserP(user.id, t).logic();
             final Game.GameP gd = payload.get("game") != null ? new Game.GameP((JSONObject) payload.get("game")).logic() : null;

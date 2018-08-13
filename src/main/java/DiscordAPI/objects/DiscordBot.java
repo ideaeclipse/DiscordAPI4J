@@ -2,6 +2,7 @@ package DiscordAPI.objects;
 
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.bot.Shards;
+import DiscordAPI.utils.RateLimitRecorder;
 import DiscordAPI.webSocket.jsonData.identity.IdentityObject;
 import DiscordAPI.webSocket.jsonData.PAYLOAD;
 import DiscordAPI.utils.DiscordLogger;
@@ -19,7 +20,7 @@ import java.util.List;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 
-public class DiscordBot implements IDiscordBot {
+class DiscordBot implements IDiscordBot {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final JSONObject identity;
     private final TDispatcher dispatcher;
@@ -29,8 +30,10 @@ public class DiscordBot implements IDiscordBot {
     private List<Role> roles;
     private User user;
 
-    public DiscordBot(final String token, final long guildID) {
+    DiscordBot(final String token, final long guildID) {
         DiscordUtils.DefaultLinks.token = token;
+        logger.info("Starting Rate Limit Monitor");
+        DiscordUtils.DefaultLinks.rateLimitRecorder = new RateLimitRecorder();
         this.guildId = guildID;
         Shards shards = new Shards();
         IdentityObject identityObject = new IdentityObject();
@@ -45,20 +48,24 @@ public class DiscordBot implements IDiscordBot {
     }
 
     @Override
-    public DiscordBot login() {
+    public IDiscordBot login() {
         logger.info("Connecting to webSocket");
         try {
-            WebSocket socket = Wss.connect(this);
+            new Wss(this);
             updateRoles();
+            Thread.sleep(1000);
             getBot();
+            Thread.sleep(1000);
             updateChannels();
+            Thread.sleep(1000);
             updateUsers();
-        } catch (IOException | WebSocketException e) {
+        } catch (IOException | WebSocketException | InterruptedException e) {
             e.printStackTrace();
         }
 
         return this;
     }
+
     @Override
     public void updateChannels() {
         channels = new ArrayList<>();
@@ -70,6 +77,7 @@ public class DiscordBot implements IDiscordBot {
                 channels.add(cd.getChannel());
             }
         }
+        logger.info("Updated Channel Listings");
     }
 
     private void updateUsers() {
@@ -80,6 +88,7 @@ public class DiscordBot implements IDiscordBot {
             User.UserP userData = new User.UserP(object, this).logic();
             users.add(userData.getUser());
         }
+        logger.info("Updated User Listings");
     }
 
     private void updateRoles() {
@@ -92,12 +101,14 @@ public class DiscordBot implements IDiscordBot {
             //System.out.println(rd.getRole().getName());
             //System.out.println(DiscordUtils.PermissionId.convertPermissions(rd.getRole().getPermission()));
         }
+        logger.info("Updated Guild Roles");
     }
 
     private void getBot() {
         JSONObject object = (JSONObject) DiscordUtils.HttpRequests.get(USERME);
         User.UserP us = new User.UserP(Long.parseUnsignedLong(String.valueOf(object.get("id"))), this).logic();
         user = us.getUser();
+        logger.info("Updated Bot user");
     }
 
     @Override
