@@ -82,13 +82,12 @@ public class Wss extends WebSocketFactory {
                                 break;
                             case HeartBeat_ACK:
                                 if (heartbeat.isAlive()) {
-                                    if ((System.currentTimeMillis() - startTime > (w.heartbeat_interval + 1000)) && heartbeat.isAlive()) {
+                                    System.out.println(System.currentTimeMillis() - startTime);
+                                    if ((System.currentTimeMillis() - startTime > (w.heartbeat_interval + 5000)) && heartbeat.isAlive()) {
                                         heartbeat.interrupt();
                                         logger.error("Heartbeat return took to long");
-                                        break;
                                     }
                                     startTime = System.currentTimeMillis();
-
                                 }
                                 break;
                         }

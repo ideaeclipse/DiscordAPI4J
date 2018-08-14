@@ -59,17 +59,17 @@ class DiscordBot implements IDiscordBot {
 
     @Override
     public IDiscordBot login() {
-        logger.info("Connecting to webSocket");
         try {
-            this.textWss = new Wss(this);
             updateRoles();
             getBot();
             updateChannels();
             updateUsers();
+            logger.info("Connecting to webSocket");
+            this.textWss = new Wss(this);
         } catch (IOException | WebSocketException e) {
             e.printStackTrace();
         }
-
+        logger.info("DiscordBot " + user.getName() + " Started");
         return this;
     }
 
