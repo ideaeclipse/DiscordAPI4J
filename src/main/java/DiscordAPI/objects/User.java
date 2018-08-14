@@ -9,6 +9,8 @@ import java.util.List;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.GUILD;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.MEMBER;
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
+import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
 public class User {
     private final Long id;
@@ -59,7 +61,7 @@ public class User {
 
         UserP logic() {
             if (object == null) {
-                object = (JSONObject) DiscordUtils.HttpRequests.get(GUILD + bot.getGuildId() + MEMBER + "/" + id);
+                object = (JSONObject) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + bot.getGuildId() + MEMBER + "/" + id));
             }
             List<Role> roles = new ArrayList<>();
             for (String s : (List<String>) object.get("roles")) {

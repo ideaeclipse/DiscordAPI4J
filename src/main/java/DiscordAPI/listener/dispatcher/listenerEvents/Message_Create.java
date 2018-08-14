@@ -14,7 +14,7 @@ public class Message_Create extends ListenerEvent implements ListenerFeatures {
 
     public Message_Create(final IDiscordBot b, final JSONObject object) {
         super(b);
-        message = new Parser.MC(b,object).getMessage();
+        message = new Parser.MessageCreate(b,object).getMessage();
     }
 
 

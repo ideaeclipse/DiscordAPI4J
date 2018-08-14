@@ -11,7 +11,7 @@ public class Presence_Update extends ListenerEvent implements ListenerFeatures {
 
     public Presence_Update(final IDiscordBot t, final JSONObject payload) {
         super(t);
-        status = new Parser.PU(t,payload).getStatus();
+        status = new Parser.PresenceUpdate(t,payload).getStatus();
     }
 
     public Status getStatus() {

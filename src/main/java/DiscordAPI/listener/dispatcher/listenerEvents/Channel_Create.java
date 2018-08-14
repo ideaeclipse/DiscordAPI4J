@@ -12,7 +12,7 @@ public class Channel_Create extends ListenerEvent implements ListenerFeatures {
 
     public Channel_Create(final IDiscordBot b, final JSONObject payload) {
         super(b);
-        channel = new Parser.CC(b, payload).getChannel();
+        channel = new Parser.ChannelCreate(b, payload).getChannel();
     }
 
     public Channel getChannel() {

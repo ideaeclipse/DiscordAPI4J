@@ -4,7 +4,6 @@ import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.utils.RateLimitRecorder;
-import DiscordAPI.webSocket.jsonData.OpCodes;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.HeartBeat;
@@ -20,6 +19,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
 public class Wss extends WebSocketFactory {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(Wss.class));
@@ -69,6 +69,7 @@ public class Wss extends WebSocketFactory {
                             case Invalid_Session:
                                 break;
                             case Hello:
+                                Thread.currentThread().setName("TextWss");
                                 logger.info("Connected to webSocket");
                                 logger.info("Received initial Message");
                                 JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
@@ -77,7 +78,7 @@ public class Wss extends WebSocketFactory {
                                 heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new HeartBeat(wss, w.heartbeat_interval));
                                 startTime = System.currentTimeMillis();
                                 heartbeat.start();
-                                sendText(String.valueOf(bot.getIdentity()));
+                                sendText(bot.getIdentity());
                                 break;
                             case HeartBeat_ACK:
                                 if (heartbeat.isAlive()) {
@@ -95,9 +96,11 @@ public class Wss extends WebSocketFactory {
                 }).connect();
     }
 
-    public void sendText(final String message) {
-        if (!DiscordUtils.DefaultLinks.rateLimitRecorder.updateWssCount()) {
-            webSocket.sendText(message);
-        }
+    public void sendText(final JSONObject message) {
+        rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.WebSocketEvent(webSocket,message));
+    }
+
+    public WebSocket getWebSocket() {
+        return webSocket;
     }
 }

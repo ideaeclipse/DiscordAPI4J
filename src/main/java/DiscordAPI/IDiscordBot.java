@@ -2,6 +2,7 @@ package DiscordAPI;
 
 import DiscordAPI.listener.dispatcher.TDispatcher;
 import DiscordAPI.objects.Channel;
+import DiscordAPI.objects.Payloads;
 import DiscordAPI.objects.Role;
 import DiscordAPI.objects.User;
 import org.json.simple.JSONObject;
@@ -27,4 +28,8 @@ public interface IDiscordBot {
 
     //returns bot
     User getUser();
+
+    Channel createDmChannel(User user);
+
+    void setStatus(Payloads.GameTypes gameType, String gameName);
 }

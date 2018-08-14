@@ -10,11 +10,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
 public class Parser {
-    public static class CC {
+    public static class ChannelCreate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel channel;
 
-        public CC(final IDiscordBot b, final JSONObject payload) {
+        public ChannelCreate(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
@@ -30,11 +30,11 @@ public class Parser {
         }
     }
 
-    public static class CD {
+    public static class ChannelDelete {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel channel;
 
-        public CD(final IDiscordBot b, final JSONObject payload) {
+        public ChannelDelete(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             b.updateChannels();
@@ -46,12 +46,12 @@ public class Parser {
         }
     }
 
-    public static class CU {
+    public static class ChannelUpdate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel oldC;
         private volatile Channel newC;
 
-        public CU(final IDiscordBot b, final JSONObject payload) {
+        public ChannelUpdate(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             oldC = DiscordUtils.Search.CHANNEL(b.getChannels(), cd.getChannel().getName());
             newC = cd.getChannel();
@@ -69,11 +69,11 @@ public class Parser {
         }
     }
 
-    public static class MC {
+    public static class MessageCreate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Message message;
 
-        public MC(final IDiscordBot b, final JSONObject object) {
+        public MessageCreate(final IDiscordBot b, final JSONObject object) {
             JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(object.get("author")));
             Payloads.DUser u = convertToJSON(user, Payloads.DUser.class);
             Payloads.DMessage m = convertToJSON(object, Payloads.DMessage.class);
@@ -81,9 +81,9 @@ public class Parser {
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
             message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
-                logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent() + " Channel: " + message.getChannel().getName());
+                logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n","\\n") + " Channel: " + message.getChannel().getName());
             } else {
-                logger.info("Dm Sent: User: " + message.getUser().getName() + " Content: " + message.getContent());
+                logger.info("Dm Sent: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n","\\n"));
             }
         }
 
@@ -93,11 +93,11 @@ public class Parser {
         }
     }
 
-    public static class PU {
+    public static class PresenceUpdate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Status status;
 
-        public PU(final IDiscordBot t, final JSONObject payload) {
+        public PresenceUpdate(final IDiscordBot t, final JSONObject payload) {
             final Payloads.DUser user = convertToJSON((JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("user")))),Payloads.DUser.class);
             final User.UserP pd = new User.UserP(user.id, t).logic();
             final Game.GameP gd = payload.get("game") != null ? new Game.GameP((JSONObject) payload.get("game")).logic() : null;
@@ -145,6 +145,7 @@ public class Parser {
     }
     /*
     Refactor to not use static class indexing
+    Properties File
      */
     private static <T> T getObject(final Class<?> c) {
         T o = null;

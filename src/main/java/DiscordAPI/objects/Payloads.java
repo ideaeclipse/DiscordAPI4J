@@ -1,9 +1,10 @@
 package DiscordAPI.objects;
 
 public class Payloads {
-    public Payloads(){
+    public Payloads() {
 
     }
+
     public enum GameTypes {
         Playing,
         Streaming,
@@ -20,7 +21,8 @@ public class Payloads {
         Long id;
         Long guild_id;
         String content;
-        public DMessage(){
+
+        public DMessage() {
 
         }
     }
@@ -30,7 +32,8 @@ public class Payloads {
         String state;
         String details;
         GameTypes type;
-        public DGame(){
+
+        public DGame() {
 
         }
     }
@@ -41,7 +44,8 @@ public class Payloads {
         String name;
         Integer position;
         Boolean nsfw;
-        public DChannel(){
+
+        public DChannel() {
 
         }
     }
@@ -50,7 +54,8 @@ public class Payloads {
         Long id;
         String username;
         Integer discriminator;
-        public DUser(){
+
+        public DUser() {
 
         }
     }
@@ -61,7 +66,8 @@ public class Payloads {
         Integer position;
         Integer color;
         Long id;
-        public DRole(){
+
+        public DRole() {
 
         }
     }

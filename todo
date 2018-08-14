@@ -1,5 +1,8 @@
-Find better way to build json objects
-dm channel functionality
-implement rest of api (dm's\guild commands)
-implement custom terminal
-voice (Last thing)
+Advanced error handling
+bot online status
+Http Response codes -> handling
+
+Voice.
+sharding
+
+JavaDoc comments

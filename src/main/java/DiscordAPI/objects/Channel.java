@@ -4,6 +4,8 @@ import DiscordAPI.utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.CHANNEL;
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
+import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
 public class Channel {
     private final Long id;
@@ -44,7 +46,7 @@ public class Channel {
         JSONObject object = new JSONObject();
         object.put("content", messageContent);
         object.put("file", "file");
-        DiscordUtils.HttpRequests.sendJson("channels/" + id + "/messages", object);
+        rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, "channels/" + id + "/messages", object));
     }
 
     static class ChannelP {
@@ -63,7 +65,7 @@ public class Channel {
 
         ChannelP logic() {
             if (object == null) {
-                object = (JSONObject) DiscordUtils.HttpRequests.get(CHANNEL + "/" + id);
+                object = (JSONObject) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id));
             }
             Payloads.DChannel c = Parser.convertToJSON(object, Payloads.DChannel.class);
             channel = new Channel(c.id, c.name, c.position, c.nsfw, c.type);

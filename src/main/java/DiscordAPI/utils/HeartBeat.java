@@ -1,8 +1,8 @@
 package DiscordAPI.utils;
 
+import DiscordAPI.objects.Builder;
 import DiscordAPI.webSocket.Wss;
-import DiscordAPI.webSocket.jsonData.PAYLOAD;
-import com.neovisionaries.ws.client.WebSocket;
+import DiscordAPI.webSocket.OpCodes;
 import org.json.simple.JSONObject;
 
 public class HeartBeat implements Runnable {
@@ -22,10 +22,8 @@ public class HeartBeat implements Runnable {
     public void run() {
         while (run) {
             try {
-                JSONObject object = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(DiscordUtils.BuildJSON.BuildJSON(PAYLOAD.values())));
-                object.put("op", 1);
-                object.put("d", 251);
-                webSocket.sendText(String.valueOf(object));
+                JSONObject object = Builder.buildPayload(OpCodes.Heartbeat, 251);
+                webSocket.sendText(object);
                 Thread.sleep(this.heartbeat);
             } catch (InterruptedException e) {
                 e.printStackTrace();

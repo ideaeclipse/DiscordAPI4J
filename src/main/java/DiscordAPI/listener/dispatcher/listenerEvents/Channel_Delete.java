@@ -14,7 +14,7 @@ public class Channel_Delete extends ListenerEvent implements ListenerFeatures {
 
     public Channel_Delete(final IDiscordBot b, final JSONObject payload) {
         super(b);
-        channel = new Parser.CD(b, payload).getChannel();
+        channel = new Parser.ChannelDelete(b, payload).getChannel();
     }
 
     public Channel getChannel() {

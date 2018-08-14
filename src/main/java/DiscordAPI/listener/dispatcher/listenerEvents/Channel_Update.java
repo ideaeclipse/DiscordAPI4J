@@ -13,7 +13,7 @@ public class Channel_Update extends ListenerEvent implements ListenerFeatures {
 
     public Channel_Update(final IDiscordBot b, final JSONObject payload) {
         super(b);
-        Parser.CU parser = new Parser.CU(b, payload);
+        Parser.ChannelUpdate parser = new Parser.ChannelUpdate(b, payload);
         oldC = parser.getOldChannel();
         newC = parser.getNewChannel();
     }
