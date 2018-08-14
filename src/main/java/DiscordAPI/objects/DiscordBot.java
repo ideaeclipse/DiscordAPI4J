@@ -13,6 +13,10 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
@@ -69,7 +73,14 @@ class DiscordBot implements IDiscordBot {
         } catch (IOException | WebSocketException e) {
             e.printStackTrace();
         }
-        logger.info("DiscordBot " + user.getName() + " Started");
+        try {
+            ExecutorService service = Executors.newSingleThreadExecutor();
+            Future<Boolean> future = service.submit(this.textWss);
+            future.get();
+            logger.info("DiscordBot " + user.getName() + " Started");
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
