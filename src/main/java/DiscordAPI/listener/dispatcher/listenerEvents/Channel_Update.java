@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
  * This Channel_Create.class value is stored in
  * DiscordAPI.webSocket.WebSocket_Events
  *
- * @author Myles
+ * @author Ideaeclipse
  */
 public class Channel_Update extends ListenerEvent {
     private Channel oldC;

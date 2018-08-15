@@ -10,7 +10,8 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  * This is the Channel object
  * Has a sub class ChannelP to parse incoming channel json Objects
  *
- * @author Myles
+ * @author Ideaeclipse
+ * @see DiscordAPI.objects.Payloads.DChannel
  */
 public class Channel {
     private final Long id;
@@ -71,7 +72,7 @@ public class Channel {
      * This class is only called from {@link Parser} & {@link DiscordBot}
      * must follow new instance with .logic {@link #logic()}
      *
-     * @author Myles
+     * @author Ideaeclipse
      */
     static class ChannelP {
         private final Long id;
@@ -107,7 +108,7 @@ public class Channel {
             if (object == null) {
                 object = (JSONObject) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id));
             }
-            Payloads.DChannel c = Parser.convertToJSON(object, Payloads.DChannel.class);
+            Payloads.DChannel c = Parser.convertToPayload(object, Payloads.DChannel.class);
             channel = new Channel(c.id, c.name, c.position, c.nsfw, c.type);
             return this;
         }

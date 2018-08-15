@@ -14,7 +14,7 @@ import org.json.simple.JSONObject;
  * This class uses the Presence Model {@link DiscordAPI.objects.Builder.Identity.Presence} {@link Builder#buildPayload(OpCodes, Object)} {@link Builder#buildData(Object)}
  * To set bots presence use {@link DiscordBot#setStatus(Payloads.GameTypes, String)}
  *
- * @author Myles
+ * @author Ideaeclipse
  */
 public class Presence_Update extends ListenerEvent {
     private Status status;

@@ -13,7 +13,7 @@ import org.json.simple.JSONObject;
  * DiscordAPI.webSocket.WebSocket_Events
  * If you need to know which type of channel the message came from compare it to ChannelTypes {@link DiscordAPI.objects.Payloads.ChannelTypes}
  *
- * @author Myles
+ * @author Ideaeclipse
  */
 public class Message_Create extends ListenerEvent {
     private Message message;

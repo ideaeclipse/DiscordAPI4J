@@ -26,7 +26,7 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  * Uses IDiscordBot as it's Interface
  * To create a new instance of DiscordBot see DiscrdBotBuilder {@link DiscordBotBuilder}
  *
- * @author Myles
+ * @author Ideaeclipse
  */
 class DiscordBot implements IDiscordBot {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
@@ -173,6 +173,9 @@ class DiscordBot implements IDiscordBot {
         return Builder.buildPayload(OpCodes.Identify, this.identity);
     }
 
+    /**
+     * @return Listener Dispatcher
+     */
     @Override
     public TDispatcher getDispatcher() {
         return this.dispatcher;

@@ -7,7 +7,7 @@ import DiscordAPI.IDiscordBot;
  * Base Class for listener Library
  * Every Event extends this event
  *
- * @author Myles
+ * @author Ideaeclipse
  */
 public abstract class ListenerEvent {
     private IDiscordBot DiscordBot;

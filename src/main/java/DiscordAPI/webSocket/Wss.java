@@ -71,13 +71,14 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                             case Request_Guild_Members:
                                 break;
                             case Invalid_Session:
+                                System.out.println(message);
                                 break;
                             case Hello:
                                 Thread.currentThread().setName("TextWss");
                                 logger.info("Connected to webSocket");
                                 logger.info("Received initial Message");
                                 JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
-                                w = Parser.convertToJSON(d, Payloads.DWelcome.class);
+                                w = Parser.convertToPayload(d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
                                 heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new HeartBeat(wss, w.heartbeat_interval));
                                 startTime = System.currentTimeMillis();

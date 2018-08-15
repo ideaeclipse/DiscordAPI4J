@@ -6,6 +6,9 @@ import DiscordAPI.objects.Message;
 import DiscordAPI.objects.Payloads;
 import DiscordAPI.utils.DiscordUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Main {
     private Main(String token, Long guildId) {
         IDiscordBot bot = new DiscordBotBuilder(token, guildId).login();

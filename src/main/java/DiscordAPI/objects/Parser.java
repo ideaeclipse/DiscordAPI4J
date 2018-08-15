@@ -7,13 +7,30 @@ import org.json.simple.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * This class is called from each listenerEvent {@link DiscordAPI.listener.dispatcher.listenerEvents.Channel_Create}
+ * Each class logs there event using {@link DiscordLogger}
+ *
+ * @author Ideaeclipse
+ */
 public class Parser {
+    /**
+     * Parses payload sent from {@link DiscordAPI.webSocket.Wss} and converts it to a channel
+     *
+     * @author Ideaeclipse
+     * @see DiscordAPI.webSocket.WebSocket_Events#CHANNEL_CREATE
+     */
     public static class ChannelCreate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel channel;
 
+        /**
+         * @param b       DiscordBot
+         * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
+         */
         public ChannelCreate(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
@@ -30,10 +47,20 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses payload sent from {@link DiscordAPI.webSocket.Wss} and converts it to a channel
+     *
+     * @author Ideaeclipse
+     * @see DiscordAPI.webSocket.WebSocket_Events#CHANNEL_DELETE
+     */
     public static class ChannelDelete {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel channel;
 
+        /**
+         * @param b       DiscordBot
+         * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
+         */
         public ChannelDelete(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
@@ -46,11 +73,21 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses payload sent from {@link DiscordAPI.webSocket.Wss} and converts it to a old channel and new channel
+     *
+     * @author Ideaeclipse
+     * @see DiscordAPI.webSocket.WebSocket_Events#CHANNEL_UPDATE
+     */
     public static class ChannelUpdate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Channel oldC;
         private volatile Channel newC;
 
+        /**
+         * @param b       DiscordBot
+         * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
+         */
         public ChannelUpdate(final IDiscordBot b, final JSONObject payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             oldC = DiscordUtils.Search.CHANNEL(b.getChannels(), cd.getChannel().getName());
@@ -69,21 +106,32 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses payload sent from {@link DiscordAPI.webSocket.Wss} and converts it to a message
+     *
+     * @author Ideaeclipse
+     * @see DiscordAPI.webSocket.WebSocket_Events#MESSAGE_CREATE
+     * @see DiscordAPI.objects.Payloads.ChannelTypes
+     */
     public static class MessageCreate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Message message;
 
-        public MessageCreate(final IDiscordBot b, final JSONObject object) {
-            JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(object.get("author")));
-            Payloads.DUser u = convertToJSON(user, Payloads.DUser.class);
-            Payloads.DMessage m = convertToJSON(object, Payloads.DMessage.class);
+        /**
+         * @param b       DiscordBot
+         * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
+         */
+        public MessageCreate(final IDiscordBot b, final JSONObject payload) {
+            JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("author")));
+            Payloads.DUser u = convertToPayload(user, Payloads.DUser.class);
+            Payloads.DMessage m = convertToPayload(payload, Payloads.DMessage.class);
             User.UserP pd = new User.UserP(u.id, b).logic();
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
             message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
-                logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n","\\n") + " Channel: " + message.getChannel().getName());
+                logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
             } else {
-                logger.info("Dm Sent: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n","\\n"));
+                logger.info("Dm Sent: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n"));
             }
         }
 
@@ -93,13 +141,23 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses payload sent from {@link DiscordAPI.webSocket.Wss} and converts it to a Status
+     *
+     * @author Ideaeclipse
+     * @see DiscordAPI.webSocket.WebSocket_Events#PRESENCE_UPDATE
+     */
     public static class PresenceUpdate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private volatile Status status;
 
-        public PresenceUpdate(final IDiscordBot t, final JSONObject payload) {
-            final Payloads.DUser user = convertToJSON((JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("user")))),Payloads.DUser.class);
-            final User.UserP pd = new User.UserP(user.id, t).logic();
+        /**
+         * @param b       DiscordBot
+         * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
+         */
+        public PresenceUpdate(final IDiscordBot b, final JSONObject payload) {
+            final Payloads.DUser user = convertToPayload((JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("user")))), Payloads.DUser.class);
+            final User.UserP pd = new User.UserP(user.id, b).logic();
             final Game.GameP gd = payload.get("game") != null ? new Game.GameP((JSONObject) payload.get("game")).logic() : null;
             status = new Status(gd != null ? gd.getGame() : null, pd.getUser(), String.valueOf(payload.get("status")));
             logger.info("Presence Update: User: " + status.getUser().getName() + " Status: " + status.getStatus() + (status.getGame() != null ? " Game: " + ((status.getGame().getType() == Payloads.GameTypes.Playing) ?
@@ -112,7 +170,15 @@ public class Parser {
         }
     }
 
-    public static <T> T convertToJSON(final JSONObject object, final Class<?> c) {
+    /**
+     * This method takes in a JSONObject and a Payload type {@link Payloads}
+     *
+     * @param object Payload from {@link DiscordAPI.webSocket.Wss}
+     * @param c      {@link Payloads#*#getClass()}
+     * @param <T>    {@link Payloads}
+     * @return {@link Payloads#*}
+     */
+    public static <T> T convertToPayload(final JSONObject object, final Class<?> c) {
         T o = getObject(c);
         try {
             for (Object s : object.keySet()) {
@@ -143,20 +209,18 @@ public class Parser {
         }
         return o;
     }
-    /*
-    Refactor to not use static class indexing
-    Properties File
+
+    /**
+     * Creates a new Instance of the class passed
+     *
+     * @param c   {@link Payloads#*}
+     * @param <T> {@link Payloads}
+     * @return new instance of <T>
      */
     private static <T> T getObject(final Class<?> c) {
         T o = null;
         try {
-            if (c.getName().contains("$")) {
-                Class<?> a = Payloads.class;
-                Object superC = a.getConstructor().newInstance();
-                o = (T) c.getConstructor(superC.getClass()).newInstance(superC);
-            } else {
-                o = (T) c.getConstructor().newInstance();
-            }
+            o = (T) c.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }

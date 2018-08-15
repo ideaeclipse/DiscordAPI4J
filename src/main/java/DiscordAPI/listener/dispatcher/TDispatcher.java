@@ -9,7 +9,7 @@ import java.util.List;
  * Dispatcher is used to handle all listeners initialized by the user
  * This object is stored in {@link DiscordAPI.objects.DiscordBot} {@link DiscordAPI.IDiscordBot}
  *
- * @author Myles
+ * @author Ideaeclipse
  */
 public class TDispatcher {
     private List<TListener<?>> listeners;

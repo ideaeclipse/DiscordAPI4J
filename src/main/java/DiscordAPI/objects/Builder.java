@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * This class is used for Building JSONObject {@link JSONObject}
  * Based on the payload structure Discord's Websocket handles
  *
- * @author Myles
+ * @author Ideaeclipse
  */
 public class Builder {
     static class CreateDmChannel {

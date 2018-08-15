@@ -7,7 +7,7 @@ import DiscordAPI.listener.listenerTypes.ListenerEvent;
  * Used for listener library
  *
  * @param <T>
- * @author Myles
+ * @author Ideaeclipse
  */
 public interface TListener<T extends ListenerEvent> {
     /**
