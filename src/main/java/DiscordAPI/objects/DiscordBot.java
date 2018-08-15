@@ -21,6 +21,13 @@ import java.util.concurrent.Future;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
+/**
+ * This is the main object used in this library, not visible to the developer
+ * Uses IDiscordBot as it's Interface
+ * To create a new instance of DiscordBot see DiscrdBotBuilder {@link DiscordBotBuilder}
+ *
+ * @author Myles
+ */
 class DiscordBot implements IDiscordBot {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final JSONObject identity;
@@ -32,6 +39,12 @@ class DiscordBot implements IDiscordBot {
     private User user;
     private Wss textWss;
 
+    /**
+     * Called from {@link DiscordBotBuilder} {@link DiscordAPI.IDiscordBotBuilder}
+     *
+     * @param token Bot token
+     * @param guildID Guild id (Right click server and hit copy id)
+     */
     DiscordBot(final String token, final long guildID) {
         DiscordUtils.DefaultLinks.token = token;
         this.identity = buildIdentity();
@@ -41,6 +54,11 @@ class DiscordBot implements IDiscordBot {
         dispatcher = new TDispatcher();
     }
 
+    /**
+     * Creates the 'd' value of the identity payload
+     *
+     * @return Identity object
+     */
     private JSONObject buildIdentity() {
         JSONObject object = new JSONObject();
         Builder.Identity i = new Builder.Identity();
@@ -61,6 +79,12 @@ class DiscordBot implements IDiscordBot {
         return guildId;
     }
 
+    /**
+     * login method, starts the websocket connection and loads all the roles,users,channels from the server
+     * also queries the /users/@me data of your bot so the user can get the User object that contains the bot info
+     *
+     * @return new instance of DiscordBot
+     */
     @Override
     public IDiscordBot login() {
         try {
@@ -159,6 +183,12 @@ class DiscordBot implements IDiscordBot {
         return user;
     }
 
+    /**
+     * Creating dm channel with a user to search for a user use {@link DiscordAPI.utils.DiscordUtils.Search#USER(List, String)}
+     *
+     * @param user that you wish to create a dm channel with
+     * @return returns said dm channel
+     */
     @Override
     public Channel createDmChannel(final User user) {
         Builder.CreateDmChannel cm = new Builder.CreateDmChannel();
@@ -167,6 +197,12 @@ class DiscordBot implements IDiscordBot {
         return parser.getChannel();
     }
 
+    /**
+     * changes bot status, gametypes: {@link DiscordAPI.objects.Payloads.GameTypes}
+     *
+     * @param gameType GameType you wish to display
+     * @param gameName String you want your message to be
+     */
     @Override
     public void setStatus(final Payloads.GameTypes gameType, final String gameName) {
         Builder.Identity.Presence p = new Builder.Identity.Presence();

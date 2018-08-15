@@ -1,12 +1,17 @@
 package DiscordAPI.objects;
 
-import DiscordAPI.utils.DiscordUtils;
 import org.json.simple.JSONObject;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.CHANNEL;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
+/**
+ * This is the Channel object
+ * Has a sub class ChannelP to parse incoming channel json Objects
+ *
+ * @author Myles
+ */
 public class Channel {
     private final Long id;
     private final String name;
@@ -14,6 +19,15 @@ public class Channel {
     private final Boolean nsfw;
     private final Payloads.ChannelTypes type;
 
+    /**
+     * Channel is only created using Payloads.DChannel {@link DiscordAPI.objects.Payloads.DChannel}
+     *
+     * @param id       Channel Id
+     * @param name     Channel Name
+     * @param position Channel Position in relation to user view on the left handside
+     * @param nsfw     is the channel NSFW?
+     * @param type     See link for more info {@link DiscordAPI.objects.Payloads.ChannelTypes}
+     */
     private Channel(final Long id, final String name, final Integer position, final Boolean nsfw, final Payloads.ChannelTypes type) {
         this.id = id;
         this.name = name;
@@ -42,6 +56,9 @@ public class Channel {
         return type;
     }
 
+    /**
+     * @param messageContent String containing the message you wish to send
+     */
     public void sendMessage(final String messageContent) {
         JSONObject object = new JSONObject();
         object.put("content", messageContent);
@@ -49,20 +66,43 @@ public class Channel {
         rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, "channels/" + id + "/messages", object));
     }
 
+    /**
+     * This is a nested class and is used to parse a channel JSONObject
+     * This class is only called from {@link Parser} & {@link DiscordBot}
+     * must follow new instance with .logic {@link #logic()}
+     *
+     * @author Myles
+     */
     static class ChannelP {
         private final Long id;
         private Channel channel;
         private JSONObject object;
 
+        /**
+         * When calling this constructor there will be an additional API called to gain the channel Object {@link HttpEvent}
+         *
+         * @param id Channel Id
+         */
         ChannelP(final Long id) {
             this.id = id;
         }
 
+        /**
+         * No API call is made because you passed the channel object
+         *
+         * @param object channel object
+         */
         ChannelP(JSONObject object) {
             this.object = object;
             this.id = null;
         }
 
+        /**
+         * This is where the Parser parses the data you supplied
+         *
+         * @return returns the updated ChannelP instance
+         * @see DiscordAPI.objects.Payloads.DChannel
+         */
         ChannelP logic() {
             if (object == null) {
                 object = (JSONObject) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id));
