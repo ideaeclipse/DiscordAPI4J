@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 /**
- * This class is used for Building JSONObject {@link JSONObject}
+ * This class is used for Building Json {@link JSONObject}
  * Based on the payload structure Discord's Websocket handles
  *
  * @author Ideaeclipse

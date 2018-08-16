@@ -3,7 +3,7 @@ package DiscordAPI.objects;
 import org.json.simple.JSONObject;
 
 /**
- * Game Object used to parse Game JSONObject's
+ * Game Object used to parse Game Json's
  *
  * @author Ideaeclipse
  * @see DiscordAPI.objects.Payloads.DGame
@@ -46,7 +46,7 @@ public class Game {
     }
 
     /**
-     * Parses Game data from a JSONObject
+     * Parses Game data from a Json
      * {@link #logic()} must be called
      *
      * @author Ideaeclipse

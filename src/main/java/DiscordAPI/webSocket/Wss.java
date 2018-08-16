@@ -3,10 +3,7 @@ package DiscordAPI.webSocket;
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.objects.Parser;
-import DiscordAPI.utils.RateLimitRecorder;
-import DiscordAPI.utils.DiscordLogger;
-import DiscordAPI.utils.DiscordUtils;
-import DiscordAPI.utils.HeartBeat;
+import DiscordAPI.utils.*;
 import DiscordAPI.objects.Payloads;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
@@ -42,6 +39,7 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                     public void onTextMessage(WebSocket webSocket1, String message) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
                         JSONObject payload = (JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(message));
                         OpCodes opCodes = OpCodes.values()[Integer.parseInt(String.valueOf(payload.get("op")))];
+                        System.out.println(new Json(message));
                         switch (opCodes) {
                             case Dispatch:
                                 String currentEvent = String.valueOf(payload.get("t"));
@@ -71,7 +69,8 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                             case Request_Guild_Members:
                                 break;
                             case Invalid_Session:
-                                System.out.println(message);
+                                logger.error("Invalid_Session Restart if issue persists regen token");
+                                System.exit(1);
                                 break;
                             case Hello:
                                 Thread.currentThread().setName("TextWss");

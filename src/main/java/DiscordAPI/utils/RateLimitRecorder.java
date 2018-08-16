@@ -3,6 +3,8 @@ package DiscordAPI.utils;
 import com.neovisionaries.ws.client.WebSocket;
 import org.json.simple.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.*;
 
 import static DiscordAPI.utils.DiscordUtils.HttpRequests.get;
@@ -11,24 +13,48 @@ import static DiscordAPI.utils.DiscordUtils.HttpRequests.sendJson;
 import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
 public class RateLimitRecorder {
+    private final Object lock = new Object();
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final ExecutorService service;
+    private Integer count;
 
     public RateLimitRecorder() {
         service = Executors.newSingleThreadExecutor();
+        count = 0;
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                count = 0;
+                synchronized (lock) {
+                    lock.notify();
+                }
+            }
+        }, 0, 1000);
     }
 
     public Object queue(final IQueueHandler event) {
-        QueueCaller caller = new QueueCaller(event);
-        Future<Object> future = service.submit(caller);
         Object o = null;
-        try {
-            if (event.getClass().equals(HttpEvent.class)) {
-                o = future.get();
+        count++;
+        if (!(count > 2)) {
+            QueueCaller caller = new QueueCaller(event);
+            Future<Object> future = service.submit(caller);
+            try {
+                if (event.getClass().equals(HttpEvent.class)) {
+                    o = future.get();
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
-            Thread.sleep(500);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } else {
+            try {
+                synchronized (lock) {
+                    lock.wait();
+                    return queue(event);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         return o;
     }
@@ -54,7 +80,7 @@ public class RateLimitRecorder {
         }
 
         public static class WebSocketEvent implements IQueueHandler {
-            private final  JSONObject object;
+            private final JSONObject object;
             private WebSocket socket;
 
             public WebSocketEvent(final WebSocket socket, final JSONObject object) {

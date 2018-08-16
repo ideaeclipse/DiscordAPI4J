@@ -68,7 +68,7 @@ public class Channel {
     }
 
     /**
-     * This is a nested class and is used to parse a channel JSONObject
+     * This is a nested class and is used to parse a channel Json
      * This class is only called from {@link Parser} & {@link DiscordBot}
      * must follow new instance with .logic {@link #logic()}
      *

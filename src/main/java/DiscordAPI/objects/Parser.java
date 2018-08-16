@@ -171,7 +171,7 @@ public class Parser {
     }
 
     /**
-     * This method takes in a JSONObject and a Payload type {@link Payloads}
+     * This method takes in a Json and a Payload type {@link Payloads}
      *
      * @param object Payload from {@link DiscordAPI.webSocket.Wss}
      * @param c      {@link Payloads#*#getClass()}
