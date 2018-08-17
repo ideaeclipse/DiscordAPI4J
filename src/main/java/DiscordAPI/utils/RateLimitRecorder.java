@@ -80,10 +80,10 @@ public class RateLimitRecorder {
         }
 
         public static class WebSocketEvent implements IQueueHandler {
-            private final JSONObject object;
+            private final Json object;
             private WebSocket socket;
 
-            public WebSocketEvent(final WebSocket socket, final JSONObject object) {
+            public WebSocketEvent(final WebSocket socket, final Json object) {
                 this.socket = socket;
                 this.object = object;
             }
@@ -98,9 +98,9 @@ public class RateLimitRecorder {
         public static class HttpEvent implements IQueueHandler {
             private final RequestTypes type;
             private final String url;
-            private final JSONObject object;
+            private final Json object;
 
-            public HttpEvent(final RequestTypes type, final String url, final JSONObject object) {
+            public HttpEvent(final RequestTypes type, final String url, final Json object) {
                 this.type = type;
                 this.url = url;
                 this.object = object;

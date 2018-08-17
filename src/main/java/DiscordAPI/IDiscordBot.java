@@ -5,7 +5,7 @@ import DiscordAPI.objects.Channel;
 import DiscordAPI.objects.Payloads;
 import DiscordAPI.objects.Role;
 import DiscordAPI.objects.User;
-import org.json.simple.JSONObject;
+import DiscordAPI.utils.Json;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface IDiscordBot {
 
     List<User> getUsers();
 
-    JSONObject getIdentity();
+    Json getIdentity();
 
     TDispatcher getDispatcher();
 

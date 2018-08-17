@@ -59,7 +59,7 @@ public class DiscordUtils {
             }
         }
 
-        static Object sendJson(final String url, final JSONObject object) {
+        static Object sendJson(final String url, final Json object) {
             try {
                 HttpsURLConnection con = initialize(new URL(APIBASE + url));
                 con.setDoOutput(true);
@@ -80,24 +80,16 @@ public class DiscordUtils {
         private static Object printOutput(final InputStream inputStream) throws IOException {
             BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
             String string;
-            StringBuffer response = new StringBuffer();
+            StringBuilder response = new StringBuilder();
             while ((string = in.readLine()) != null) {
                 response.append(string);
             }
             in.close();
-            return DiscordUtils.convertToJSONOBJECT(response.toString());
+            //System.out.println("RESPONSE: " + response);
+            return response.toString();
         }
     }
 
-    public static Object convertToJSONOBJECT(final String message) {
-        JSONParser parser = new JSONParser();
-        try {
-            return parser.parse(message);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public static ThreadFactory createDaemonThreadFactory(String threadName) {
         return (runnable) -> {

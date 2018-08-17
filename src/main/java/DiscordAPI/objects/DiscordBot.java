@@ -1,15 +1,12 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.utils.RateLimitRecorder;
+import DiscordAPI.utils.*;
 import DiscordAPI.webSocket.OpCodes;
-import DiscordAPI.utils.DiscordLogger;
-import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.webSocket.Wss;
 import DiscordAPI.listener.dispatcher.TDispatcher;
 import com.neovisionaries.ws.client.WebSocketException;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -30,7 +27,7 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  */
 class DiscordBot implements IDiscordBot {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-    private final JSONObject identity;
+    private final Json identity;
     private final TDispatcher dispatcher;
     private final long guildId;
     private List<Channel> channels;
@@ -42,7 +39,7 @@ class DiscordBot implements IDiscordBot {
     /**
      * Called from {@link DiscordBotBuilder} {@link DiscordAPI.IDiscordBotBuilder}
      *
-     * @param token Bot token
+     * @param token   Bot token
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final long guildID) {
@@ -59,8 +56,8 @@ class DiscordBot implements IDiscordBot {
      *
      * @return Identity object
      */
-    private JSONObject buildIdentity() {
-        JSONObject object = new JSONObject();
+    private Json buildIdentity() {
+        Json object = new Json();
         Builder.Identity i = new Builder.Identity();
 
         i.token = token;
@@ -87,6 +84,7 @@ class DiscordBot implements IDiscordBot {
      */
     @Override
     public IDiscordBot login() {
+
         try {
             updateRoles();
             getBot();
@@ -97,6 +95,8 @@ class DiscordBot implements IDiscordBot {
         } catch (IOException | WebSocketException e) {
             e.printStackTrace();
         }
+
+
         try {
             ExecutorService service = Executors.newSingleThreadExecutor();
             Future<Boolean> future = service.submit(this.textWss);
@@ -105,49 +105,59 @@ class DiscordBot implements IDiscordBot {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+
         return this;
     }
 
     @Override
     public void updateChannels() {
         channels = new ArrayList<>();
-        JSONArray array = (JSONArray) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + "/" + CHANNEL));
-        for (Object o : array) {
-            JSONObject object = (JSONObject) o;
+        JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + "/" + CHANNEL)));
+        for (Json o : array) {
+            Json object = o;
             if (Integer.parseInt(String.valueOf(object.get("type"))) == 0) {
                 Channel.ChannelP cd = new Channel.ChannelP(object).logic();
                 channels.add(cd.getChannel());
             }
+        }
+        for (Channel c : channels) {
+            System.out.println(c);
         }
         logger.info("Updated Channel Listings");
     }
 
     private void updateUsers() {
         users = new ArrayList<>();
-        JSONArray array = (JSONArray) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + MEMBER + "?limit=1000"));
-        for (Object o : array) {
-            JSONObject object = (JSONObject) o;
+        JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + MEMBER + "?limit=1000")));
+        for (Json o : array) {
+            Json object = o;
             User.UserP userData = new User.UserP(object, this).logic();
             users.add(userData.getUser());
+        }
+        for (User s : users) {
+            System.out.println(s);
         }
         logger.info("Updated User Listings");
     }
 
     private void updateRoles() {
         roles = new ArrayList<>();
-        JSONArray array = (JSONArray) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + ROLE));
-        for (Object o : array) {
-            JSONObject object = (JSONObject) o;
-            Role.RoleP rd = new Role.RoleP(object).logic();
+        JsonArray j = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + ROLE)));
+
+        for (Json o : j) {
+            Role.RoleP rd = new Role.RoleP(o).logic();
             roles.add(rd.getRole());
             //System.out.println(rd.getRole().getName());
             //System.out.println(DiscordUtils.PermissionId.convertPermissions(rd.getRole().getPermission()));
+        }
+        for (Role r : roles) {
+            System.out.println(r);
         }
         logger.info("Updated Guild Roles");
     }
 
     private void getBot() {
-        JSONObject object = (JSONObject) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, USERME));
+        Json object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, USERME)));
         User.UserP us = new User.UserP(Long.parseUnsignedLong(String.valueOf(object.get("id"))), this).logic();
         user = us.getUser();
         logger.info("Updated Bot user");
@@ -169,7 +179,7 @@ class DiscordBot implements IDiscordBot {
     }
 
     @Override
-    public JSONObject getIdentity() {
+    public Json getIdentity() {
         return Builder.buildPayload(OpCodes.Identify, this.identity);
     }
 
@@ -196,7 +206,7 @@ class DiscordBot implements IDiscordBot {
     public Channel createDmChannel(final User user) {
         Builder.CreateDmChannel cm = new Builder.CreateDmChannel();
         cm.recipient_id = user.getId();
-        Channel.ChannelP parser = new Channel.ChannelP((JSONObject) Objects.requireNonNull(rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, USERME + "/channels", Builder.buildData(cm))))).logic();
+        Channel.ChannelP parser = new Channel.ChannelP(new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, USERME + "/channels", Builder.buildData(cm))))).logic();
         return parser.getChannel();
     }
 

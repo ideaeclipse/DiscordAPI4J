@@ -37,17 +37,16 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                 .createSocket(DiscordUtils.DefaultLinks.WEBSOCKET)
                 .addListener(new WebSocketAdapter() {
                     public void onTextMessage(WebSocket webSocket1, String message) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-                        JSONObject payload = (JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(message));
+                        Json payload = new Json(message);
                         OpCodes opCodes = OpCodes.values()[Integer.parseInt(String.valueOf(payload.get("op")))];
-                        System.out.println(new Json(message));
                         switch (opCodes) {
                             case Dispatch:
                                 String currentEvent = String.valueOf(payload.get("t"));
                                 for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
                                     if (currentEvent.equals(webSocket_events.toString())) {
                                         Class<?> cl = webSocket_events.getaClass();
-                                        Constructor constructor = cl.getConstructor(IDiscordBot.class, JSONObject.class);
-                                        Object t = constructor.newInstance(bot, payload.get("d"));
+                                        Constructor constructor = cl.getConstructor(IDiscordBot.class, Json.class);
+                                        Object t = constructor.newInstance(bot, new Json((String) payload.get("d")));
                                         bot.getDispatcher().notify((ListenerEvent) t);
                                     }
                                 }
@@ -76,7 +75,7 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                                 Thread.currentThread().setName("TextWss");
                                 logger.info("Connected to webSocket");
                                 logger.info("Received initial Message");
-                                JSONObject d = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("d")));
+                                Json d = new Json(String.valueOf(payload.get("d")));
                                 w = Parser.convertToPayload(d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
                                 heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new HeartBeat(wss, w.heartbeat_interval));
@@ -90,6 +89,7 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
 
                                 break;
                             case HeartBeat_ACK:
+                                System.out.println("alive");
                                 if (heartbeat.isAlive()) {
                                     if ((System.currentTimeMillis() - startTime > (w.heartbeat_interval + 5000)) && heartbeat.isAlive()) {
                                         heartbeat.interrupt();
@@ -103,7 +103,7 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                 }).connect();
     }
 
-    public void sendText(final JSONObject message) {
+    public void sendText(final Json message) {
         rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.WebSocketEvent(webSocket, message));
     }
 

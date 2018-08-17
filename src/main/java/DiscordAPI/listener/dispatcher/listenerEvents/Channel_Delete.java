@@ -4,6 +4,7 @@ import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.Channel;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
+import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
 import org.json.simple.JSONObject;
 
@@ -25,7 +26,7 @@ public class Channel_Delete extends ListenerEvent{
      * @param payload the 'd' param from the message from the webscoekt
      * @see Wss under case Dispatch
      */
-    public Channel_Delete(final IDiscordBot b, final JSONObject payload) {
+    public Channel_Delete(final IDiscordBot b, final Json payload) {
         super(b);
         channel = new Parser.ChannelDelete(b, payload).getChannel();
     }

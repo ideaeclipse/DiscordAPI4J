@@ -1,9 +1,10 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.utils.Json;
 import org.json.simple.JSONObject;
 
 /**
- * This class is used for {@link Parser#convertToPayload(JSONObject, Class)}
+ * This class is used for {@link Parser#convertToPayload(Json, Class)}
  * and will return the class you passed to the method
  *
  * @author Ideaeclipse

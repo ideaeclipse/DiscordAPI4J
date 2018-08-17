@@ -4,6 +4,7 @@ import DiscordAPI.objects.Builder;
 import DiscordAPI.webSocket.Wss;
 import DiscordAPI.webSocket.OpCodes;
 import org.json.simple.JSONObject;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 public class HeartBeat implements Runnable {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
@@ -22,7 +23,8 @@ public class HeartBeat implements Runnable {
     public void run() {
         while (run) {
             try {
-                JSONObject object = Builder.buildPayload(OpCodes.Heartbeat, 251);
+                Json object = Builder.buildPayload(OpCodes.Heartbeat, 251);
+                System.out.println(object);
                 webSocket.sendText(object);
                 Thread.sleep(this.heartbeat);
             } catch (InterruptedException e) {

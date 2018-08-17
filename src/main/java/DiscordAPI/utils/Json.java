@@ -1,22 +1,24 @@
 package DiscordAPI.utils;
 
-import com.koloboke.collect.impl.hash.Hash;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import org.eclipse.jetty.websocket.api.SuspendToken;
 
 import java.util.*;
 
 public class Json {
+    private static final DiscordLogger logger = new DiscordLogger(String.valueOf(Json.class));
     private final Map<String, Object> map;
-    private String output;
-    List<Boolean> run;
-    List<Integer> indexs;
-    int index;
-    String object;
+
+    public Json() {
+        map = new HashMap<>();
+    }
 
     public Json(final String object) {
-        this.object = object;
-        System.out.println(object);
-        map = convertToMap(object);
+        if (object.charAt(0) == '[') {
+            logger.error("Wrong type use JsonArray");
+        }
+        ConvertToMap convert = new ConvertToMap(object);
+        //System.out.println("Initial string; " + object);
+        map = convert.getMap();
     }
 
     public void put(String key, Object value) {
@@ -24,99 +26,173 @@ public class Json {
     }
 
     public Object get(String key) {
-        return map.get(key);
+        Object o = map.get(key);
+        if (o instanceof HashMap) {
+            return convertToString((Map<String, Object>) o);
+        } else {
+            return o;
+        }
     }
 
-    private Map<String, Object> convertToMap(String object) {
-        index = 0;
-        run = new ArrayList<>();
-        indexs = new ArrayList<>();
-        final Map<String, Object> map;
-        object = object.replace("\"", "");
-
-        if (object.charAt(0) == '{') {
-            object = object.substring(1, object.length());
-        } else {
-            System.out.println("Invalid String");
-        }
-        if (object.charAt(object.length() - 1) == '}') {
-            object = object.substring(0, object.length() - 1);
-        } else {
-            System.out.println("Invalid String");
-        }
-        this.object = object;
-        //System.out.println("**" + object);
-        map = splitString(convertToList(object));
-        System.out.println(map);
-        return map;
-    }
-
-    private List<String> convertToList(String object) {
-        index = object.indexOf(',');
-        while (index >= 0) {
-            if (run.size() > 0) {
-                for (int i = 0; i < run.size(); i++) {
-                    run.set(i, test(run.get(i)));
-                }
-            } else {
-                run.add(test(true));
-            }
-            index = object.indexOf(",", index + 1);
-        }
+    public static List<String> asList(String message) {
         List<String> strings = new ArrayList<>();
-        for (int i = 0; i < indexs.size(); i++) {
-            if (i == 0) {
-                strings.add(object.substring(0, indexs.get(i)));
-            } else if (i == indexs.size() - 1) {
-                strings.add(object.substring(indexs.get(i) + 1, object.length()));
-                strings.add(object.substring(indexs.get(i - 1) + 1, indexs.get(i)));
-            } else {
-                strings.add(object.substring(indexs.get(i - 1) + 1, indexs.get(i)));
+        List<Integer> integers = new ArrayList<>();
+        message = message.substring(1, message.length() - 1);
+        //System.out.println(message);
+        if (message.contains(",")) {
+            int index = message.indexOf(',');
+            while (index >= 0) {
+                integers.add(index);
+                index = message.indexOf(',', index + 1);
             }
+            for (int i = 0; i < integers.size(); i++) {
+                if (i == integers.size() - 1 && i == 0) {
+                    strings.add(message.substring(0, integers.get(i)).trim());
+                    strings.add(message.substring(integers.get(i) + 1, message.length()).trim());
+                } else if (i == integers.size() - 1) {
+                    strings.add(message.substring(integers.get(i - 1), integers.get(i)).trim());
+                    strings.add(message.substring(integers.get(i) + 1, message.length()).trim());
+                } else if (i == 0) {
+                    strings.add(message.substring(0, integers.get(i)).trim());
+                } else {
+                    strings.add(message.substring(integers.get(i - 1), integers.get(i)).trim());
+                }
+            }
+        } else {
+            strings.add(message);
         }
         return strings;
     }
 
-    private Boolean test(boolean run) {
-        System.out.println(object.charAt(index + 3) + " " + object.charAt(index - 1));
-        if ((object.charAt(index + 3) != '{') && run) {
-            System.out.println("No");
-            indexs.add(index);
-        } else if ((object.charAt(index - 1) == '}')) {
-            System.out.println("End");
-            run = Boolean.parseBoolean(null);
-            indexs.add(index);
-        } else if (run) {
-            System.out.println("Start");
-            run = false;
-            indexs.add(index);
-        }
-        return run;
+    public Set<String> keySet() {
+        return map.keySet();
     }
 
-    private Map<String, Object> splitString(List<String> strings) {
-        System.out.println("*" + strings);
-        Map<String, Object> map = new HashMap<>();
-        for (String s : strings) {
-            List<String> list = new ArrayList<>();
-            int index = s.indexOf(":");
-            list.add(s.substring(0, index));
-            list.add(s.substring(index + 1, s.length()));
-            System.out.println(list);
-            if (list.get(1).startsWith("{")) {
-                map.put(list.get(0), convertToMap(list.get(1)));
-            } else {
-                map.put(list.get(0), list.get(1));
-            }
+    static class ConvertToMap {
+        private Map<String, Object> map;
+
+        ConvertToMap(String object) {
+            //System.out.println("ConvertMap Initial String: " + object);
+            map = convert(object);
         }
-        return map;
+
+        Map<String, Object> getMap() {
+            return map;
+        }
+
+        private Map<String, Object> convert(String object) {
+            Map<String, Object> map;
+            object = object.replace("\"", "").trim();
+            if (object.charAt(0) == '{') {
+                object = object.substring(1, object.length());
+            } else {
+                //System.out.println("Invalid String");
+            }
+            if (object.charAt(object.length() - 1) == '}') {
+                object = object.substring(0, object.length() - 1);
+            } else {
+                //System.out.println("Invalid String");
+            }
+            map = splitString(convertToList(object));
+            return map;
+
+        }
+
+        static List<String> convertToList(final String object) {
+            //System.out.println("Formated String: " + object);
+            List<Integer> indexs = test(object.toCharArray());
+            List<String> strings = new ArrayList<>();
+            if (indexs.size() > 0) {
+                for (int i = 0; i < indexs.size(); i++) {
+                    if (i == 0) {
+                        strings.add(object.substring(0, indexs.get(i)).trim());
+                    } else if (i == indexs.size() - 1) {
+                        strings.add(object.substring(indexs.get(i) + 1, object.length()).trim());
+                        strings.add(object.substring(indexs.get(i - 1) + 1, indexs.get(i)).trim());
+                    } else {
+                        strings.add(object.substring(indexs.get(i - 1) + 1, indexs.get(i)).trim());
+                    }
+                }
+            } else {
+                strings.add(object);
+            }
+            //System.out.println("LIST: " + strings);
+            return strings;
+        }
+
+        static List<Integer> test(final char[] chars) {
+            List<Integer> index = new ArrayList<>();
+            boolean run = true;
+            boolean array = true;
+            int counter = 0;
+            for (int i = 0; i < chars.length; i++) {
+                if (chars[i] == '{') {
+                    //System.out.println("{ " + counter);
+                    if (counter == 0)
+                        run = false;
+                    counter++;
+                } else if (chars[i] == '}') {
+                    //System.out.println("} " + counter);
+                    if (counter == 1)
+                        run = true;
+                    counter--;
+                } else if (chars[i] == '[' && array) {
+                    array = false;
+                } else if (chars[i] == ']') {
+                    array = true;
+                } else if (chars[i] == ',' && run && array) {
+                    //System.out.println("split");
+                    index.add(i);
+                }
+            }
+            //System.out.println(index);
+            return index;
+        }
+
+
+        private Map<String, Object> splitString(List<String> strings) {
+            //System.out.println("!!!!!!!! " + strings);
+            Map<String, Object> map = new HashMap<>();
+            for (String s : strings) {
+                //System.out.println(s);
+                List<String> list = new ArrayList<>();
+                int index = s.indexOf(":");
+                //System.out.println(index);
+                list.add(s.substring(0, index).trim());
+                list.add(s.substring(index + 1, s.length()).trim());
+                //System.out.println(list);
+                //System.out.println(list.get(1));
+                if (list.get(1).startsWith("{")) {
+                    Map<String, Object> m = new ConvertToMap(list.get(1)).getMap();
+                    //System.out.println("Test " + m);
+                    map.put(list.get(0), m);
+                } else {
+                    map.put(list.get(0), list.get(1));
+                }
+            }
+            return map;
+        }
     }
 
     private String convertToString(Map<String, Object> map) {
         StringBuilder builder = new StringBuilder();
         builder.append("{");
         for (String s : map.keySet()) {
-            builder.append("\"").append(s).append("\"").append(":").append("\"").append((map.get(s) instanceof HashMap) ? convertToString((Map<String, Object>) map.get(s)) : map.get(s)).append("\"").append(",");
+            if (map.get(s) != null)
+                builder.append("\"")
+                        .append(s)
+                        .append("\"")
+                        .append(":")
+                        .append((map.get(s) instanceof Integer ||
+                                map.get(s) instanceof ArrayList ||
+                                map.get(s) instanceof Boolean ||
+                                map.get(s) instanceof Json) ? "" : "\""
+                        ).append((map.get(s) instanceof HashMap) ? convertToString((Map<String, Object>) map.get(s)) : map.get(s))
+                        .append((map.get(s) instanceof Integer ||
+                                map.get(s) instanceof ArrayList ||
+                                map.get(s) instanceof Boolean ||
+                                map.get(s) instanceof Json) ? "" : "\"")
+                        .append(",");
         }
         builder.deleteCharAt(builder.length() - 1);
         builder.append("}");
@@ -125,7 +201,6 @@ public class Json {
 
     @Override
     public String toString() {
-        System.out.println(convertToString(map));
-        return output;
+        return convertToString(map);
     }
 }

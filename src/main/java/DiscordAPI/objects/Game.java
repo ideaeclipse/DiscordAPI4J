@@ -1,6 +1,6 @@
 package DiscordAPI.objects;
 
-import org.json.simple.JSONObject;
+import DiscordAPI.utils.Json;
 
 /**
  * Game Object used to parse Game Json's
@@ -53,12 +53,12 @@ public class Game {
      */
     static class GameP {
         private Game game;
-        private final JSONObject object;
+        private final Json object;
 
         /**
          * @param object Game Object obtains from {@link DiscordAPI.webSocket.Wss}
          */
-        GameP(final JSONObject object) {
+        GameP(final Json object) {
             this.object = object;
         }
 

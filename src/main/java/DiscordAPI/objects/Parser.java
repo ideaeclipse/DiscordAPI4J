@@ -3,11 +3,11 @@ package DiscordAPI.objects;
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
+import DiscordAPI.utils.Json;
 import org.json.simple.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -31,7 +31,7 @@ public class Parser {
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public ChannelCreate(final IDiscordBot b, final JSONObject payload) {
+        public ChannelCreate(final IDiscordBot b, final Json payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
@@ -61,7 +61,7 @@ public class Parser {
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public ChannelDelete(final IDiscordBot b, final JSONObject payload) {
+        public ChannelDelete(final IDiscordBot b, final Json payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             b.updateChannels();
@@ -88,7 +88,7 @@ public class Parser {
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public ChannelUpdate(final IDiscordBot b, final JSONObject payload) {
+        public ChannelUpdate(final IDiscordBot b, final Json payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             oldC = DiscordUtils.Search.CHANNEL(b.getChannels(), cd.getChannel().getName());
             newC = cd.getChannel();
@@ -121,12 +121,14 @@ public class Parser {
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public MessageCreate(final IDiscordBot b, final JSONObject payload) {
-            JSONObject user = (JSONObject) DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("author")));
+        public MessageCreate(final IDiscordBot b, final Json payload) {
+            Json user = new Json(String.valueOf(payload.get("author")));
             Payloads.DUser u = convertToPayload(user, Payloads.DUser.class);
             Payloads.DMessage m = convertToPayload(payload, Payloads.DMessage.class);
             User.UserP pd = new User.UserP(u.id, b).logic();
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
+            System.out.println(cd.getChannel());
+            System.out.println(m.guild_id + " " + m.content);
             message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
                 logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
@@ -155,10 +157,10 @@ public class Parser {
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public PresenceUpdate(final IDiscordBot b, final JSONObject payload) {
-            final Payloads.DUser user = convertToPayload((JSONObject) Objects.requireNonNull(DiscordUtils.convertToJSONOBJECT(String.valueOf(payload.get("user")))), Payloads.DUser.class);
+        public PresenceUpdate(final IDiscordBot b, final Json payload) {
+            final Payloads.DUser user = convertToPayload(new Json(String.valueOf(payload.get("user"))), Payloads.DUser.class);
             final User.UserP pd = new User.UserP(user.id, b).logic();
-            final Game.GameP gd = payload.get("game") != null ? new Game.GameP((JSONObject) payload.get("game")).logic() : null;
+            final Game.GameP gd = payload.get("game") != null ? new Game.GameP(new Json((String) payload.get("game"))).logic() : null;
             status = new Status(gd != null ? gd.getGame() : null, pd.getUser(), String.valueOf(payload.get("status")));
             logger.info("Presence Update: User: " + status.getUser().getName() + " Status: " + status.getStatus() + (status.getGame() != null ? " Game: " + ((status.getGame().getType() == Payloads.GameTypes.Playing) ?
                     "Playing " + status.getGame().getName() + " Details: " + status.getGame().getState() + " " + status.getGame().getDetails()
@@ -173,12 +175,12 @@ public class Parser {
     /**
      * This method takes in a Json and a Payload type {@link Payloads}
      *
+     * @param <T>    {@link Payloads}
      * @param object Payload from {@link DiscordAPI.webSocket.Wss}
      * @param c      {@link Payloads#*#getClass()}
-     * @param <T>    {@link Payloads}
      * @return {@link Payloads#*}
      */
-    public static <T> T convertToPayload(final JSONObject object, final Class<?> c) {
+    public static <T> T convertToPayload(final Json object, final Class<?> c) {
         T o = getObject(c);
         try {
             for (Object s : object.keySet()) {
@@ -189,7 +191,7 @@ public class Parser {
                 } catch (NoSuchFieldException ignored) {
                     continue;
                 }
-                String value = String.valueOf(object.get(s));
+                String value = String.valueOf(object.get((String) s));
                 if (f.getType().equals(String.class)) {
                     f.set(o, value);
                 } else if (f.getType().equals(Integer.class)) {

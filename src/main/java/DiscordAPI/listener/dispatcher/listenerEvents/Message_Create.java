@@ -4,6 +4,7 @@ package DiscordAPI.listener.dispatcher.listenerEvents;
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.*;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
+import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
 import org.json.simple.JSONObject;
 
@@ -25,7 +26,7 @@ public class Message_Create extends ListenerEvent {
      * @param payload the 'd' param from the message from the webscoekt
      * @see Wss under case Dispatch
      */
-    public Message_Create(final IDiscordBot b, final JSONObject payload) {
+    public Message_Create(final IDiscordBot b, final Json payload) {
         super(b);
         message = new Parser.MessageCreate(b, payload).getMessage();
     }

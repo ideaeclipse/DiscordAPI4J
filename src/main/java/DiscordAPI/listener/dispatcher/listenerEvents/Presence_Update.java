@@ -3,9 +3,9 @@ package DiscordAPI.listener.dispatcher.listenerEvents;
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.*;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
+import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.OpCodes;
 import DiscordAPI.webSocket.Wss;
-import org.json.simple.JSONObject;
 
 /**
  * This Class is called using java reflection
@@ -26,7 +26,7 @@ public class Presence_Update extends ListenerEvent {
      * @param payload the 'd' param from the message from the webscoekt
      * @see Wss under case Dispatch
      */
-    public Presence_Update(final IDiscordBot b, final JSONObject payload) {
+    public Presence_Update(final IDiscordBot b, final Json payload) {
         super(b);
         status = new Parser.PresenceUpdate(b, payload).getStatus();
     }

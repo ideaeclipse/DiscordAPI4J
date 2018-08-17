@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.utils.Json;
 import org.json.simple.JSONObject;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.CHANNEL;
@@ -61,10 +62,16 @@ public class Channel {
      * @param messageContent String containing the message you wish to send
      */
     public void sendMessage(final String messageContent) {
-        JSONObject object = new JSONObject();
+        Json object = new Json();
         object.put("content", messageContent);
         object.put("file", "file");
+        System.out.println(object);
         rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, "channels/" + id + "/messages", object));
+    }
+
+    @Override
+    public String toString() {
+        return "{Channel} Id: " + id + " Name: " + name + " Position: " + position + " Nsfw: " + nsfw + " ChannelType: " + type;
     }
 
     /**
@@ -77,7 +84,7 @@ public class Channel {
     static class ChannelP {
         private final Long id;
         private Channel channel;
-        private JSONObject object;
+        private Json object;
 
         /**
          * When calling this constructor there will be an additional API called to gain the channel Object {@link HttpEvent}
@@ -93,7 +100,7 @@ public class Channel {
          *
          * @param object channel object
          */
-        ChannelP(JSONObject object) {
+        ChannelP(Json object) {
             this.object = object;
             this.id = null;
         }
@@ -106,7 +113,7 @@ public class Channel {
          */
         ChannelP logic() {
             if (object == null) {
-                object = (JSONObject) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id));
+                object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id)));
             }
             Payloads.DChannel c = Parser.convertToPayload(object, Payloads.DChannel.class);
             channel = new Channel(c.id, c.name, c.position, c.nsfw, c.type);

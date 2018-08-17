@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.utils.Json;
 import org.json.simple.JSONObject;
 
 /**
@@ -50,6 +51,11 @@ public class Role {
         return permission;
     }
 
+    @Override
+    public String toString() {
+        return "{Role} Id: " + id + " Name: " + name + " Colour: " + colourCode + " Position: " + position + " Permission: " + permission;
+    }
+
     /**
      * Parses Role data
      * logic() must be called
@@ -57,13 +63,13 @@ public class Role {
      * @author Ideaeclipse
      */
     static class RoleP {
-        private final JSONObject object;
+        private final Json object;
         private Role role;
 
         /**
          * @param object role Object
          */
-        RoleP(final JSONObject object) {
+        RoleP(final Json object) {
             this.object = object;
         }
 

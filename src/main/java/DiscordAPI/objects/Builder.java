@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.OpCodes;
 import org.json.simple.JSONObject;
 
@@ -24,11 +25,11 @@ public class Builder {
     static class Identity {
         String token;
         //Properties Class
-        JSONObject properties;
+        Json properties;
         Boolean compress = true;
         Integer large_threshold = 250;
         //Presence Class
-        JSONObject presence;
+        Json presence;
         ArrayList<Integer> shards = new Shard().getInts();
 
         /**
@@ -53,7 +54,7 @@ public class Builder {
          */
         static class Presence {
             //Game
-            JSONObject game;
+            Json game;
             String status = "online";
             Long since = null;
             Boolean afk = false;
@@ -84,8 +85,8 @@ public class Builder {
      * @param data Json Object to file 'd' param use {@link Builder#buildData(Object)}
      * @return Complete payload ready to send over the websocket
      */
-    public static JSONObject buildPayload(OpCodes code, Object data) {
-        JSONObject object = new JSONObject();
+    public static Json buildPayload(OpCodes code, Object data) {
+        Json object = new Json();
         object.put("op", code.ordinal());
         object.put("d", data);
         return object;
@@ -94,12 +95,12 @@ public class Builder {
     /**
      * This method is used for the Object param in buildPayload {@link Builder#buildPayload(OpCodes, Object)}
      *
-     * @param generic is an instance of an Object that in the Builder Class {@link Builder}
      * @param <T> is the generic Type
+     * @param generic is an instance of an Object that in the Builder Class {@link Builder}
      * @return Returns a Json Data used for the 'd' value in the Wss payload
      */
-    static <T> JSONObject buildData(T generic) {
-        JSONObject data = new JSONObject();
+    static <T> Json buildData(T generic) {
+        Json data = new Json();
         for (Field f : generic.getClass().getDeclaredFields()) {
             try {
                 data.put(f.getName(), f.get(generic));
