@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * This class is used for Building Json {@link JSONObject}
@@ -25,11 +26,11 @@ public class Builder {
     static class Identity {
         String token;
         //Properties Class
-        Json properties;
+        Map properties;
         Boolean compress = true;
         Integer large_threshold = 250;
         //Presence Class
-        Json presence;
+        Map presence;
         ArrayList<Integer> shards = new Shard().getInts();
 
         /**
@@ -48,16 +49,18 @@ public class Builder {
                 return ints;
             }
         }
+
         /**
          * Used for creating an Presnece object used in the identity Payload
          * This is used in {@link DiscordBot#buildIdentity()}
          */
         static class Presence {
             //Game
-            Json game;
+            Map game;
             String status = "online";
             Long since = null;
             Boolean afk = false;
+
             /**
              * Used for creating an Game object used in the identity Payload
              * This is used in {@link DiscordBot#buildIdentity()}
@@ -67,6 +70,7 @@ public class Builder {
                 Integer type = Payloads.GameTypes.Playing.ordinal();
             }
         }
+
         /**
          * Used for creating an Properties object used in the identity Payload
          * This is used in {@link DiscordBot#buildIdentity()}
@@ -95,11 +99,11 @@ public class Builder {
     /**
      * This method is used for the Object param in buildPayload {@link Builder#buildPayload(OpCodes, Object)}
      *
-     * @param <T> is the generic Type
+     * @param <T>     is the generic Type
      * @param generic is an instance of an Object that in the Builder Class {@link Builder}
      * @return Returns a Json Data used for the 'd' value in the Wss payload
      */
-    static <T> Json buildData(T generic) {
+    static <T> Map<String, Object> buildData(T generic) {
         Json data = new Json();
         for (Field f : generic.getClass().getDeclaredFields()) {
             try {
@@ -108,6 +112,6 @@ public class Builder {
                 e.printStackTrace();
             }
         }
-        return data;
+        return data.getMap();
     }
 }

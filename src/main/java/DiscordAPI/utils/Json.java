@@ -17,8 +17,11 @@ public class Json {
             logger.error("Wrong type use JsonArray");
         }
         ConvertToMap convert = new ConvertToMap(object);
-        //System.out.println("Initial string; " + object);
         map = convert.getMap();
+    }
+
+    public Json(final Map<String, Object> map) {
+        this.map = map;
     }
 
     public void put(String key, Object value) {
@@ -34,11 +37,14 @@ public class Json {
         }
     }
 
+    public Map<String, Object> getMap() {
+        return map;
+    }
+
     public static List<String> asList(String message) {
         List<String> strings = new ArrayList<>();
         List<Integer> integers = new ArrayList<>();
         message = message.substring(1, message.length() - 1);
-        //System.out.println(message);
         if (message.contains(",")) {
             int index = message.indexOf(',');
             while (index >= 0) {
@@ -71,9 +77,8 @@ public class Json {
     static class ConvertToMap {
         private Map<String, Object> map;
 
-        ConvertToMap(String object) {
-            //System.out.println("ConvertMap Initial String: " + object);
-            map = convert(object);
+        ConvertToMap(final String object) {
+            map = convert(object.replace("\n", "\\n"));
         }
 
         Map<String, Object> getMap() {
@@ -86,12 +91,22 @@ public class Json {
             if (object.charAt(0) == '{') {
                 object = object.substring(1, object.length());
             } else {
-                //System.out.println("Invalid String");
+                try {
+                    throw new InvalidString();
+                } catch (InvalidString invalidString) {
+                    invalidString.printStackTrace();
+                }
+                return null;
             }
             if (object.charAt(object.length() - 1) == '}') {
                 object = object.substring(0, object.length() - 1);
             } else {
-                //System.out.println("Invalid String");
+                try {
+                    throw new InvalidString();
+                } catch (InvalidString invalidString) {
+                    invalidString.printStackTrace();
+                }
+                return null;
             }
             map = splitString(convertToList(object));
             return map;
@@ -163,6 +178,7 @@ public class Json {
                 //System.out.println(list);
                 //System.out.println(list.get(1));
                 if (list.get(1).startsWith("{")) {
+                    //System.out.println(s + " " + list.get(1));
                     Map<String, Object> m = new ConvertToMap(list.get(1)).getMap();
                     //System.out.println("Test " + m);
                     map.put(list.get(0), m);
@@ -174,25 +190,30 @@ public class Json {
         }
     }
 
+    private static class InvalidString extends Exception {
+
+    }
+
     private String convertToString(Map<String, Object> map) {
         StringBuilder builder = new StringBuilder();
         builder.append("{");
         for (String s : map.keySet()) {
-            if (map.get(s) != null)
-                builder.append("\"")
-                        .append(s)
-                        .append("\"")
-                        .append(":")
-                        .append((map.get(s) instanceof Integer ||
-                                map.get(s) instanceof ArrayList ||
-                                map.get(s) instanceof Boolean ||
-                                map.get(s) instanceof Json) ? "" : "\""
-                        ).append((map.get(s) instanceof HashMap) ? convertToString((Map<String, Object>) map.get(s)) : map.get(s))
-                        .append((map.get(s) instanceof Integer ||
-                                map.get(s) instanceof ArrayList ||
-                                map.get(s) instanceof Boolean ||
-                                map.get(s) instanceof Json) ? "" : "\"")
-                        .append(",");
+            builder.append("\"")
+                    .append(s)
+                    .append("\"")
+                    .append(":")
+                    .append((map.get(s) instanceof Integer ||
+                            map.get(s) instanceof ArrayList ||
+                            map.get(s) instanceof Boolean ||
+                            map.get(s) instanceof Json ||
+                            map.get(s) instanceof Map) ? "" : "\""
+                    ).append((map.get(s) instanceof HashMap) ? convertToString((Map<String, Object>) map.get(s)) : map.get(s))
+                    .append((map.get(s) instanceof Integer ||
+                            map.get(s) instanceof ArrayList ||
+                            map.get(s) instanceof Boolean ||
+                            map.get(s) instanceof Json ||
+                            map.get(s) instanceof Map) ? "" : "\"")
+                    .append(",");
         }
         builder.deleteCharAt(builder.length() - 1);
         builder.append("}");

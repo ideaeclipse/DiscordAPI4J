@@ -81,7 +81,7 @@ public class RateLimitRecorder {
 
         public static class WebSocketEvent implements IQueueHandler {
             private final Json object;
-            private WebSocket socket;
+            private final WebSocket socket;
 
             public WebSocketEvent(final WebSocket socket, final Json object) {
                 this.socket = socket;
@@ -90,7 +90,7 @@ public class RateLimitRecorder {
 
             @Override
             public Object event() {
-                socket.sendText(String.valueOf(object));
+                socket.sendText(object.toString());
                 return null;
             }
         }

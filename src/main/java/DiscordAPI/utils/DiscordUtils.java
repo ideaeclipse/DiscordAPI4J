@@ -3,9 +3,6 @@ package DiscordAPI.utils;
 import DiscordAPI.objects.Channel;
 import DiscordAPI.objects.Role;
 import DiscordAPI.objects.User;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -67,7 +64,7 @@ public class DiscordUtils {
                 con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 con.setRequestProperty("Accept", "application/json");
                 OutputStream os = con.getOutputStream();
-                os.write(String.valueOf(object).getBytes("UTF-8"));
+                os.write(object.toString().getBytes("UTF-8"));
                 os.close();
                 return printOutput(con.getInputStream());
             } catch (IOException e) {

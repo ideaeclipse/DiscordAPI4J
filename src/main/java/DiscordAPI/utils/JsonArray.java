@@ -8,8 +8,5 @@ public class JsonArray extends ArrayList<Json> {
         for (String s : Json.ConvertToMap.convertToList(message)) {
             this.add(new Json(s));
         }
-        for(Json s: this){
-            System.out.println(s.toString());
-        }
     }
 }

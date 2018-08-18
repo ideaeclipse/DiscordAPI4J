@@ -61,11 +61,11 @@ public class Channel {
     /**
      * @param messageContent String containing the message you wish to send
      */
-    public void sendMessage(final String messageContent) {
+    public void sendMessage(String messageContent) {
         Json object = new Json();
+        messageContent = messageContent.replace("\n", "\\n");
         object.put("content", messageContent);
         object.put("file", "file");
-        System.out.println(object);
         rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, "channels/" + id + "/messages", object));
     }
 

@@ -24,7 +24,6 @@ public class HeartBeat implements Runnable {
         while (run) {
             try {
                 Json object = Builder.buildPayload(OpCodes.Heartbeat, 251);
-                System.out.println(object);
                 webSocket.sendText(object);
                 Thread.sleep(this.heartbeat);
             } catch (InterruptedException e) {

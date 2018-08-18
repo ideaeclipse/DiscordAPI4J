@@ -7,6 +7,7 @@ import DiscordAPI.webSocket.Wss;
 import DiscordAPI.listener.dispatcher.TDispatcher;
 import com.neovisionaries.ws.client.WebSocketException;
 import org.json.simple.JSONArray;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.IOException;
 import java.util.*;
@@ -43,6 +44,7 @@ class DiscordBot implements IDiscordBot {
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final long guildID) {
+        logger.setLevel(DiscordLogger.Level.TRACE);
         DiscordUtils.DefaultLinks.token = token;
         this.identity = buildIdentity();
         logger.info("Starting Rate Limit Monitor");
@@ -57,7 +59,6 @@ class DiscordBot implements IDiscordBot {
      * @return Identity object
      */
     private Json buildIdentity() {
-        Json object = new Json();
         Builder.Identity i = new Builder.Identity();
 
         i.token = token;
@@ -67,8 +68,7 @@ class DiscordBot implements IDiscordBot {
         p.game = Builder.buildData(new Builder.Identity.Presence.Game());
 
         i.presence = Builder.buildData(p);
-
-        return Builder.buildData(i);
+        return new Json(Builder.buildData(i));
     }
 
     @Override
@@ -121,7 +121,7 @@ class DiscordBot implements IDiscordBot {
             }
         }
         for (Channel c : channels) {
-            System.out.println(c);
+            logger.debug(c.toString());
         }
         logger.info("Updated Channel Listings");
     }
@@ -135,7 +135,7 @@ class DiscordBot implements IDiscordBot {
             users.add(userData.getUser());
         }
         for (User s : users) {
-            System.out.println(s);
+            logger.debug(s.toString());
         }
         logger.info("Updated User Listings");
     }
@@ -151,7 +151,7 @@ class DiscordBot implements IDiscordBot {
             //System.out.println(DiscordUtils.PermissionId.convertPermissions(rd.getRole().getPermission()));
         }
         for (Role r : roles) {
-            System.out.println(r);
+            logger.debug(r.toString());
         }
         logger.info("Updated Guild Roles");
     }
@@ -206,7 +206,7 @@ class DiscordBot implements IDiscordBot {
     public Channel createDmChannel(final User user) {
         Builder.CreateDmChannel cm = new Builder.CreateDmChannel();
         cm.recipient_id = user.getId();
-        Channel.ChannelP parser = new Channel.ChannelP(new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, USERME + "/channels", Builder.buildData(cm))))).logic();
+        Channel.ChannelP parser = new Channel.ChannelP(new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, USERME + "/channels", new Json(Builder.buildData(cm)))))).logic();
         return parser.getChannel();
     }
 

@@ -127,8 +127,6 @@ public class Parser {
             Payloads.DMessage m = convertToPayload(payload, Payloads.DMessage.class);
             User.UserP pd = new User.UserP(u.id, b).logic();
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
-            System.out.println(cd.getChannel());
-            System.out.println(m.guild_id + " " + m.content);
             message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
                 logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
