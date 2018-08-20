@@ -92,6 +92,7 @@ public class Json {
                 object = object.substring(1, object.length());
             } else {
                 try {
+                    System.out.println(object);
                     throw new InvalidString();
                 } catch (InvalidString invalidString) {
                     invalidString.printStackTrace();
@@ -183,7 +184,11 @@ public class Json {
                     //System.out.println("Test " + m);
                     map.put(list.get(0), m);
                 } else {
-                    map.put(list.get(0), list.get(1));
+                    if (list.get(1).contains("null")) {
+                        map.put(list.get(0), null);
+                    } else {
+                        map.put(list.get(0), list.get(1));
+                    }
                 }
             }
             return map;
@@ -198,6 +203,7 @@ public class Json {
         StringBuilder builder = new StringBuilder();
         builder.append("{");
         for (String s : map.keySet()) {
+
             builder.append("\"")
                     .append(s)
                     .append("\"")
@@ -206,13 +212,15 @@ public class Json {
                             map.get(s) instanceof ArrayList ||
                             map.get(s) instanceof Boolean ||
                             map.get(s) instanceof Json ||
-                            map.get(s) instanceof Map) ? "" : "\""
+                            map.get(s) instanceof Map ||
+                            map.get(s) == null) ? "" : "\""
                     ).append((map.get(s) instanceof HashMap) ? convertToString((Map<String, Object>) map.get(s)) : map.get(s))
                     .append((map.get(s) instanceof Integer ||
                             map.get(s) instanceof ArrayList ||
                             map.get(s) instanceof Boolean ||
                             map.get(s) instanceof Json ||
-                            map.get(s) instanceof Map) ? "" : "\"")
+                            map.get(s) instanceof Map ||
+                            map.get(s) == null) ? "" : "\"")
                     .append(",");
         }
         builder.deleteCharAt(builder.length() - 1);

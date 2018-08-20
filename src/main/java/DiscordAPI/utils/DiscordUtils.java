@@ -14,20 +14,45 @@ import java.util.concurrent.ThreadFactory;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 
-public class DiscordUtils {
-    static class HttpRequests {
 
+/**
+ * This class is the utility class and has various function each described in their class header
+ *
+ * @author Myles
+ */
+public class DiscordUtils {
+    /**
+     * This class is used to Handle all Http Api Requests
+     *
+     * @author Myles
+     */
+    static class HttpRequests {
+        /**
+         * @param con Con url {@link #initialize(URL)}
+         * @return returns connection with proper header
+         */
         private static HttpsURLConnection authenticate(HttpsURLConnection con) {
             con.setRequestProperty("Authorization", "Bot " + token);
             return con;
         }
 
+        /**
+         * @param url url string
+         * @return returns a connection
+         * @throws IOException if connection cannot be opened it throws an exception
+         */
         private static HttpsURLConnection initialize(final URL url) throws IOException {
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con = authenticate(con);
             return con;
         }
 
+        /**
+         * If you need to use the Get Method for a web url
+         *
+         * @param url url string
+         * @return Json String from the web api
+         */
         static Object get(final String url) {
             HttpsURLConnection con = null;
             try {
@@ -44,6 +69,11 @@ public class DiscordUtils {
             return null;
         }
 
+        /**
+         * If you need to use the Post Method for a web url
+         *
+         * @param url url string
+         */
         static void post(final String url) {
             try {
                 HttpsURLConnection con = initialize(new URL(APIBASE + url));
