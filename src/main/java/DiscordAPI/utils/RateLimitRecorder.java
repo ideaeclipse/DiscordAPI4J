@@ -1,7 +1,6 @@
 package DiscordAPI.utils;
 
 import com.neovisionaries.ws.client.WebSocket;
-import org.json.simple.JSONObject;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,7 +13,7 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
 public class RateLimitRecorder {
     private final Object lock = new Object();
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    //private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final ExecutorService service;
     private Integer count;
 
@@ -121,6 +120,7 @@ public class RateLimitRecorder {
                         post(url);
                         break;
                     case sendJson:
+                        assert object != null;
                         return sendJson(url, object);
                 }
                 return null;

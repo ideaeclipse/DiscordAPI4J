@@ -20,7 +20,7 @@ public class Main {
                 }
             } else if (message.getChannel().getType().equals(Payloads.ChannelTypes.dmChannel)) {
                 if (!message.getUser().getName().equals(bot.getUser().getName())) {
-                    bot.setStatus(Payloads.GameTypes.Listening, "Big Dicks");
+                    bot.setStatus(Payloads.GameTypes.Listening, "Some music");
                     message.getChannel().sendMessage("Dm received");
                 }
             }

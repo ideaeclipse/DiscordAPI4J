@@ -86,6 +86,13 @@ public class DiscordUtils {
             }
         }
 
+        /**
+         * This method will send Post method with a json String
+         *
+         * @param url url String
+         * @param object Json Object
+         * @return Returns the response from the WebServer
+         */
         static Object sendJson(final String url, final Json object) {
             try {
                 HttpsURLConnection con = initialize(new URL(APIBASE + url));
@@ -104,6 +111,13 @@ public class DiscordUtils {
             return null;
         }
 
+        /**
+         * This method returns an Object based on your request
+         *
+         * @param inputStream the input stream from the connection
+         * @return Object from the webserver
+         * @throws IOException throws exception
+         */
         private static Object printOutput(final InputStream inputStream) throws IOException {
             BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
             String string;

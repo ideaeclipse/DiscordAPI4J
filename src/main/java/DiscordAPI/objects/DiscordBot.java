@@ -6,8 +6,6 @@ import DiscordAPI.webSocket.OpCodes;
 import DiscordAPI.webSocket.Wss;
 import DiscordAPI.listener.dispatcher.TDispatcher;
 import com.neovisionaries.ws.client.WebSocketException;
-import org.json.simple.JSONArray;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.IOException;
 import java.util.*;
@@ -223,6 +221,7 @@ class DiscordBot implements IDiscordBot {
         g.name = gameName;
         g.type = gameType.ordinal();
         p.game = Builder.buildData(g);
+        System.out.println(Builder.buildPayload(OpCodes.Status_Update, Builder.buildData(p)));
         rateLimitRecorder.queue(new WebSocketEvent(this.textWss.getWebSocket(), Builder.buildPayload(OpCodes.Status_Update, Builder.buildData(p))));
     }
 }
