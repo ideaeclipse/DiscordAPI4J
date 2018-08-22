@@ -9,12 +9,10 @@ import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
-import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
@@ -41,6 +39,7 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                         OpCodes opCodes = OpCodes.values()[Integer.parseInt(String.valueOf(payload.get("op")))];
                         switch (opCodes) {
                             case Dispatch:
+                                //System.out.println(message);
                                 String currentEvent = String.valueOf(payload.get("t"));
                                 for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
                                     if (currentEvent.equals(webSocket_events.toString())) {

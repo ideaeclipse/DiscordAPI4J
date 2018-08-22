@@ -5,23 +5,24 @@ package DiscordAPI.objects;
  *
  * @author Ideaeclipse
  */
+@Deprecated
 public class Status {
     private final Game game;
-    private final User user;
+    private final DiscordUser user;
     private final String status;
 
     /**
      * @param game   {@link Game}
-     * @param user   {@link User}
+     * @param user   {@link DiscordUser}
      * @param status status of game
      */
-    Status(Game game, User user, String status) {
+    Status(Game game, DiscordUser user, String status) {
         this.game = game;
         this.user = user;
         this.status = status;
     }
 
-    public User getUser() {
+    public DiscordUser getUser() {
         return user;
     }
 

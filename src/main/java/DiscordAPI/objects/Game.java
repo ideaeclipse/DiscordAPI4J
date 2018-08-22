@@ -45,6 +45,11 @@ public class Game {
         return state;
     }
 
+    @Override
+    public String toString() {
+        return "{Game} Name: " + getName() + " State: " + getState() + " Details: " + getDetails() + " Type: " + getType();
+    }
+
     /**
      * Parses Game data from a Json
      * {@link #logic()} must be called

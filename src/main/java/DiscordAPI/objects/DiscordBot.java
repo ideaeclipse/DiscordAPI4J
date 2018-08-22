@@ -29,10 +29,12 @@ class DiscordBot implements IDiscordBot {
     private final Json identity;
     private final TDispatcher dispatcher;
     private final long guildId;
+    private final AudioManager audioManager;
     private List<Channel> channels;
+    private List<VoiceChannel> voiceChannels;
     private List<User> users;
     private List<Role> roles;
-    private User user;
+    private DiscordUser user;
     private Wss textWss;
 
     /**
@@ -42,6 +44,7 @@ class DiscordBot implements IDiscordBot {
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final long guildID) {
+        DiscordUtils.DefaultLinks.bot = this;
         logger.setLevel(DiscordLogger.Level.TRACE);
         DiscordUtils.DefaultLinks.token = token;
         this.identity = buildIdentity();
@@ -49,6 +52,14 @@ class DiscordBot implements IDiscordBot {
         DiscordUtils.DefaultLinks.rateLimitRecorder = new RateLimitRecorder();
         this.guildId = guildID;
         dispatcher = new TDispatcher();
+        audioManager = new AudioManager(this);
+    }
+
+    /**
+     * @return Current AudioManager
+     */
+    public AudioManager getAudioManager() {
+        return this.audioManager;
     }
 
     /**
@@ -76,7 +87,7 @@ class DiscordBot implements IDiscordBot {
 
     /**
      * login method, starts the websocket connection and loads all the roles,users,channels from the server
-     * also queries the /users/@me data of your bot so the user can get the User object that contains the bot info
+     * also queries the /users/@me data of your bot so the user can get the DiscordUser object that contains the bot info
      *
      * @return new instance of DiscordBot
      */
@@ -100,6 +111,7 @@ class DiscordBot implements IDiscordBot {
             Future<Boolean> future = service.submit(this.textWss);
             future.get();
             logger.info("DiscordBot " + user.getName() + " Started");
+            audioManager.joinChannel(DiscordUtils.Search.VOICECHANNEL(getVoiceChannels(), "Bot"));
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -110,13 +122,20 @@ class DiscordBot implements IDiscordBot {
     @Override
     public void updateChannels() {
         channels = new ArrayList<>();
+        voiceChannels = new ArrayList<>();
         JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + "/" + CHANNEL)));
         for (Json o : array) {
             Json object = o;
             if (Integer.parseInt(String.valueOf(object.get("type"))) == 0) {
                 Channel.ChannelP cd = new Channel.ChannelP(object).logic();
                 channels.add(cd.getChannel());
+            } else if (Integer.parseInt(String.valueOf(object.get("type"))) == 2) {
+                VoiceChannel.ChannelP cd = new VoiceChannel.ChannelP(object).logic();
+                voiceChannels.add(cd.getChannel());
             }
+        }
+        for (VoiceChannel c : voiceChannels) {
+            logger.debug(c.toString());
         }
         for (Channel c : channels) {
             logger.debug(c.toString());
@@ -128,14 +147,13 @@ class DiscordBot implements IDiscordBot {
         users = new ArrayList<>();
         JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + MEMBER + "?limit=1000")));
         for (Json o : array) {
-            Json object = o;
-            User.UserP userData = new User.UserP(object, this).logic();
-            users.add(userData.getUser());
+            User.ServerUniqueUserP userData = new User.ServerUniqueUserP(this, o).logic();
+            users.add(userData.getServerUniqueUser());
         }
         for (User s : users) {
             logger.debug(s.toString());
         }
-        logger.info("Updated User Listings");
+        logger.info("Updated DiscordUser Listings");
     }
 
     private void updateRoles() {
@@ -143,7 +161,7 @@ class DiscordBot implements IDiscordBot {
         JsonArray j = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + ROLE)));
 
         for (Json o : j) {
-            Role.RoleP rd = new Role.RoleP(o).logic();
+            Role.RoleP rd = new Role.RoleP(this, o).logic();
             roles.add(rd.getRole());
             //System.out.println(rd.getRole().getName());
             //System.out.println(DiscordUtils.PermissionId.convertPermissions(rd.getRole().getPermission()));
@@ -156,7 +174,7 @@ class DiscordBot implements IDiscordBot {
 
     private void getBot() {
         Json object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, USERME)));
-        User.UserP us = new User.UserP(Long.parseUnsignedLong(String.valueOf(object.get("id"))), this).logic();
+        DiscordUser.UserP us = new DiscordUser.UserP(Long.parseUnsignedLong((String) object.get("id")),this).logicId();
         user = us.getUser();
         logger.info("Updated Bot user");
     }
@@ -164,6 +182,10 @@ class DiscordBot implements IDiscordBot {
     @Override
     public List<Channel> getChannels() {
         return channels;
+    }
+
+    public List<VoiceChannel> getVoiceChannels() {
+        return voiceChannels;
     }
 
     @Override
@@ -190,8 +212,12 @@ class DiscordBot implements IDiscordBot {
     }
 
     @Override
-    public User getUser() {
+    public DiscordUser getBotUser() {
         return user;
+    }
+
+    public Wss getTextWss() {
+        return textWss;
     }
 
     /**
@@ -203,7 +229,7 @@ class DiscordBot implements IDiscordBot {
     @Override
     public Channel createDmChannel(final User user) {
         Builder.CreateDmChannel cm = new Builder.CreateDmChannel();
-        cm.recipient_id = user.getId();
+        cm.recipient_id = user.getDiscordUser().getId();
         Channel.ChannelP parser = new Channel.ChannelP(new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, USERME + "/channels", new Json(Builder.buildData(cm)))))).logic();
         return parser.getChannel();
     }
@@ -221,7 +247,6 @@ class DiscordBot implements IDiscordBot {
         g.name = gameName;
         g.type = gameType.ordinal();
         p.game = Builder.buildData(g);
-        System.out.println(Builder.buildPayload(OpCodes.Status_Update, Builder.buildData(p)));
         rateLimitRecorder.queue(new WebSocketEvent(this.textWss.getWebSocket(), Builder.buildPayload(OpCodes.Status_Update, Builder.buildData(p))));
     }
 }

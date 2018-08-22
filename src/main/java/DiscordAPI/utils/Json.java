@@ -186,6 +186,10 @@ public class Json {
                 } else {
                     if (list.get(1).contains("null")) {
                         map.put(list.get(0), null);
+                    } else if (list.get(1).contains("false")) {
+                        map.put(list.get(0), false);
+                    } else if (list.get(1).contains("true")) {
+                        map.put(list.get(1), true);
                     } else {
                         map.put(list.get(0), list.get(1));
                     }
@@ -203,7 +207,6 @@ public class Json {
         StringBuilder builder = new StringBuilder();
         builder.append("{");
         for (String s : map.keySet()) {
-
             builder.append("\"")
                     .append(s)
                     .append("\"")

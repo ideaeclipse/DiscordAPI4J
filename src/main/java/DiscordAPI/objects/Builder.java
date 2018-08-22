@@ -19,6 +19,13 @@ public class Builder {
         Long recipient_id;
     }
 
+    static class VoiceStateUpdate {
+        Long guild_id;
+        Long channel_id;
+        Boolean self_mute = false;
+        Boolean self_deaf = false;
+    }
+
     /**
      * Used for creating an identity payload
      * This is used in {@link DiscordBot#buildIdentity()}

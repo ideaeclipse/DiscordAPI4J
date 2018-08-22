@@ -1,117 +1,100 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.GUILD;
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.MEMBER;
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
-import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
-/**
- * This class is used for storing and parsing User data
- *
- * @author Ideaeclipse
- * @see DiscordAPI.objects.Payloads.DUser
- */
 public class User {
-    private final Long id;
-    private final String name;
-    private final Integer discriminator;
+    private final String nick;
+    private final String joined_at;
     private final List<Role> roles;
+    private final Boolean deaf;
+    private final Boolean mute;
+    private final String session_id;
+    private final DiscordUser user;
+    private final Game game;
+    private final String status;
 
-    /**
-     * @param id            User Id
-     * @param Name          User Name
-     * @param discriminator User discriminator
-     * @param roles         {@link Role}
-     */
-    private User(final Long id, final String Name, final Integer discriminator, final List<Role> roles) {
-        this.id = id;
-        this.name = Name;
-        this.discriminator = discriminator;
+    private User(final String nick, final String joined_at, final List<Role> roles, final Boolean deaf, final Boolean mute, final String session_id, final DiscordUser user, final String status, final Game game) {
+        this.nick = nick;
+        this.joined_at = joined_at;
         this.roles = roles;
+        this.deaf = deaf;
+        this.mute = mute;
+        this.session_id = session_id;
+        this.user = user;
+        this.game = game;
+        this.status = status;
     }
 
-    public String getName() {
-        return name;
+    public String getNick() {
+        return nick;
     }
 
-    public Integer getDiscriminator() {
-        return discriminator;
-    }
-
-    public Long getId() {
-        return id;
+    public String getJoined_at() {
+        return joined_at;
     }
 
     public List<Role> getRoles() {
         return roles;
     }
 
-    @Override
-    public String toString() {
-        return "{User} Id: " + id + " Name: " + name + " Discriminator: " + discriminator + " Roles: " + roles;
+    public Boolean getDeaf() {
+        return deaf;
     }
 
-    /**
-     * Parses user data
-     *
-     * @author Ideaeclipse
-     */
-    static class UserP {
-        private final Long id;
+    public Boolean getMute() {
+        return mute;
+    }
+
+    public String getSession_id() {
+        return session_id;
+    }
+
+    public DiscordUser getDiscordUser() {
+        return user;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    @Override
+    public String toString() {
+        return "{User} Nick: " + nick + " Joined_At: " + joined_at + " Roles: " + roles + " Deaf: " + deaf + " Mute: " + mute + " Session: " + session_id + " DiscordUser: " + user + " Status: " + status + " Game: " + game;
+    }
+
+    public static class ServerUniqueUserP {
         private final IDiscordBot bot;
-        private User user;
-        private Json object;
+        private final Json payload;
+        private User serverUniqueUser;
 
-        /**
-         * @param id         user Id
-         * @param DiscordBot bot
-         */
-        UserP(final Long id, final IDiscordBot DiscordBot) {
-            this.id = id;
-            this.bot = DiscordBot;
-        }
-
-        /**
-         * @param object
-         * @param bot
-         */
-        UserP(Json object, IDiscordBot bot) {
-            this.object = object;
+        ServerUniqueUserP(final IDiscordBot bot, final Json payload) {
             this.bot = bot;
-            this.id = null;
+            this.payload = payload;
         }
 
-        UserP logic() {
-            if (object == null) {
-                object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + bot.getGuildId() + MEMBER + "/" + id)));
-            }
+        ServerUniqueUserP logic() {
+            Payloads.DServerUniqueUser u = Parser.convertToPayload(payload, Payloads.DServerUniqueUser.class);
             List<Role> roles = new ArrayList<>();
-            for (String s : Json.asList((String) object.get("roles"))) {
-                Role role = DiscordUtils.Search.ROLES(bot.getRoles(), Long.parseUnsignedLong(s));
-                if (role != null) {
-                    roles.add(role);
+            if (u.roles != null) {
+                for (Long s : u.roles) {
+                    roles.add(new Role.RoleP(bot, s).logic().getRole());
                 }
             }
-            Payloads.DUser u = null;
-            if (object.get("user") != null) {
-                u = Parser.convertToPayload(new Json((String) object.get("user")), Payloads.DUser.class);
-            }
-            assert u != null;
-            user = new User(u.id, u.username, u.discriminator, roles);
+            serverUniqueUser = new User(u.nick, u.joined_at, roles, u.deaf, u.mute, u.session_id, u.user, u.status, u.game);
             return this;
         }
 
-        User getUser() {
-            return this.user;
+        public User getServerUniqueUser() {
+            return serverUniqueUser;
         }
     }
 }

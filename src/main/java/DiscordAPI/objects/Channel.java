@@ -30,7 +30,7 @@ public class Channel {
      * @param nsfw     is the channel NSFW?
      * @param type     See link for more info {@link DiscordAPI.objects.Payloads.ChannelTypes}
      */
-    private Channel(final Long id, final String name, final Integer position, final Boolean nsfw, final Payloads.ChannelTypes type) {
+    Channel(final Long id, final String name, final Integer position, final Boolean nsfw, final Payloads.ChannelTypes type) {
         this.id = id;
         this.name = name;
         this.position = position;

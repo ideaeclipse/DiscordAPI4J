@@ -1,5 +1,7 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.IDiscordBot;
+import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
 import org.json.simple.JSONObject;
 
@@ -63,19 +65,32 @@ public class Role {
      * @author Ideaeclipse
      */
     static class RoleP {
+        private final IDiscordBot bot;
         private final Json object;
         private Role role;
+        private Long id;
 
         /**
          * @param object role Object
          */
-        RoleP(final Json object) {
+        RoleP(final IDiscordBot bot, final Json object) {
+            this.bot = bot;
             this.object = object;
         }
 
+        RoleP(final IDiscordBot bot, final Long id) {
+            this.bot = bot;
+            this.object = null;
+            this.id = id;
+        }
+
         RoleP logic() {
-            Payloads.DRole r = Parser.convertToPayload(object, Payloads.DRole.class);
-            role = new Role(r.id, r.name, r.color, r.position, r.permissions);
+            if (object != null) {
+                Payloads.DRole r = Parser.convertToPayload(object, Payloads.DRole.class);
+                role = new Role(r.id, r.name, r.color, r.position, r.permissions);
+            }else {
+                role = DiscordUtils.Search.ROLES(bot.getRoles(), id);
+            }
             return this;
         }
 

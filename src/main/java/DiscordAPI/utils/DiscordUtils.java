@@ -1,8 +1,7 @@
 package DiscordAPI.utils;
 
-import DiscordAPI.objects.Channel;
-import DiscordAPI.objects.Role;
-import DiscordAPI.objects.User;
+import DiscordAPI.IDiscordBot;
+import DiscordAPI.objects.*;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -89,7 +88,7 @@ public class DiscordUtils {
         /**
          * This method will send Post method with a json String
          *
-         * @param url url String
+         * @param url    url String
          * @param object Json Object
          * @return Returns the response from the WebServer
          */
@@ -153,9 +152,27 @@ public class DiscordUtils {
             return null;
         }
 
+        public static VoiceChannel VOICECHANNEL(final List<VoiceChannel> channels, final String channelName) {
+            for (VoiceChannel channel : channels) {
+                if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
+                    return channel;
+                }
+            }
+            return null;
+        }
+
         public static User USER(final List<User> users, final String userName) {
             for (User user : users) {
-                if (user.getName().toLowerCase().equals(userName.toLowerCase())) {
+                if (user.getDiscordUser().getName().toLowerCase().equals(userName.toLowerCase())) {
+                    return user;
+                }
+            }
+            return null;
+        }
+
+        public static User USER(final List<User> users, final Long userId) {
+            for (User user : users) {
+                if (user.getDiscordUser().getId().equals(userId)) {
                     return user;
                 }
             }
@@ -191,6 +208,7 @@ public class DiscordUtils {
     public static class DefaultLinks {
         public static String token;
         public static RateLimitRecorder rateLimitRecorder;
+        public static IDiscordBot bot;
 
         static final String APIBASE = "https://discordapp.com/api/v6/";
         public static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";

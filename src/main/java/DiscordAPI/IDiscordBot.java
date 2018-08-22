@@ -1,10 +1,7 @@
 package DiscordAPI;
 
 import DiscordAPI.listener.dispatcher.TDispatcher;
-import DiscordAPI.objects.Channel;
-import DiscordAPI.objects.Payloads;
-import DiscordAPI.objects.Role;
-import DiscordAPI.objects.User;
+import DiscordAPI.objects.*;
 import DiscordAPI.utils.Json;
 
 import java.util.List;
@@ -27,9 +24,11 @@ public interface IDiscordBot {
     TDispatcher getDispatcher();
 
     //returns bot
-    User getUser();
+    DiscordUser getBotUser();
 
     Channel createDmChannel(User user);
+
+    AudioManager getAudioManager();
 
     void setStatus(Payloads.GameTypes gameType, String gameName);
 }

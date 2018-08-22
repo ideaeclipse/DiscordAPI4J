@@ -7,18 +7,18 @@ package DiscordAPI.objects;
  * @see DiscordAPI.objects.Payloads.DMessage
  */
 public class Message {
-    private final User user;
+    private final DiscordUser user;
     private final Channel channel;
     private final Long guildId;
     private final String content;
 
     /**
-     * @param user    User who sent the message
+     * @param user    DiscordUser who sent the message
      * @param channel Channel in which the message was sent
      * @param guildId guildId
      * @param content contents of the message
      */
-    Message(final User user, final Channel channel, final Long guildId, final String content) {
+    Message(final DiscordUser user, final Channel channel, final Long guildId, final String content) {
         this.user = user;
         this.channel = channel;
         this.guildId = guildId;
@@ -29,7 +29,7 @@ public class Message {
         return channel;
     }
 
-    public User getUser() {
+    public DiscordUser getUser() {
         return user;
     }
 

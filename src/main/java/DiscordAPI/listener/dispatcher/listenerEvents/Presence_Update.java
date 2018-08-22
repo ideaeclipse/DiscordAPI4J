@@ -17,7 +17,7 @@ import DiscordAPI.webSocket.Wss;
  * @author Ideaeclipse
  */
 public class Presence_Update extends ListenerEvent {
-    private Status status;
+    private User status;
 
     /**
      * Initialized using Java reflection
@@ -28,13 +28,13 @@ public class Presence_Update extends ListenerEvent {
      */
     public Presence_Update(final IDiscordBot b, final Json payload) {
         super(b);
-        status = new Parser.PresenceUpdate(b, payload).getStatus();
+        status = new Parser.PresenceUpdate(b, payload).getUser();
     }
 
     /**
-     * @return User's Current Status {@link Status}
+     * @return DiscordUser's Current Status {@link User}
      */
-    public Status getStatus() {
+    public User getStatus() {
         return status;
     }
 }

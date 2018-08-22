@@ -1,7 +1,8 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.utils.Json;
-import org.json.simple.JSONObject;
+
+import java.util.List;
 
 /**
  * This class is used for {@link Parser#convertToPayload(Json, Class)}
@@ -28,7 +29,8 @@ public class Payloads {
      */
     public enum ChannelTypes {
         textChannel,
-        dmChannel
+        dmChannel,
+        voiceChannel
     }
 
     /**
@@ -46,6 +48,32 @@ public class Payloads {
         String content;
 
         public DMessage() {
+
+        }
+    }
+
+    static class DVoiceServerUpdate {
+        String token;
+        Long guild_id;
+        String endpoint;
+
+        public DVoiceServerUpdate() {
+
+        }
+    }
+
+    static class DVoiceStateUpdate {
+        Long user_id;
+        Boolean suppress;
+        String session_id;
+        Boolean self_video;
+        Boolean self_mute;
+        Boolean mute;
+        Boolean deaf;
+        Long guild_id;
+        Long channel_id;
+
+        public DVoiceStateUpdate() {
 
         }
     }
@@ -95,17 +123,35 @@ public class Payloads {
     }
 
     /**
-     * This class stores User data
+     * This class stores DiscordUser data
      *
      * @author Ideaeclipse
-     * @see User
+     * @see DiscordUser
      */
     static class DUser {
         Long id;
         String username;
         Integer discriminator;
+        Boolean deaf;
+        Boolean mute;
 
         public DUser() {
+
+        }
+    }
+
+    static class DServerUniqueUser {
+        String nick;
+        String joined_at;
+        List<Long> roles;
+        Boolean deaf;
+        Boolean mute;
+        String session_id;
+        DiscordUser user;
+        String status;
+        Game game;
+
+        public DServerUniqueUser() {
 
         }
     }

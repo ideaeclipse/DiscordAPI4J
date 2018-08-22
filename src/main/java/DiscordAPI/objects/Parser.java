@@ -4,11 +4,11 @@ import DiscordAPI.IDiscordBot;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
-import org.json.simple.JSONObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
 
 /**
  * This class is called from each listenerEvent {@link DiscordAPI.listener.dispatcher.listenerEvents.Channel_Create}
@@ -123,15 +123,14 @@ public class Parser {
          */
         public MessageCreate(final IDiscordBot b, final Json payload) {
             Json user = new Json(String.valueOf(payload.get("author")));
-            Payloads.DUser u = convertToPayload(user, Payloads.DUser.class);
             Payloads.DMessage m = convertToPayload(payload, Payloads.DMessage.class);
-            User.UserP pd = new User.UserP(u.id, b).logic();
+            DiscordUser.UserP pd = new DiscordUser.UserP(user, b).logic();
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
             message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
-                logger.info("Message Create: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
+                logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
             } else {
-                logger.info("Dm Sent: User: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n"));
+                logger.info("Dm Sent: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n"));
             }
         }
 
@@ -149,24 +148,63 @@ public class Parser {
      */
     public static class PresenceUpdate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private volatile Status status;
+        private final User user;
 
         /**
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
         public PresenceUpdate(final IDiscordBot b, final Json payload) {
+            final User.ServerUniqueUserP u = new User.ServerUniqueUserP(b, payload).logic();
+            user = u.getServerUniqueUser();
+            logger.info("Presence Update: DiscordUser: " + user.getDiscordUser().getName() + " Status: " + user.getStatus() + (user.getGame() != null ? " Game: " + ((user.getGame().getType() == Payloads.GameTypes.Playing) ?
+                    "Playing " + user.getGame().getName() + " Details: " + user.getGame().getState() + " " + user.getGame().getDetails()
+                    : "Listening to " + user.getGame().getState() + " Song: " + user.getGame().getDetails() + " on " + user.getGame().getName()) : ""));
+
+            /*
             final Payloads.DUser user = convertToPayload(new Json(String.valueOf(payload.get("user"))), Payloads.DUser.class);
-            final User.UserP pd = new User.UserP(user.id, b).logic();
+            final DiscordUser.UserP pd = new DiscordUser.UserP(user.id, b).logic();
             final Game.GameP gd = payload.get("game") != null ? new Game.GameP(new Json((String) payload.get("game"))).logic() : null;
             status = new Status(gd != null ? gd.getGame() : null, pd.getUser(), String.valueOf(payload.get("status")));
-            logger.info("Presence Update: User: " + status.getUser().getName() + " Status: " + status.getStatus() + (status.getGame() != null ? " Game: " + ((status.getGame().getType() == Payloads.GameTypes.Playing) ?
-                    "Playing " + status.getGame().getName() + " Details: " + status.getGame().getState() + " " + status.getGame().getDetails()
-                    : "Listening to " + status.getGame().getState() + " Song: " + status.getGame().getDetails() + " on " + status.getGame().getName()) : ""));
+
+        */
         }
 
-        public Status getStatus() {
-            return status;
+        public User getUser() {
+            return user;
+        }
+    }
+
+    public static class VoiceServerUpdate {
+        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+        private final VServerUpdate voiceServerUpdate;
+
+        public VoiceServerUpdate(final IDiscordBot b, final Json payload) {
+            Payloads.DVoiceServerUpdate vsu = convertToPayload(payload, Payloads.DVoiceServerUpdate.class);
+            this.voiceServerUpdate = new VServerUpdate(vsu.token, vsu.endpoint);
+            synchronized (b.getAudioManager().getLock()) {
+                b.getAudioManager().setVoiceServerUpdate(voiceServerUpdate);
+                b.getAudioManager().getLock().notify();
+            }
+        }
+
+        public VServerUpdate getVoiceServerUpdate() {
+            return voiceServerUpdate;
+        }
+    }
+
+    public static class VoiceStateUpdate {
+        private final User user;
+        private final VStateUpdate vStateUpdate;
+        private final Channel channel;
+
+        public VoiceStateUpdate(final IDiscordBot b, final Json payload) {
+            VStateUpdate.VStateUpdateP v = new VStateUpdate.VStateUpdateP(b, payload).logic();
+            user = v.getUser();
+            vStateUpdate = v.getvStateUpdate();
+            channel = v.getChannel();
+            if (b.getAudioManager().getInitialUpdate() == null)
+                b.getAudioManager().setInitialUpdate(vStateUpdate);
         }
     }
 
@@ -190,24 +228,78 @@ public class Parser {
                     continue;
                 }
                 String value = String.valueOf(object.get((String) s));
-                if (f.getType().equals(String.class)) {
-                    f.set(o, value);
-                } else if (f.getType().equals(Integer.class)) {
-                    f.set(o, Integer.parseInt(value));
-                } else if (f.getType().equals(Float.class)) {
-                    f.set(o, Float.parseFloat(value));
-                } else if (f.getType().equals(Long.class)) {
-                    f.set(o, Long.parseUnsignedLong(value));
-                } else if (f.getType().equals(Boolean.class)) {
-                    f.set(o, Boolean.parseBoolean(value));
+                if (value.equals("null")) {
+                    value = null;
+                }
+                if (f.getType().equals(List.class)) {
+                    ParameterizedType genericType = (ParameterizedType) f.getGenericType();
+                    f.set(o, convertToList(value, (Class<?>) genericType.getActualTypeArguments()[0]));
+                } else if (f.getType().equals(DiscordUser.class)) {
+                    f.set(o, new DiscordUser.UserP(new Json(value), DiscordUtils.DefaultLinks.bot).logic().getUser());
+                } else if (f.getType().equals(Game.class)) {
+                    f.set(o, value != null ? new Game.GameP(new Json(value)).logic().getGame() : null);
                 } else if (f.getType().isEnum()) {
                     f.set(o, f.getType().getEnumConstants()[Integer.parseInt(value)]);
+                } else {
+                    f.set(o, convert(value, f.getType()));
                 }
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
         return o;
+    }
+
+    private static <T> List<T> convertToList(String value, Class<T> c) {
+        List<T> list = new ArrayList<>();
+        value = value.substring(1, value.length() - 1);
+        List<Integer> indexes = new ArrayList<>();
+        if (value.contains(",")) {
+            int index = value.indexOf(",");
+            while (index >= 0) {
+                indexes.add(index);
+                index = value.indexOf(",", (index + 1));
+            }
+            if (indexes.size() > 1) {
+                for (int i = 0; i < indexes.size(); i++) {
+                    if (i == 0) {
+                        list.add(convert(value.substring(0, indexes.get(i)).trim(), c));
+                    } else if (i == indexes.size() - 1) {
+                        list.add(convert(value.substring(indexes.get(i - 1), indexes.get(i)).trim(), c));
+                        list.add(convert(value.substring(indexes.get(i), value.length()).trim(), c));
+                    } else {
+                        list.add(convert(value.substring(indexes.get(i - 1), indexes.get(i)).trim(), c));
+                    }
+                }
+            } else if (indexes.size() == 1) {
+                list.add(convert(value.substring(0, indexes.get(0)).trim(), c));
+                list.add(convert(value.substring(indexes.get(0) + 1, value.length()).trim(), c));
+            }
+        } else {
+            if (value.length() > 0) {
+                list.add(convert(value, c));
+            }
+        }
+        return list;
+    }
+
+    private static <T> T convert(Object value, Class<T> c) {
+        final String s = String.valueOf(value);
+        Object convertedValue = null;
+        if (c != null) {
+            if (c.equals(String.class)) {
+                convertedValue = s;
+            } else if (c.equals(Integer.class)) {
+                convertedValue = Integer.parseInt(s);
+            } else if (c.equals(Float.class)) {
+                convertedValue = Float.parseFloat(s);
+            } else if (c.equals(Long.class)) {
+                convertedValue = Long.parseUnsignedLong(s);
+            } else if (c.equals(Boolean.class)) {
+                convertedValue = Boolean.parseBoolean(s);
+            }
+        }
+        return (T) convertedValue;
     }
 
     /**
