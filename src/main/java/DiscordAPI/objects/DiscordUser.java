@@ -90,7 +90,10 @@ public class DiscordUser {
 
         UserP logic() {
             if (id == null) {
-                User temp = DiscordUtils.Search.USER(Objects.requireNonNull(bot.getUsers()), Long.parseUnsignedLong((String) object.get("id")));
+                User temp = null;
+                if (bot.getUsers() != null) {
+                    temp = DiscordUtils.Search.USER(Objects.requireNonNull(bot.getUsers()), Long.parseUnsignedLong((String) object.get("id")));
+                }
                 if (temp == null) {
                     Payloads.DUser u = Parser.convertToPayload(object, Payloads.DUser.class);
                     user = new DiscordUser(u.id, u.username, u.discriminator);

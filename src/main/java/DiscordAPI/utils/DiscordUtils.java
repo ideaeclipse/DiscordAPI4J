@@ -152,10 +152,12 @@ public class DiscordUtils {
             return null;
         }
 
-        public static VoiceChannel VOICECHANNEL(final List<VoiceChannel> channels, final String channelName) {
-            for (VoiceChannel channel : channels) {
-                if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
-                    return channel;
+        public static Channel VOICECHANNEL(final List<Channel> channels, final String channelName) {
+            for (Channel channel : channels) {
+                if (channel.getType().equals(Payloads.ChannelTypes.voiceChannel)) {
+                    if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
+                        return channel;
+                    }
                 }
             }
             return null;

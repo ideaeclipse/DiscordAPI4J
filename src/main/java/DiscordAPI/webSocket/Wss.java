@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
-public class Wss extends WebSocketFactory implements Callable<Boolean> {
+public class Wss extends WebSocketFactory {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(Wss.class));
     private final Object lock = new Object();
     private Thread heartbeat;
@@ -82,10 +82,8 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
                                 heartbeat.start();
                                 sendText(bot.getIdentity());
                                 synchronized (lock) {
-                                    status = true;
                                     lock.notify();
                                 }
-
                                 break;
                             case HeartBeat_ACK:
                                 System.out.println("alive");
@@ -110,13 +108,7 @@ public class Wss extends WebSocketFactory implements Callable<Boolean> {
         return webSocket;
     }
 
-    @Override
-    public Boolean call() throws Exception {
-        synchronized (lock) {
-            while (!this.status) {
-                lock.wait();
-            }
-            return status;
-        }
+    public Object getLock() {
+        return lock;
     }
 }

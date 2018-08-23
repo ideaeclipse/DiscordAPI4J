@@ -35,7 +35,7 @@ public class Parser {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
-                b.updateChannels();
+                //b.updateChannels();
                 logger.info("Text Channel Create: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
             } else if (channel.getType().equals(Payloads.ChannelTypes.dmChannel)) {
                 logger.info("Dm Channel Created");
@@ -64,7 +64,7 @@ public class Parser {
         public ChannelDelete(final IDiscordBot b, final Json payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
-            b.updateChannels();
+            //b.updateChannels();
             logger.info("Channel Delete: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
         }
 
@@ -92,7 +92,7 @@ public class Parser {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             oldC = DiscordUtils.Search.CHANNEL(b.getChannels(), cd.getChannel().getName());
             newC = cd.getChannel();
-            b.updateChannels();
+           // b.updateChannels();
             logger.info("Channel Update Old: Name: " + oldC.getName() + " NSFW: " + oldC.getNsfw() + " Position: " + oldC.getPosition());
             logger.info("Channel Update New: Name: " + newC.getName() + " NSFW: " + newC.getNsfw() + " Position: " + newC.getPosition());
         }
@@ -235,11 +235,11 @@ public class Parser {
                     ParameterizedType genericType = (ParameterizedType) f.getGenericType();
                     f.set(o, convertToList(value, (Class<?>) genericType.getActualTypeArguments()[0]));
                 } else if (f.getType().equals(DiscordUser.class)) {
-                    f.set(o, new DiscordUser.UserP(new Json(value), DiscordUtils.DefaultLinks.bot).logic().getUser());
+                    f.set(o, value != null ? new DiscordUser.UserP(new Json(value), DiscordUtils.DefaultLinks.bot).logic().getUser() : null);
                 } else if (f.getType().equals(Game.class)) {
                     f.set(o, value != null ? new Game.GameP(new Json(value)).logic().getGame() : null);
                 } else if (f.getType().isEnum()) {
-                    f.set(o, f.getType().getEnumConstants()[Integer.parseInt(value)]);
+                    f.set(o, value != null ? f.getType().getEnumConstants()[Integer.parseInt(value)] : null);
                 } else {
                     f.set(o, convert(value, f.getType()));
                 }

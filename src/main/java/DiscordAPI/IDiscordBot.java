@@ -11,7 +11,7 @@ public interface IDiscordBot {
 
     long getGuildId();
 
-    void updateChannels();
+    //void updateChannels();
 
     List<Channel> getChannels();
 

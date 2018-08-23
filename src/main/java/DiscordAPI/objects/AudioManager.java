@@ -22,7 +22,7 @@ public class AudioManager {
     }
 
 
-    public void joinChannel(final VoiceChannel channel) {
+    public void joinChannel(final Channel channel) {
         Builder.VoiceStateUpdate voiceStateUpdate = new Builder.VoiceStateUpdate();
         voiceStateUpdate.channel_id = channel.getId();
         voiceStateUpdate.guild_id = bot.getGuildId();
