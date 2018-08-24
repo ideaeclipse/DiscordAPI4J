@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.OpCodes;
@@ -22,7 +23,7 @@ public class AudioManager {
     }
 
 
-    public void joinChannel(final Channel channel) {
+    public void joinChannel(final IChannel channel) {
         Builder.VoiceStateUpdate voiceStateUpdate = new Builder.VoiceStateUpdate();
         voiceStateUpdate.channel_id = channel.getId();
         voiceStateUpdate.guild_id = bot.getGuildId();

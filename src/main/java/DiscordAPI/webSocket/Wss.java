@@ -1,5 +1,6 @@
 package DiscordAPI.webSocket;
 
+import DiscordAPI.IPrivateBot;
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.objects.Parser;
@@ -13,8 +14,8 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.Callable;
 
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.async;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
 public class Wss extends WebSocketFactory {
@@ -25,30 +26,34 @@ public class Wss extends WebSocketFactory {
     private Long startTime;
     private Wss wss;
     private final WebSocket webSocket;
-    private Boolean status;
 
     public Wss(final IDiscordBot bot) throws IOException, WebSocketException {
-        this.status = false;
         wss = this;
         webSocket = this
                 .setConnectionTimeout(5000)
                 .createSocket(DiscordUtils.DefaultLinks.WEBSOCKET)
                 .addListener(new WebSocketAdapter() {
-                    public void onTextMessage(WebSocket webSocket1, String message) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+                    public void onTextMessage(WebSocket webSocket1, String message) {
                         Json payload = new Json(message);
                         OpCodes opCodes = OpCodes.values()[Integer.parseInt(String.valueOf(payload.get("op")))];
                         switch (opCodes) {
                             case Dispatch:
-                                //System.out.println(message);
                                 String currentEvent = String.valueOf(payload.get("t"));
-                                for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
-                                    if (currentEvent.equals(webSocket_events.toString())) {
-                                        Class<?> cl = webSocket_events.getaClass();
-                                        Constructor constructor = cl.getConstructor(IDiscordBot.class, Json.class);
-                                        Object t = constructor.newInstance(bot, new Json((String) payload.get("d")));
-                                        bot.getDispatcher().notify((ListenerEvent) t);
+                                async.queue(() -> {
+                                    try {
+                                        for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
+                                            if (currentEvent.equals(webSocket_events.toString())) {
+                                                Class<?> cl = webSocket_events.getaClass();
+                                                Constructor constructor = cl.getConstructor(IPrivateBot.class, Json.class);
+                                                Object t = constructor.newInstance(bot, new Json((String) payload.get("d")));
+                                                bot.getDispatcher().notify((ListenerEvent) t);
+                                            }
+                                        }
+                                    } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
+                                        e.printStackTrace();
                                     }
-                                }
+                                    return null;
+                                }, currentEvent);
                                 break;
                             case Heartbeat:
                                 break;

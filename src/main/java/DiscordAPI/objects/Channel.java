@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.Json;
 import org.json.simple.JSONObject;
 
@@ -14,7 +15,7 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  * @author Ideaeclipse
  * @see DiscordAPI.objects.Payloads.DChannel
  */
-public class Channel {
+class Channel implements IChannel {
     private final Long id;
     private final String name;
     private final Integer position;
@@ -83,7 +84,7 @@ public class Channel {
      */
     static class ChannelP {
         private final Long id;
-        private Channel channel;
+        private IChannel channel;
         private Json object;
 
         /**
@@ -120,7 +121,7 @@ public class Channel {
             return this;
         }
 
-        public Channel getChannel() {
+        public IChannel getChannel() {
             return channel;
         }
     }

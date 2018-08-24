@@ -1,8 +1,9 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.*;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
+import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.OpCodes;
 import DiscordAPI.webSocket.Wss;
@@ -17,7 +18,7 @@ import DiscordAPI.webSocket.Wss;
  * @author Ideaeclipse
  */
 public class Presence_Update extends ListenerEvent {
-    private User status;
+    private IUser status;
 
     /**
      * Initialized using Java reflection
@@ -26,7 +27,7 @@ public class Presence_Update extends ListenerEvent {
      * @param payload the 'd' param from the message from the webscoekt
      * @see Wss under case Dispatch
      */
-    public Presence_Update(final IDiscordBot b, final Json payload) {
+    public Presence_Update(final IPrivateBot b, final Json payload) {
         super(b);
         status = new Parser.PresenceUpdate(b, payload).getUser();
     }
@@ -34,7 +35,7 @@ public class Presence_Update extends ListenerEvent {
     /**
      * @return DiscordUser's Current Status {@link User}
      */
-    public User getStatus() {
+    public IUser getStatus() {
         return status;
     }
 }

@@ -2,7 +2,7 @@ import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.dispatcher.listenerEvents.Message_Create;
 import DiscordAPI.listener.dispatcher.TListener;
 import DiscordAPI.objects.DiscordBotBuilder;
-import DiscordAPI.objects.Message;
+import DiscordAPI.objects.Interfaces.IMessage;
 import DiscordAPI.objects.Payloads;
 import DiscordAPI.utils.DiscordUtils;
 
@@ -11,7 +11,7 @@ public class Main {
     private Main(String token, Long guildId) {
         IDiscordBot bot = new DiscordBotBuilder(token, guildId).login();
         bot.getDispatcher().addListener((TListener<Message_Create>) a -> {
-            Message message = a.getMessage();
+            IMessage message = a.getMessage();
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
                 if (!message.getUser().getName().equals(bot.getBotUser().getName()) && message.getChannel().getName().toLowerCase().equals("bot")) {
                     StringBuilder builder = new StringBuilder();

@@ -1,24 +1,28 @@
 package DiscordAPI.objects;
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
+import DiscordAPI.objects.Interfaces.IDiscordUser;
+import DiscordAPI.objects.Interfaces.IGame;
+import DiscordAPI.objects.Interfaces.IRole;
+import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Json;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class User {
+class User implements IUser {
     private final String nick;
     private final String joined_at;
-    private final List<Role> roles;
+    private final List<IRole> roles;
     private final Boolean deaf;
     private final Boolean mute;
     private final String session_id;
-    private final DiscordUser user;
-    private final Game game;
+    private final IDiscordUser user;
+    private final IGame game;
     private final String status;
 
-    private User(final String nick, final String joined_at, final List<Role> roles, final Boolean deaf, final Boolean mute, final String session_id, final DiscordUser user, final String status, final Game game) {
+    private User(final String nick, final String joined_at, final List<IRole> roles, final Boolean deaf, final Boolean mute, final String session_id, final DiscordUser user, final String status, final IGame game) {
         this.nick = nick;
         this.joined_at = joined_at;
         this.roles = roles;
@@ -38,7 +42,7 @@ public class User {
         return joined_at;
     }
 
-    public List<Role> getRoles() {
+    public List<IRole> getRoles() {
         return roles;
     }
 
@@ -54,7 +58,7 @@ public class User {
         return session_id;
     }
 
-    public DiscordUser getDiscordUser() {
+    public IDiscordUser getDiscordUser() {
         return user;
     }
 
@@ -62,7 +66,7 @@ public class User {
         return status;
     }
 
-    public Game getGame() {
+    public IGame getGame() {
         return game;
     }
 
@@ -72,18 +76,18 @@ public class User {
     }
 
     public static class ServerUniqueUserP {
-        private final IDiscordBot bot;
+        private final IPrivateBot bot;
         private final Json payload;
         private User serverUniqueUser;
 
-        ServerUniqueUserP(final IDiscordBot bot, final Json payload) {
+        ServerUniqueUserP(final IPrivateBot bot, final Json payload) {
             this.bot = bot;
             this.payload = payload;
         }
 
         ServerUniqueUserP logic() {
             Payloads.DServerUniqueUser u = Parser.convertToPayload(payload, Payloads.DServerUniqueUser.class);
-            List<Role> roles = new ArrayList<>();
+            List<IRole> roles = new ArrayList<>();
             if (u.roles != null) {
                 for (Long s : u.roles) {
                     roles.add(new Role.RoleP(bot, s).logic().getRole());

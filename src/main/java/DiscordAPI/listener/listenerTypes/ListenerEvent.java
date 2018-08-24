@@ -1,6 +1,7 @@
 package DiscordAPI.listener.listenerTypes;
 
 
+import DiscordAPI.IPrivateBot;
 import DiscordAPI.IDiscordBot;
 
 /**
@@ -10,12 +11,12 @@ import DiscordAPI.IDiscordBot;
  * @author Ideaeclipse
  */
 public abstract class ListenerEvent {
-    private IDiscordBot DiscordBot;
+    private IPrivateBot DiscordBot;
 
     /**
      * @param b DiscordBot {@link DiscordAPI.objects.DiscordBot}
      */
-    public ListenerEvent(final IDiscordBot b) {
+    public ListenerEvent(final IPrivateBot b) {
         this.DiscordBot = b;
     }
 
@@ -23,6 +24,6 @@ public abstract class ListenerEvent {
      * @return DiscordBot {@link DiscordAPI.objects.DiscordBot}
      */
     public IDiscordBot getDiscordBot() {
-        return this.DiscordBot;
+        return this.DiscordBot.getPublicBot();
     }
 }

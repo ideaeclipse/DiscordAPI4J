@@ -1,12 +1,12 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.*;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
+import DiscordAPI.objects.Interfaces.IMessage;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
-import org.json.simple.JSONObject;
 
 /**
  * This Class is called using java reflection
@@ -17,7 +17,7 @@ import org.json.simple.JSONObject;
  * @author Ideaeclipse
  */
 public class Message_Create extends ListenerEvent {
-    private Message message;
+    private IMessage message;
 
     /**
      * Initialized using Java reflection
@@ -26,7 +26,7 @@ public class Message_Create extends ListenerEvent {
      * @param payload the 'd' param from the message from the webscoekt
      * @see Wss under case Dispatch
      */
-    public Message_Create(final IDiscordBot b, final Json payload) {
+    public Message_Create(final IPrivateBot b, final Json payload) {
         super(b);
         message = new Parser.MessageCreate(b, payload).getMessage();
     }
@@ -34,7 +34,7 @@ public class Message_Create extends ListenerEvent {
     /**
      * @return returns Message created using {@link DiscordAPI.objects.Parser.MessageCreate}
      */
-    public Message getMessage() {
+    public IMessage getMessage() {
         return this.message;
     }
 }

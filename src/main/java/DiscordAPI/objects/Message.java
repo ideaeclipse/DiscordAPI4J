@@ -1,14 +1,18 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.objects.Interfaces.IChannel;
+import DiscordAPI.objects.Interfaces.IDiscordUser;
+import DiscordAPI.objects.Interfaces.IMessage;
+
 /**
  * Class is used to store message info
  *
  * @author Ideaeclipse
  * @see DiscordAPI.objects.Payloads.DMessage
  */
-public class Message {
-    private final DiscordUser user;
-    private final Channel channel;
+class Message implements IMessage {
+    private final IDiscordUser user;
+    private final IChannel channel;
     private final Long guildId;
     private final String content;
 
@@ -18,18 +22,18 @@ public class Message {
      * @param guildId guildId
      * @param content contents of the message
      */
-    Message(final DiscordUser user, final Channel channel, final Long guildId, final String content) {
+    Message(final IDiscordUser user, final IChannel channel, final Long guildId, final String content) {
         this.user = user;
         this.channel = channel;
         this.guildId = guildId;
         this.content = content;
     }
 
-    public Channel getChannel() {
+    public IChannel getChannel() {
         return channel;
     }
 
-    public DiscordUser getUser() {
+    public IDiscordUser getUser() {
         return user;
     }
 

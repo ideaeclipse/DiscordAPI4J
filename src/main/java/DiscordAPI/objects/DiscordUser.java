@@ -1,6 +1,8 @@
 package DiscordAPI.objects;
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
+import DiscordAPI.objects.Interfaces.IDiscordUser;
+import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
 
@@ -17,7 +19,7 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  * @author Ideaeclipse
  * @see DiscordAPI.objects.Payloads.DUser
  */
-public class DiscordUser {
+class DiscordUser implements IDiscordUser {
     private final Long id;
     private final String name;
     private final Integer discriminator;
@@ -58,15 +60,15 @@ public class DiscordUser {
      */
     static class UserP {
         private final Long id;
-        private final IDiscordBot bot;
-        private DiscordUser user;
+        private final IPrivateBot bot;
+        private IDiscordUser user;
         private Json object;
 
         /**
          * @param id         user Id
          * @param DiscordBot bot
          */
-        UserP(final Long id, final IDiscordBot DiscordBot) {
+        UserP(final Long id, final IPrivateBot DiscordBot) {
             this.id = id;
             this.bot = DiscordBot;
         }
@@ -75,7 +77,7 @@ public class DiscordUser {
          * @param object
          * @param bot
          */
-        UserP(Json object, IDiscordBot bot) {
+        UserP(Json object, IPrivateBot bot) {
             this.object = object;
             this.bot = bot;
             this.id = null;
@@ -90,7 +92,7 @@ public class DiscordUser {
 
         UserP logic() {
             if (id == null) {
-                User temp = null;
+                IUser temp = null;
                 if (bot.getUsers() != null) {
                     temp = DiscordUtils.Search.USER(Objects.requireNonNull(bot.getUsers()), Long.parseUnsignedLong((String) object.get("id")));
                 }
@@ -104,7 +106,7 @@ public class DiscordUser {
             return this;
         }
 
-        DiscordUser getUser() {
+        IDiscordUser getUser() {
             return this.user;
         }
     }

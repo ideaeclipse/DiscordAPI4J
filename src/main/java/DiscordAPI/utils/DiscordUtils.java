@@ -1,7 +1,10 @@
 package DiscordAPI.utils;
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.*;
+import DiscordAPI.objects.Interfaces.IChannel;
+import DiscordAPI.objects.Interfaces.IRole;
+import DiscordAPI.objects.Interfaces.IUser;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -143,8 +146,8 @@ public class DiscordUtils {
 
 
     public static class Search {
-        public static Channel CHANNEL(final List<Channel> channels, final String channelName) {
-            for (Channel channel : channels) {
+        public static IChannel CHANNEL(final List<IChannel> channels, final String channelName) {
+            for (IChannel channel : channels) {
                 if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
                     return channel;
                 }
@@ -152,8 +155,8 @@ public class DiscordUtils {
             return null;
         }
 
-        public static Channel VOICECHANNEL(final List<Channel> channels, final String channelName) {
-            for (Channel channel : channels) {
+        public static IChannel VOICECHANNEL(final List<IChannel> channels, final String channelName) {
+            for (IChannel channel : channels) {
                 if (channel.getType().equals(Payloads.ChannelTypes.voiceChannel)) {
                     if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
                         return channel;
@@ -163,8 +166,8 @@ public class DiscordUtils {
             return null;
         }
 
-        public static User USER(final List<User> users, final String userName) {
-            for (User user : users) {
+        public static IUser USER(final List<IUser> users, final String userName) {
+            for (IUser user : users) {
                 if (user.getDiscordUser().getName().toLowerCase().equals(userName.toLowerCase())) {
                     return user;
                 }
@@ -172,8 +175,8 @@ public class DiscordUtils {
             return null;
         }
 
-        public static User USER(final List<User> users, final Long userId) {
-            for (User user : users) {
+        public static IUser USER(final List<IUser> users, final Long userId) {
+            for (IUser user : users) {
                 if (user.getDiscordUser().getId().equals(userId)) {
                     return user;
                 }
@@ -181,8 +184,8 @@ public class DiscordUtils {
             return null;
         }
 
-        public static Role ROLES(final List<Role> roles, final Long id) {
-            for (Role role : roles) {
+        public static IRole ROLES(final List<IRole> roles, final Long id) {
+            for (IRole role : roles) {
                 if (role.getId().equals(id)) {
                     return role;
                 }
@@ -210,7 +213,8 @@ public class DiscordUtils {
     public static class DefaultLinks {
         public static String token;
         public static RateLimitRecorder rateLimitRecorder;
-        public static IDiscordBot bot;
+        public static IPrivateBot bot;
+        public static Async async;
 
         static final String APIBASE = "https://discordapp.com/api/v6/";
         public static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";

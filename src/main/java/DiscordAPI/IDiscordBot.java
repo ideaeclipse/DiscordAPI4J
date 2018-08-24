@@ -2,6 +2,10 @@ package DiscordAPI;
 
 import DiscordAPI.listener.dispatcher.TDispatcher;
 import DiscordAPI.objects.*;
+import DiscordAPI.objects.Interfaces.IChannel;
+import DiscordAPI.objects.Interfaces.IDiscordUser;
+import DiscordAPI.objects.Interfaces.IRole;
+import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Json;
 
 import java.util.List;
@@ -13,20 +17,20 @@ public interface IDiscordBot {
 
     //void updateChannels();
 
-    List<Channel> getChannels();
+    List<IChannel> getChannels();
 
-    List<Role> getRoles();
+    List<IRole> getRoles();
 
-    List<User> getUsers();
+    List<IUser> getUsers();
 
     Json getIdentity();
 
     TDispatcher getDispatcher();
 
     //returns bot
-    DiscordUser getBotUser();
+    IDiscordUser getBotUser();
 
-    Channel createDmChannel(User user);
+    IChannel createDmChannel(IUser user);
 
     AudioManager getAudioManager();
 

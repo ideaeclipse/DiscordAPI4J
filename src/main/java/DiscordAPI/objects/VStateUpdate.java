@@ -1,6 +1,7 @@
 package DiscordAPI.objects;
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
+import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.Json;
 
 public class VStateUpdate {
@@ -71,13 +72,13 @@ public class VStateUpdate {
     See if refactoring is possible
      */
     public static class VStateUpdateP {
-        private final IDiscordBot bot;
+        private final IPrivateBot bot;
         private final Json payload;
         private User user;
         private VStateUpdate vStateUpdate;
-        private Channel channel;
+        private IChannel channel;
 
-        VStateUpdateP(final IDiscordBot bot, final Json payload) {
+        VStateUpdateP(final IPrivateBot bot, final Json payload) {
             this.bot = bot;
             this.payload = payload;
         }
@@ -100,7 +101,7 @@ public class VStateUpdate {
             return vStateUpdate;
         }
 
-        public Channel getChannel() {
+        public IChannel getChannel() {
             return channel;
         }
     }

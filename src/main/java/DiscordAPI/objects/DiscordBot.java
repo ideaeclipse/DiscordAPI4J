@@ -1,6 +1,11 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.IPrivateBot;
 import DiscordAPI.IDiscordBot;
+import DiscordAPI.objects.Interfaces.IChannel;
+import DiscordAPI.objects.Interfaces.IDiscordUser;
+import DiscordAPI.objects.Interfaces.IRole;
+import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.*;
 import DiscordAPI.webSocket.OpCodes;
 import DiscordAPI.webSocket.Wss;
@@ -20,23 +25,23 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  *
  * @author Ideaeclipse
  */
-class DiscordBot implements IDiscordBot {
+@SuppressWarnings("ALL")
+class DiscordBot implements IDiscordBot, IPrivateBot {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final Json identity;
     private final TDispatcher dispatcher;
     private final long guildId;
     private final AudioManager audioManager;
-    private List<Channel> channels;
-    private List<VoiceChannel> voiceChannels;
-    private List<User> users;
-    private List<Role> roles;
-    private DiscordUser user;
+    private List<IChannel> channels;
+    private List<IUser> users;
+    private List<IRole> roles;
+    private IDiscordUser user;
     private Wss textWss;
 
     /**
      * Called from {@link DiscordBotBuilder} {@link DiscordAPI.IDiscordBotBuilder}
      *
-     * @param token   Bot token
+     * @param token   IPrivateBot token
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final long guildID) {
@@ -49,6 +54,7 @@ class DiscordBot implements IDiscordBot {
         this.guildId = guildID;
         dispatcher = new TDispatcher();
         audioManager = new AudioManager(this);
+        async = new Async();
     }
 
     /**
@@ -81,6 +87,11 @@ class DiscordBot implements IDiscordBot {
         return guildId;
     }
 
+    @Override
+    public IDiscordBot getPublicBot() {
+        return this;
+    }
+
     /**
      * login method, starts the websocket connection and loads all the roles,users,channels from the server
      * also queries the /users/@me data of your bot so the user can get the DiscordUser object that contains the bot info
@@ -89,23 +100,20 @@ class DiscordBot implements IDiscordBot {
      */
     @Override
     public IDiscordBot login() {
-        Async async = new Async(this);
-        roles = async.queue(new URoles(this, guildId));
-        async.asyncQueue(new UChannels(guildId));
-        async.asyncQueue(new UUsers(this, guildId));
-        async.asyncQueue(new UBot(this));
-        List list = async.execute();
-        channels = (List<Channel>) list.get(0);
-        users = (List<User>) list.get(1);
-        List<DiscordUser> bot = (List<DiscordUser>) list.get(2);
+        //Updates Roles
+        roles = async.queue(updateRoles(), "RoleUpdate");
+        List asyncList = async.asyncQueue(updateChannels()).asyncQueue(updateUsers()).asyncQueue(updateBotUser()).execute();
+        channels = (List<IChannel>) asyncList.get(0);
+        users = (List<IUser>) asyncList.get(1);
+        List<DiscordUser> bot = (List<DiscordUser>) asyncList.get(2);
         user = bot.get(0);
-        for (Role r : roles) {
+        for (IRole r : roles) {
             logger.debug(r.toString());
         }
-        for (Channel c : channels) {
+        for (IChannel c : channels) {
             logger.debug(c.toString());
         }
-        for (User u : users) {
+        for (IUser u : users) {
             logger.debug(u.toString());
         }
         logger.debug(user.toString());
@@ -120,129 +128,21 @@ class DiscordBot implements IDiscordBot {
         } catch (IOException | WebSocketException | InterruptedException e) {
             e.printStackTrace();
         }
-
         return this;
     }
 
-    /*
-    channels -> Text Channels
-    voiceChannels -> Voice Channels;
-     */
-    private static class UChannels implements Async.IU {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private final Long guildId;
-
-        UChannels(final Long guildId) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
-            this.guildId = guildId;
-        }
-
-        @Override
-        public List update() {
-            List<Channel> channels = new LinkedList<>();
-            logger.debug("Starting Channel Update");
-            JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + "/" + CHANNEL)));
-            for (Json o : array) {
-                Json object = o;
-                if (Integer.parseInt(String.valueOf(object.get("type"))) == 0) {
-                    Channel.ChannelP cd = new Channel.ChannelP(object).logic();
-                    channels.add(cd.getChannel());
-                } else if (Integer.parseInt(String.valueOf(object.get("type"))) == 2) {
-                    VoiceChannel.ChannelP cd = new VoiceChannel.ChannelP(object).logic();
-                    channels.add(cd.getChannel());
-                }
-            }
-            logger.info("Updated Channel Listings");
-            return channels;
-        }
-    }
-
-    private static class UUsers implements Async.IU {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private final Long guildId;
-        private final IDiscordBot bot;
-
-        private UUsers(final IDiscordBot bot, final Long guildId) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
-            this.guildId = guildId;
-            this.bot = bot;
-        }
-
-        @Override
-        public List update() {
-            List<User> users = new LinkedList<>();
-            logger.debug("Starting User Update");
-            JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + MEMBER + "?limit=1000")));
-            for (Json o : array) {
-                User.ServerUniqueUserP userData = new User.ServerUniqueUserP(bot, o).logic();
-                users.add(userData.getServerUniqueUser());
-            }
-            logger.info("Updated DiscordUser Listings");
-            return users;
-        }
-    }
-
-    private static class URoles implements Async.IU {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private final List<Role> roles;
-        private final Long guildId;
-        private final IDiscordBot bot;
-
-        private URoles(final IDiscordBot bot, final Long guildId) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
-            roles = new LinkedList<>();
-            this.bot = bot;
-            this.guildId = guildId;
-        }
-
-        @Override
-        public List update() {
-            logger.debug("Starting Role Update");
-            JsonArray j = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + ROLE)));
-            for (Json o : j) {
-                Role.RoleP rd = new Role.RoleP(bot, o).logic();
-                roles.add(rd.getRole());
-                //System.out.println(rd.getRole().getName());
-                //System.out.println(DiscordUtils.PermissionId.convertPermissions(rd.getRole().getPermission()));
-            }
-            logger.info("Updated Guild Roles");
-            return roles;
-        }
-    }
-
-    private static class UBot implements Async.IU {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private final IDiscordBot bot;
-
-        private UBot(final IDiscordBot bot) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
-            this.bot = bot;
-        }
-
-        @Override
-        public List update() {
-            List<DiscordUser> users = new LinkedList<>();
-            logger.debug("Starting Bot User Update");
-            Json object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, USERME)));
-            DiscordUser.UserP us = new DiscordUser.UserP(Long.parseUnsignedLong((String) object.get("id")), bot).logicId();
-            users.add(us.getUser());
-            logger.info("Updated Bot user");
-            return users;
-        }
-    }
-
     @Override
-    public List<Channel> getChannels() {
+    public List<IChannel> getChannels() {
         return channels;
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<IUser> getUsers() {
         return users;
     }
 
     @Override
-    public List<Role> getRoles() {
+    public List<IRole> getRoles() {
         return roles;
     }
 
@@ -260,7 +160,7 @@ class DiscordBot implements IDiscordBot {
     }
 
     @Override
-    public DiscordUser getBotUser() {
+    public IDiscordUser getBotUser() {
         return user;
     }
 
@@ -276,11 +176,73 @@ class DiscordBot implements IDiscordBot {
      * @return returns said dm channel
      */
     @Override
-    public Channel createDmChannel(final User user) {
+    public IChannel createDmChannel(final IUser user) {
         Builder.CreateDmChannel cm = new Builder.CreateDmChannel();
         cm.recipient_id = user.getDiscordUser().getId();
         Channel.ChannelP parser = new Channel.ChannelP(new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, USERME + "/channels", new Json(Builder.buildData(cm)))))).logic();
         return parser.getChannel();
+    }
+
+    @Override
+    public Async.IU<List<IRole>> updateRoles() {
+        return () -> {
+            List<IRole> roles = new ArrayList<>();
+            logger.debug("Starting Role Update");
+            JsonArray j = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + ROLE)));
+            for (Json o : j) {
+                Role.RoleP rd = new Role.RoleP(bot, o).logic();
+                roles.add(rd.getRole());
+            }
+            logger.info("Updated Roles");
+            return roles;
+        };
+    }
+
+    @Override
+    public Async.IU<List<IUser>> updateUsers() {
+        return () -> {
+            List<IUser> users = new LinkedList<>();
+            logger.debug("Starting User Update");
+            JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + MEMBER + "?limit=1000")));
+            for (Json o : array) {
+                User.ServerUniqueUserP userData = new User.ServerUniqueUserP(bot, o).logic();
+                users.add(userData.getServerUniqueUser());
+            }
+            logger.info("Updated User Listings");
+            return users;
+        };
+    }
+
+    @Override
+    public Async.IU<List<IChannel>> updateChannels() {
+        return () -> {
+            List<IChannel> channels = new LinkedList<>();
+            logger.debug("Starting Channel Update");
+            JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + "/" + CHANNEL)));
+            for (Json o : array) {
+                if (Integer.parseInt(String.valueOf(o.get("type"))) == 0) {
+                    Channel.ChannelP cd = new Channel.ChannelP(o).logic();
+                    channels.add(cd.getChannel());
+                } else if (Integer.parseInt(String.valueOf(o.get("type"))) == 2) {
+                    VoiceChannel.ChannelP cd = new VoiceChannel.ChannelP(o).logic();
+                    channels.add(cd.getChannel());
+                }
+            }
+            logger.info("Updated Channel Listings");
+            return channels;
+        };
+    }
+
+    private Async.IU<List<IDiscordUser>> updateBotUser() {
+        return () -> {
+            List<IDiscordUser> users = new LinkedList<>();
+            logger.debug("Starting Bot User Update");
+            Json object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, USERME)));
+            DiscordUser.UserP us = new DiscordUser.UserP(Long.parseUnsignedLong((String) object.get("id")), bot).logicId();
+            users.add(us.getUser());
+            logger.info("Updated Bot user");
+            return users;
+        };
     }
 
     /**

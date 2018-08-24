@@ -1,22 +1,18 @@
 package DiscordAPI.utils;
 
-import DiscordAPI.IDiscordBot;
-
 import java.util.*;
 import java.util.concurrent.*;
 
 public class Async {
-    private final IDiscordBot bot;
     private List<IU> list;
 
-    public Async(final IDiscordBot bot) {
-        this.bot = bot;
+    public Async() {
         this.list = new LinkedList<>();
     }
 
-    public List queue(IU test) {
-        ExecutorService service = Executors.newSingleThreadExecutor(DiscordUtils.createDaemonThreadFactory(String.valueOf(test.getClass().getSimpleName())));
-        Future<List> future = service.submit(new Event(test, 0));
+    public <T> T queue(final IU<T> test,final String name) {
+        ExecutorService service = Executors.newSingleThreadExecutor(DiscordUtils.createDaemonThreadFactory("Sync-Executor-" + name));
+        Future<T> future = service.submit(new Event<>(test, 0));
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -25,50 +21,53 @@ public class Async {
         return null;
     }
 
-    public void asyncQueue(IU test) {
+    public <T> Async asyncQueue(IU<T> test) {
         list.add(test);
+        return this;
     }
 
-    public List execute() {
+    public <T> List<T> execute() {
         ExecutorService service = Executors.newSingleThreadExecutor();
-        Future<List> future = service.submit(() -> {
-            List<List> r = new LinkedList<>();
-            List<Future<List>> returnList = new LinkedList<>();
+        Future<List<T>> future = service.submit(() -> {
+            List<T> r = new LinkedList<>();
+            List<Future<T>> returnList = new LinkedList<>();
             ExecutorService s = Executors.newFixedThreadPool(list.size(), DiscordUtils.createDaemonThreadFactory("Async-Executor"));
             for (int i = 0; i < list.size(); i++) {
-                Future<List> f = s.submit(new Event(list.get(i), i));
+                Future<T> f = s.submit(new Event<T>(list.get(i), i));
                 returnList.add(f);
             }
-            for (Future<List> future1 : returnList) {
+            for (Future<T> future1 : returnList) {
                 r.add(future1.get());
             }
             return r;
         });
         try {
-            return future.get();
+            List<T> r = future.get();
+            list = new LinkedList<>();
+            return r;
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private static class Event implements Callable<List> {
-        private final IU event;
+    private static class Event<T> implements Callable<T> {
+        private final IU<T> event;
         private final int threadNumber;
 
-        Event(final IU event, final int threadNumber) {
+        Event(final IU<T> event, final int threadNumber) {
             this.threadNumber = threadNumber + 1;
             this.event = event;
         }
 
         @Override
-        public List call() {
+        public T call() {
             Thread.currentThread().setName(Thread.currentThread().getName() + "-" + threadNumber);
             return event.update();
         }
     }
 
-    public interface IU {
-        List update();
+    public interface IU<T> {
+        T update();
     }
 }

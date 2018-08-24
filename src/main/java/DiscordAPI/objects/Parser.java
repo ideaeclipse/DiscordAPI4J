@@ -1,6 +1,7 @@
 package DiscordAPI.objects;
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
+import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
@@ -9,6 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
+
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.async;
 
 /**
  * This class is called from each listenerEvent {@link DiscordAPI.listener.dispatcher.listenerEvents.Channel_Create}
@@ -25,24 +28,25 @@ public class Parser {
      */
     public static class ChannelCreate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private volatile Channel channel;
+        private volatile IChannel channel;
 
         /**
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public ChannelCreate(final IDiscordBot b, final Json payload) {
+        public ChannelCreate(final IPrivateBot b, final Json payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
-                //b.updateChannels();
+                async.queue(b.updateChannels(), "UpdateChannels");
+                System.out.println(b.getChannels());
                 logger.info("Text Channel Create: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
             } else if (channel.getType().equals(Payloads.ChannelTypes.dmChannel)) {
                 logger.info("Dm Channel Created");
             }
         }
 
-        public Channel getChannel() {
+        public IChannel getChannel() {
             return channel;
         }
     }
@@ -55,20 +59,20 @@ public class Parser {
      */
     public static class ChannelDelete {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private volatile Channel channel;
+        private volatile IChannel channel;
 
         /**
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public ChannelDelete(final IDiscordBot b, final Json payload) {
+        public ChannelDelete(final IPrivateBot b, final Json payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             //b.updateChannels();
             logger.info("Channel Delete: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
         }
 
-        public Channel getChannel() {
+        public IChannel getChannel() {
             return channel;
         }
     }
@@ -81,27 +85,27 @@ public class Parser {
      */
     public static class ChannelUpdate {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
-        private volatile Channel oldC;
-        private volatile Channel newC;
+        private volatile IChannel oldC;
+        private volatile IChannel newC;
 
         /**
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public ChannelUpdate(final IDiscordBot b, final Json payload) {
+        public ChannelUpdate(final IPrivateBot b, final Json payload) {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             oldC = DiscordUtils.Search.CHANNEL(b.getChannels(), cd.getChannel().getName());
             newC = cd.getChannel();
-           // b.updateChannels();
+            // b.updateChannels();
             logger.info("Channel Update Old: Name: " + oldC.getName() + " NSFW: " + oldC.getNsfw() + " Position: " + oldC.getPosition());
             logger.info("Channel Update New: Name: " + newC.getName() + " NSFW: " + newC.getNsfw() + " Position: " + newC.getPosition());
         }
 
-        public Channel getOldChannel() {
+        public IChannel getOldChannel() {
             return oldC;
         }
 
-        public Channel getNewChannel() {
+        public IChannel getNewChannel() {
             return newC;
         }
     }
@@ -121,7 +125,7 @@ public class Parser {
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public MessageCreate(final IDiscordBot b, final Json payload) {
+        public MessageCreate(final IPrivateBot b, final Json payload) {
             Json user = new Json(String.valueOf(payload.get("author")));
             Payloads.DMessage m = convertToPayload(payload, Payloads.DMessage.class);
             DiscordUser.UserP pd = new DiscordUser.UserP(user, b).logic();
@@ -154,7 +158,7 @@ public class Parser {
          * @param b       DiscordBot
          * @param payload Payload from {@link DiscordAPI.webSocket.Wss}
          */
-        public PresenceUpdate(final IDiscordBot b, final Json payload) {
+        public PresenceUpdate(final IPrivateBot b, final Json payload) {
             final User.ServerUniqueUserP u = new User.ServerUniqueUserP(b, payload).logic();
             user = u.getServerUniqueUser();
             logger.info("Presence Update: DiscordUser: " + user.getDiscordUser().getName() + " Status: " + user.getStatus() + (user.getGame() != null ? " Game: " + ((user.getGame().getType() == Payloads.GameTypes.Playing) ?
@@ -179,7 +183,7 @@ public class Parser {
         private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
         private final VServerUpdate voiceServerUpdate;
 
-        public VoiceServerUpdate(final IDiscordBot b, final Json payload) {
+        public VoiceServerUpdate(final IPrivateBot b, final Json payload) {
             Payloads.DVoiceServerUpdate vsu = convertToPayload(payload, Payloads.DVoiceServerUpdate.class);
             this.voiceServerUpdate = new VServerUpdate(vsu.token, vsu.endpoint);
             synchronized (b.getAudioManager().getLock()) {
@@ -196,9 +200,9 @@ public class Parser {
     public static class VoiceStateUpdate {
         private final User user;
         private final VStateUpdate vStateUpdate;
-        private final Channel channel;
+        private final IChannel channel;
 
-        public VoiceStateUpdate(final IDiscordBot b, final Json payload) {
+        public VoiceStateUpdate(final IPrivateBot b, final Json payload) {
             VStateUpdate.VStateUpdateP v = new VStateUpdate.VStateUpdateP(b, payload).logic();
             user = v.getUser();
             vStateUpdate = v.getvStateUpdate();

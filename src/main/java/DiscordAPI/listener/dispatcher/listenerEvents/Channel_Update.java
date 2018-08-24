@@ -1,12 +1,11 @@
 package DiscordAPI.listener.dispatcher.listenerEvents;
 
-import DiscordAPI.IDiscordBot;
-import DiscordAPI.objects.Channel;
+import DiscordAPI.IPrivateBot;
+import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.listener.listenerTypes.ListenerEvent;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
-import org.json.simple.JSONObject;
 
 /**
  * This Class is called using java reflection
@@ -16,8 +15,8 @@ import org.json.simple.JSONObject;
  * @author Ideaeclipse
  */
 public class Channel_Update extends ListenerEvent {
-    private Channel oldC;
-    private Channel newC;
+    private IChannel oldC;
+    private IChannel newC;
 
     /**
      * Initialized using Java reflection
@@ -26,7 +25,7 @@ public class Channel_Update extends ListenerEvent {
      * @param payload the 'd' param from the message from the webscoekt
      * @see Wss under case Dispatch
      */
-    public Channel_Update(final IDiscordBot b, final Json payload) {
+    public Channel_Update(final IPrivateBot b, final Json payload) {
         super(b);
         Parser.ChannelUpdate parser = new Parser.ChannelUpdate(b, payload);
         oldC = parser.getOldChannel();
@@ -36,14 +35,14 @@ public class Channel_Update extends ListenerEvent {
     /**
      * @return Original Channel created using {@link DiscordAPI.objects.Parser.ChannelCreate}
      */
-    public Channel getOldChannel() {
+    public IChannel getOldChannel() {
         return oldC;
     }
 
     /**
      * @return New Channel created using {@link DiscordAPI.objects.Parser.ChannelCreate}
      */
-    public Channel getNewChannel() {
+    public IChannel getNewChannel() {
         return newC;
     }
 }

@@ -1,9 +1,9 @@
 package DiscordAPI.objects;
 
-import DiscordAPI.IDiscordBot;
+import DiscordAPI.IPrivateBot;
+import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
-import org.json.simple.JSONObject;
 
 /**
  * This class is used for storing and parsing Role data
@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
  * @author Ideaeclipse
  * @see DiscordAPI.objects.Payloads.DRole
  */
-public class Role {
+class Role implements IRole {
     private final Long id;
     private final String name;
     private final Integer colourCode;
@@ -65,20 +65,20 @@ public class Role {
      * @author Ideaeclipse
      */
     static class RoleP {
-        private final IDiscordBot bot;
+        private final IPrivateBot bot;
         private final Json object;
-        private Role role;
+        private IRole role;
         private Long id;
 
         /**
          * @param object role Object
          */
-        RoleP(final IDiscordBot bot, final Json object) {
+        RoleP(final IPrivateBot bot, final Json object) {
             this.bot = bot;
             this.object = object;
         }
 
-        RoleP(final IDiscordBot bot, final Long id) {
+        RoleP(final IPrivateBot bot, final Long id) {
             this.bot = bot;
             this.object = null;
             this.id = id;
@@ -94,7 +94,7 @@ public class Role {
             return this;
         }
 
-        Role getRole() {
+        IRole getRole() {
             return role;
         }
     }

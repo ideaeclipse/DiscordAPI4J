@@ -1,5 +1,6 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.objects.Interfaces.IGame;
 import DiscordAPI.utils.Json;
 
 /**
@@ -8,7 +9,7 @@ import DiscordAPI.utils.Json;
  * @author Ideaeclipse
  * @see DiscordAPI.objects.Payloads.DGame
  */
-public class Game {
+class Game implements IGame {
     private final String name;
     private final String state;
     private final String details;

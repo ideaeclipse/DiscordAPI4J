@@ -6,7 +6,7 @@ import DiscordAPI.utils.RateLimitRecorder;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.CHANNEL;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
-public class VoiceChannel extends Channel {
+class VoiceChannel extends Channel {
 
     private VoiceChannel(final Long id, final String name, final Integer position, final Boolean nsfw) {
         super(id, name, position, nsfw, Payloads.ChannelTypes.voiceChannel);
