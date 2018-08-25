@@ -19,11 +19,7 @@ public interface IDiscordBot {
 
     List<IChannel> getChannels();
 
-    List<IRole> getRoles();
-
     List<IUser> getUsers();
-
-    Json getIdentity();
 
     TDispatcher getDispatcher();
 
@@ -31,8 +27,6 @@ public interface IDiscordBot {
     IDiscordUser getBotUser();
 
     IChannel createDmChannel(IUser user);
-
-    AudioManager getAudioManager();
 
     void setStatus(Payloads.GameTypes gameType, String gameName);
 }

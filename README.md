@@ -7,7 +7,6 @@ import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.dispatcher.listenerEvents.Message_Create;
 import DiscordAPI.listener.dispatcher.TListener;
 import DiscordAPI.objects.DiscordBotBuilder;
-import DiscordAPI.objects.Message;
 import DiscordAPI.objects.Payloads;
 import DiscordAPI.utils.DiscordUtils;
 

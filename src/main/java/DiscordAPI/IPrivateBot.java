@@ -1,19 +1,21 @@
 package DiscordAPI;
 
+import DiscordAPI.listener.dispatcher.TDispatcher;
 import DiscordAPI.objects.AudioManager;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Async;
+import DiscordAPI.utils.Json;
 
 import java.util.List;
 
 public interface IPrivateBot {
-    Async.IU<List<IRole>> updateRoles();
+    void updateRoles();
 
-    Async.IU<List<IUser>> updateUsers();
+    void updateUsers();
 
-    Async.IU<List<IChannel>> updateChannels();
+    void updateChannels();
 
     AudioManager getAudioManager();
 
@@ -26,4 +28,8 @@ public interface IPrivateBot {
     long getGuildId();
 
     IDiscordBot getPublicBot();
+
+    TDispatcher getDispatcher();
+
+    Json getIdentity();
 }

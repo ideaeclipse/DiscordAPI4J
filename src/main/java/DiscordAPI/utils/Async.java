@@ -4,13 +4,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class Async {
-    private List<IU> list;
 
-    public Async() {
-        this.list = new LinkedList<>();
-    }
-
-    public <T> T queue(final IU<T> test,final String name) {
+    public static <T> T queue(final IU<T> test, final String name) {
         ExecutorService service = Executors.newSingleThreadExecutor(DiscordUtils.createDaemonThreadFactory("Sync-Executor-" + name));
         Future<T> future = service.submit(new Event<>(test, 0));
         try {
@@ -21,30 +16,23 @@ public class Async {
         return null;
     }
 
-    public <T> Async asyncQueue(IU<T> test) {
-        list.add(test);
-        return this;
-    }
-
-    public <T> List<T> execute() {
+    public static <T> List<T> execute(final AsyncList<T> list) {
         ExecutorService service = Executors.newSingleThreadExecutor();
         Future<List<T>> future = service.submit(() -> {
-            List<T> r = new LinkedList<>();
-            List<Future<T>> returnList = new LinkedList<>();
+            List<T> returnList = new LinkedList<>();
+            List<Future<T>> eventReturnList = new LinkedList<>();
             ExecutorService s = Executors.newFixedThreadPool(list.size(), DiscordUtils.createDaemonThreadFactory("Async-Executor"));
             for (int i = 0; i < list.size(); i++) {
-                Future<T> f = s.submit(new Event<T>(list.get(i), i));
-                returnList.add(f);
+                Future<T> f = s.submit(new Event<>(list.get(i), i));
+                eventReturnList.add(f);
             }
-            for (Future<T> future1 : returnList) {
-                r.add(future1.get());
+            for (Future<T> future1 : eventReturnList) {
+                returnList.add(future1.get());
             }
-            return r;
+            return returnList;
         });
         try {
-            List<T> r = future.get();
-            list = new LinkedList<>();
-            return r;
+            return future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -69,5 +57,27 @@ public class Async {
 
     public interface IU<T> {
         T update();
+    }
+
+    public static class AsyncList<T> {
+        private final List<IU<T>> list;
+
+        public AsyncList() {
+            list = new LinkedList<>();
+        }
+
+        public IU<T> get(final int i) {
+            return list.get(i);
+        }
+
+        public AsyncList<T> add(final IU<T> event) {
+            list.add(event);
+            return this;
+        }
+
+        Integer size() {
+            return list.size();
+        }
+
     }
 }

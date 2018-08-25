@@ -214,7 +214,6 @@ public class DiscordUtils {
         public static String token;
         public static RateLimitRecorder rateLimitRecorder;
         public static IPrivateBot bot;
-        public static Async async;
 
         static final String APIBASE = "https://discordapp.com/api/v6/";
         public static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";

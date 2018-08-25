@@ -75,7 +75,7 @@ class User implements IUser {
         return "{User} Nick: " + nick + " Joined_At: " + joined_at + " Roles: " + roles + " Deaf: " + deaf + " Mute: " + mute + " Session: " + session_id + " DiscordUser: " + user + " Status: " + status + " Game: " + game;
     }
 
-    public static class ServerUniqueUserP {
+    static class ServerUniqueUserP {
         private final IPrivateBot bot;
         private final Json payload;
         private User serverUniqueUser;
@@ -97,7 +97,7 @@ class User implements IUser {
             return this;
         }
 
-        public User getServerUniqueUser() {
+        User getServerUniqueUser() {
             return serverUniqueUser;
         }
     }

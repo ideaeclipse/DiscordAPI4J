@@ -54,7 +54,6 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         this.guildId = guildID;
         dispatcher = new TDispatcher();
         audioManager = new AudioManager(this);
-        async = new Async();
     }
 
     /**
@@ -101,8 +100,9 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     @Override
     public IDiscordBot login() {
         //Updates Roles
-        roles = async.queue(updateRoles(), "RoleUpdate");
-        List asyncList = async.asyncQueue(updateChannels()).asyncQueue(updateUsers()).asyncQueue(updateBotUser()).execute();
+        roles = Async.queue(uRoles(), "RoleUpdate");
+        Async.AsyncList list = new Async.AsyncList().add(uChannels()).add(uUsers()).add(uBotUser());
+        List asyncList = Async.execute(list);
         channels = (List<IChannel>) asyncList.get(0);
         users = (List<IUser>) asyncList.get(1);
         List<DiscordUser> bot = (List<DiscordUser>) asyncList.get(2);
@@ -184,7 +184,21 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     }
 
     @Override
-    public Async.IU<List<IRole>> updateRoles() {
+    public void updateRoles() {
+        roles = Async.queue(uRoles(), "RoleUpdate");
+    }
+
+    @Override
+    public void updateUsers() {
+        users = Async.queue(uUsers(), "UserUpdate");
+    }
+
+    @Override
+    public void updateChannels() {
+        channels = Async.queue(uChannels(), "ChannelUpdate");
+    }
+
+    public Async.IU<List<IRole>> uRoles() {
         return () -> {
             List<IRole> roles = new ArrayList<>();
             logger.debug("Starting Role Update");
@@ -198,23 +212,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         };
     }
 
-    @Override
-    public Async.IU<List<IUser>> updateUsers() {
-        return () -> {
-            List<IUser> users = new LinkedList<>();
-            logger.debug("Starting User Update");
-            JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + MEMBER + "?limit=1000")));
-            for (Json o : array) {
-                User.ServerUniqueUserP userData = new User.ServerUniqueUserP(bot, o).logic();
-                users.add(userData.getServerUniqueUser());
-            }
-            logger.info("Updated User Listings");
-            return users;
-        };
-    }
-
-    @Override
-    public Async.IU<List<IChannel>> updateChannels() {
+    public Async.IU<List<IChannel>> uChannels() {
         return () -> {
             List<IChannel> channels = new LinkedList<>();
             logger.debug("Starting Channel Update");
@@ -233,7 +231,21 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         };
     }
 
-    private Async.IU<List<IDiscordUser>> updateBotUser() {
+    public Async.IU<List<IUser>> uUsers() {
+        return () -> {
+            List<IUser> users = new LinkedList<>();
+            logger.debug("Starting User Update");
+            JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + MEMBER + "?limit=1000")));
+            for (Json o : array) {
+                User.ServerUniqueUserP userData = new User.ServerUniqueUserP(bot, o).logic();
+                users.add(userData.getServerUniqueUser());
+            }
+            logger.info("Updated User Listings");
+            return users;
+        };
+    }
+
+    private Async.IU<List<IDiscordUser>> uBotUser() {
         return () -> {
             List<IDiscordUser> users = new LinkedList<>();
             logger.debug("Starting Bot User Update");

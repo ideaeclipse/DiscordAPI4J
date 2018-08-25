@@ -15,7 +15,6 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.async;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
 public class Wss extends WebSocketFactory {
@@ -27,7 +26,7 @@ public class Wss extends WebSocketFactory {
     private Wss wss;
     private final WebSocket webSocket;
 
-    public Wss(final IDiscordBot bot) throws IOException, WebSocketException {
+    public Wss(final IPrivateBot bot) throws IOException, WebSocketException {
         wss = this;
         webSocket = this
                 .setConnectionTimeout(5000)
@@ -39,7 +38,7 @@ public class Wss extends WebSocketFactory {
                         switch (opCodes) {
                             case Dispatch:
                                 String currentEvent = String.valueOf(payload.get("t"));
-                                async.queue(() -> {
+                                Async.queue(() -> {
                                     try {
                                         for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
                                             if (currentEvent.equals(webSocket_events.toString())) {

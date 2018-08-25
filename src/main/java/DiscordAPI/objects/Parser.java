@@ -2,6 +2,7 @@ package DiscordAPI.objects;
 
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IChannel;
+import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
@@ -11,7 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.async;
 
 /**
  * This class is called from each listenerEvent {@link DiscordAPI.listener.dispatcher.listenerEvents.Channel_Create}
@@ -38,7 +38,7 @@ public class Parser {
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
-                async.queue(b.updateChannels(), "UpdateChannels");
+                b.updateChannels();
                 System.out.println(b.getChannels());
                 logger.info("Text Channel Create: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
             } else if (channel.getType().equals(Payloads.ChannelTypes.dmChannel)) {
@@ -222,35 +222,42 @@ public class Parser {
      */
     public static <T> T convertToPayload(final Json object, final Class<?> c) {
         T o = getObject(c);
-        try {
-            for (Object s : object.keySet()) {
-                Field f;
+        Async.AsyncList<T> list = new Async.AsyncList<>();
+        for (Object s : object.keySet()) {
+            list.add(() -> {
                 try {
-                    f = c.getDeclaredField(String.valueOf(s));
-                    f.setAccessible(true);
-                } catch (NoSuchFieldException ignored) {
-                    continue;
+                    Field f = null;
+                    try {
+                        f = c.getDeclaredField(String.valueOf(s));
+                        f.setAccessible(true);
+                    } catch (NoSuchFieldException ignored) {
+                        Thread.currentThread().interrupt();
+                    }
+                    String value = String.valueOf(object.get((String) s));
+                    if (value.equals("null")) {
+                        value = null;
+                    }
+                    if (f != null) {
+                        if (f.getType().equals(List.class)) {
+                            ParameterizedType genericType = (ParameterizedType) f.getGenericType();
+                            f.set(o, convertToList(value, (Class<?>) genericType.getActualTypeArguments()[0]));
+                        } else if (f.getType().equals(DiscordUser.class)) {
+                            f.set(o, value != null ? new DiscordUser.UserP(new Json(value), DiscordUtils.DefaultLinks.bot).logic().getUser() : null);
+                        } else if (f.getType().equals(Game.class)) {
+                            f.set(o, value != null ? new Game.GameP(new Json(value)).logic().getGame() : null);
+                        } else if (f.getType().isEnum()) {
+                            f.set(o, value != null ? f.getType().getEnumConstants()[Integer.parseInt(value)] : null);
+                        } else {
+                            f.set(o, convert(value, f.getType()));
+                        }
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-                String value = String.valueOf(object.get((String) s));
-                if (value.equals("null")) {
-                    value = null;
-                }
-                if (f.getType().equals(List.class)) {
-                    ParameterizedType genericType = (ParameterizedType) f.getGenericType();
-                    f.set(o, convertToList(value, (Class<?>) genericType.getActualTypeArguments()[0]));
-                } else if (f.getType().equals(DiscordUser.class)) {
-                    f.set(o, value != null ? new DiscordUser.UserP(new Json(value), DiscordUtils.DefaultLinks.bot).logic().getUser() : null);
-                } else if (f.getType().equals(Game.class)) {
-                    f.set(o, value != null ? new Game.GameP(new Json(value)).logic().getGame() : null);
-                } else if (f.getType().isEnum()) {
-                    f.set(o, value != null ? f.getType().getEnumConstants()[Integer.parseInt(value)] : null);
-                } else {
-                    f.set(o, convert(value, f.getType()));
-                }
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+                return null;
+            });
         }
+        Async.execute(list);
         return o;
     }
 
