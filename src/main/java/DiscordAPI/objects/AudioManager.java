@@ -20,7 +20,9 @@ public class AudioManager {
     private VoiceWss voiceWss;
 
     AudioManager(final DiscordBot bot) {
-        logger.setLevel(DiscordLogger.Level.TRACE);
+        if (bot.getProperties().getProperty("debug").equals("true")) {
+            logger.setLevel(DiscordLogger.Level.TRACE);
+        }
         this.lock = new Object();
         this.bot = bot;
     }

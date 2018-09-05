@@ -2,6 +2,7 @@ package DiscordAPI.objects;
 
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.IDiscordBot;
+import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IRole;
@@ -10,7 +11,6 @@ import DiscordAPI.utils.*;
 import DiscordAPI.utils.Properties;
 import DiscordAPI.webSocket.TextOpCodes;
 import DiscordAPI.webSocket.Wss;
-import DiscordAPI.listener.discordApiListener.IDispatcher;
 import com.neovisionaries.ws.client.WebSocketException;
 
 import java.io.IOException;
@@ -54,7 +54,9 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
             e.printStackTrace();
         }
         DiscordUtils.DefaultLinks.bot = this;
-        logger.setLevel(DiscordLogger.Level.TRACE);
+        if (bot.getProperties().getProperty("debug").equals("true")) {
+            logger.setLevel(DiscordLogger.Level.TRACE);
+        }
         DiscordUtils.DefaultLinks.token = token;
         this.identity = buildIdentity();
         logger.info("Starting Rate Limit Monitor");

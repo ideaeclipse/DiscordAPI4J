@@ -1,12 +1,12 @@
 package DiscordAPI.listener.terminalListener.listenerTypes.errors;
 
 import DiscordAPI.Terminal.Terminal;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 import java.util.Arrays;
 
-public class InvalidHelpFormat extends ListenerEvent implements ListenerFeatures {
+public class InvalidHelpFormat extends TerminalEvent implements ListenerFeatures {
     private String word;
     private String[] strings;
 

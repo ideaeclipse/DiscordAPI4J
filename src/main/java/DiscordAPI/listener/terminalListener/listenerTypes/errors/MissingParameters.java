@@ -1,12 +1,12 @@
 package DiscordAPI.listener.terminalListener.listenerTypes.errors;
 
 import DiscordAPI.Terminal.Terminal;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 import java.util.List;
 
-public class MissingParameters extends ListenerEvent implements ListenerFeatures {
+public class MissingParameters extends TerminalEvent implements ListenerFeatures {
     private List args;
 
     private MissingParameters(Terminal t) {

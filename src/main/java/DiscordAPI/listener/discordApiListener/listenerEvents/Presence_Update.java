@@ -1,7 +1,7 @@
 package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.listener.discordApiListener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.discordApiListener.ApiListener;
 import DiscordAPI.objects.*;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Json;
@@ -17,7 +17,7 @@ import DiscordAPI.webSocket.Wss;
  *
  * @author Ideaeclipse
  */
-public class Presence_Update extends ListenerEvent {
+public class Presence_Update extends ApiListener {
     private IUser status;
 
     /**

@@ -1,11 +1,10 @@
 package DiscordAPI.Terminal;
 
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.IPrivateBot;
 import DiscordAPI.Terminal.Input.ParseInput;
 import DiscordAPI.Terminal.logic.Compare;
 import DiscordAPI.Terminal.logic.Execute;
-import DiscordAPI.listener.terminalListener.listenerTypes.TDispatcher;
+import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturnValues;
 import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IMessage;
@@ -24,7 +23,7 @@ public class Terminal {
     private Compare compare;
     private IDiscordUser user;
     private Execute e;
-    private TDispatcher dispatcher;
+    private IDispatcher dispatcher;
     private IMessage m;
     private boolean isAdmin = false;
     private String currentFunction;
@@ -32,7 +31,7 @@ public class Terminal {
     public Terminal(final IDiscordUser u, final IDiscordBot bot) {
         this.bot = bot;
         user = u;
-        dispatcher = new TDispatcher(this);
+        dispatcher = new IDispatcher();
         if (u.getName().toLowerCase().equals(bot.getProperties().getProperty("adminUser"))) {
             isAdmin = true;
         }
@@ -109,7 +108,7 @@ public class Terminal {
         return user;
     }
 
-    public TDispatcher getDispatcher() {
+    public IDispatcher getDispatcher() {
         return this.dispatcher;
     }
 

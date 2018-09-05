@@ -2,10 +2,10 @@ package DiscordAPI.listener.terminalListener.listenerTypes;
 
 import DiscordAPI.Terminal.Terminal;
 
-public abstract class ListenerEvent {
+public abstract class TerminalEvent {
     private Terminal t;
 
-    public ListenerEvent(Terminal t) {
+    public TerminalEvent(Terminal t) {
         this.t = t;
     }
 

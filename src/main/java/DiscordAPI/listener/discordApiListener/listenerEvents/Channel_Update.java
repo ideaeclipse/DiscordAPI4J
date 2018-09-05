@@ -1,7 +1,7 @@
 package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.listener.discordApiListener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.discordApiListener.ApiListener;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.utils.Json;
@@ -14,7 +14,7 @@ import DiscordAPI.webSocket.Wss;
  *
  * @author Ideaeclipse
  */
-public class Channel_Update extends ListenerEvent {
+public class Channel_Update extends ApiListener {
     private IChannel oldC;
     private IChannel newC;
 

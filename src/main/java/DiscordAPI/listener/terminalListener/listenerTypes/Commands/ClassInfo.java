@@ -3,14 +3,14 @@ package DiscordAPI.listener.terminalListener.listenerTypes.Commands;
 import DiscordAPI.Terminal.NameConversion;
 import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.CustomAnnotation;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-public class ClassInfo extends ListenerEvent implements ListenerFeatures {
+public class ClassInfo extends TerminalEvent implements ListenerFeatures {
     private Constructor[] c;
     private Method[] m;
     private Class<?> d, a;

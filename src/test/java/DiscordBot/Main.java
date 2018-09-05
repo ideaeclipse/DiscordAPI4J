@@ -1,14 +1,7 @@
 package DiscordBot;
 
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.listener.discordApiListener.IListener;
-import DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
 import DiscordAPI.objects.DiscordBotBuilder;
-import DiscordAPI.objects.Interfaces.IMessage;
-import DiscordAPI.objects.Payloads;
-import DiscordAPI.utils.DiscordUtils;
-
-import java.util.Hashtable;
 
 
 public class Main {

@@ -1,13 +1,13 @@
 package DiscordAPI.listener.terminalListener.listenerTypes.Commands;
 
 import DiscordAPI.Terminal.Terminal;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 import java.util.List;
 import java.util.Map;
 
-public class BotCommands extends ListenerEvent implements ListenerFeatures {
+public class BotCommands extends TerminalEvent implements ListenerFeatures {
     private Map map;
     private List list;
     private Class<?> d, a;

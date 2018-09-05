@@ -1,6 +1,6 @@
 package DiscordAPI;
 
-import DiscordAPI.listener.discordApiListener.IDispatcher;
+import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.objects.AudioManager;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IRole;
@@ -32,4 +32,6 @@ public interface IPrivateBot {
     IDispatcher getDispatcher();
 
     Json getIdentity();
+
+    Properties getProperties();
 }

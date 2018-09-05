@@ -13,7 +13,7 @@ public class Properties {
     private static final String configName = "src/config.properties";
     private File file;
     private java.util.Properties prop;
-    private String[] properties = {"adminUser", "adminGroup", "commandsDirectory", "genericDirectory", "adminFileDir", "defaultFileDirectory","useTerminal"};
+    private String[] properties = {"adminUser", "adminGroup", "commandsDirectory", "genericDirectory", "adminFileDir", "defaultFileDirectory", "useTerminal", "debug"};
 
     public Properties() {
         file = new File(configName);
@@ -74,8 +74,10 @@ public class Properties {
             }
         } else {
             for (String s : unset) {
-                prop.put(s, sc.nextLine());
+                prop.put(s, "");
             }
+            System.out.println("Please set values manually in file or restart program to enter them");
+            System.exit(1);
         }
     }
 

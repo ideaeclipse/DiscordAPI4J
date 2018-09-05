@@ -3,7 +3,7 @@ package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.*;
-import DiscordAPI.listener.discordApiListener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.discordApiListener.ApiListener;
 import DiscordAPI.objects.Interfaces.IMessage;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
@@ -16,7 +16,7 @@ import DiscordAPI.webSocket.Wss;
  *
  * @author Ideaeclipse
  */
-public class Message_Create extends ListenerEvent {
+public class Message_Create extends ApiListener {
     private IMessage message;
 
     /**

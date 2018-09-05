@@ -27,7 +27,9 @@ public class VoiceWss extends WebSocketFactory {
         this.bot = bot;
         this.initialServerUpdate = vServerUpdate;
         this.initialStateUpdate = vStateUpdate;
-        logger.setLevel(DiscordLogger.Level.TRACE);
+        if (bot.getProperties().getProperty("debug").equals("true")) {
+            logger.setLevel(DiscordLogger.Level.TRACE);
+        }
         webSocket = this
                 .setConnectionTimeout(5000)
                 .createSocket("ws://" + endpoint + "?v=3")

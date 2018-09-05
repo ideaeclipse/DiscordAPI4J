@@ -1,7 +1,6 @@
 package DiscordAPI.webSocket;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.listener.discordApiListener.listenerTypes.ListenerEvent;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.utils.*;
 import DiscordAPI.objects.Payloads;
@@ -26,6 +25,9 @@ public class Wss extends WebSocketFactory {
     private final WebSocket webSocket;
 
     public Wss(final IPrivateBot bot) throws IOException, WebSocketException {
+        if (bot.getProperties().getProperty("debug").equals("true")) {
+            logger.setLevel(DiscordLogger.Level.TRACE);
+        }
         wss = this;
         webSocket = this
                 .setConnectionTimeout(5000)
@@ -33,7 +35,7 @@ public class Wss extends WebSocketFactory {
                 .addListener(new WebSocketAdapter() {
                     public void onTextMessage(WebSocket webSocket1, String message) {
                         Json payload = new Json(message);
-                        Payloads.General g = Parser.convertToPayload(payload,Payloads.General.class);
+                        Payloads.General g = Parser.convertToPayload(payload, Payloads.General.class);
                         TextOpCodes opCodes = TextOpCodes.values()[g.op];
                         switch (opCodes) {
                             case Dispatch:
@@ -44,7 +46,7 @@ public class Wss extends WebSocketFactory {
                                                 Class<?> cl = webSocket_events.getaClass();
                                                 Constructor constructor = cl.getConstructor(IPrivateBot.class, Json.class);
                                                 Object t = constructor.newInstance(bot, new Json((String) payload.get("d")));
-                                                bot.getDispatcher().notify((ListenerEvent) t);
+                                                bot.getDispatcher().notify(t);
                                             }
                                         }
                                     } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
@@ -88,7 +90,7 @@ public class Wss extends WebSocketFactory {
                                 }
                                 break;
                             case HeartBeat_ACK:
-                                System.out.println("alive");
+                                logger.debug("Alive");
                                 if (heartbeat.isAlive()) {
                                     if ((System.currentTimeMillis() - startTime > (w.heartbeat_interval + 5000)) && heartbeat.isAlive()) {
                                         heartbeat.interrupt();
