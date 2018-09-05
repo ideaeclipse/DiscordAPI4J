@@ -1,6 +1,7 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.IPrivateBot;
+import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
@@ -14,7 +15,7 @@ import java.util.*;
 
 
 /**
- * This class is called from each listenerEvent {@link DiscordAPI.listener.dispatcher.listenerEvents.Channel_Create}
+ * This class is called from each listenerEvent {@link Channel_Create}
  * Each class logs there event using {@link DiscordLogger}
  *
  * @author Ideaeclipse
@@ -245,10 +246,12 @@ public class Parser {
                             f.set(o, value != null ? new DiscordUser.UserP(new Json(value), DiscordUtils.DefaultLinks.bot).logic().getUser() : null);
                         } else if (f.getType().equals(Game.class)) {
                             f.set(o, value != null ? new Game.GameP(new Json(value)).logic().getGame() : null);
+                        } else if (f.getType().equals(Json.class)) {
+                            f.set(o, value != null ? new Json(value) : null);
                         } else if (f.getType().isEnum()) {
                             f.set(o, value != null ? f.getType().getEnumConstants()[Integer.parseInt(value)] : null);
                         } else {
-                            f.set(o, convert(value, f.getType()));
+                            f.set(o, value != null ? convert(value, f.getType()) : null);
                         }
                     }
                 } catch (IllegalAccessException e) {

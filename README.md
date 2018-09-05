@@ -4,14 +4,14 @@ Custom discordapi interpreter  <br />
 Example of Creating the bot
 ```java
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.listener.dispatcher.listenerEvents.Message_Create;
-import DiscordAPI.listener.dispatcher.TListener;
+import Message_Create;
+import TListener;
 import DiscordAPI.objects.DiscordBotBuilder;
 import DiscordAPI.objects.Payloads;
 import DiscordAPI.utils.DiscordUtils;
 
-public class Main {
-    private Main(String token, Long guildId) {
+public class DiscordBot.Main {
+    private DiscordBot.Main(String token, Long guildId) {
         IDiscordBot bot = new DiscordBotBuilder(token, guildId).login();
         bot.getDispatcher().addListener((TListener<Message_Create>) a -> {
             Message message = a.getMessage();
@@ -32,7 +32,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        new Main(args[0], Long.parseUnsignedLong(args[1]));
+        new DiscordBot.Main(args[0], Long.parseUnsignedLong(args[1]));
     }
 }
 

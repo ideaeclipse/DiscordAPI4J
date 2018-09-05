@@ -3,9 +3,12 @@ package DiscordAPI.objects;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.Json;
-import DiscordAPI.webSocket.OpCodes;
+import DiscordAPI.webSocket.TextOpCodes;
 import DiscordAPI.webSocket.VoiceWss;
 import com.neovisionaries.ws.client.WebSocket;
+import com.neovisionaries.ws.client.WebSocketException;
+
+import java.io.IOException;
 
 public class AudioManager {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
@@ -23,18 +26,17 @@ public class AudioManager {
     }
 
 
-    public void joinChannel(final IChannel channel) {
+    void joinChannel(final IChannel channel) {
         Builder.VoiceStateUpdate voiceStateUpdate = new Builder.VoiceStateUpdate();
         voiceStateUpdate.channel_id = channel.getId();
         voiceStateUpdate.guild_id = bot.getGuildId();
-        Json json = Builder.buildPayload(OpCodes.Voice_State_Update, Builder.buildData(voiceStateUpdate));
+        Json json = Builder.buildPayload(TextOpCodes.Voice_State_Update, Builder.buildData(voiceStateUpdate));
         bot.getTextWss().sendText(json);
         synchronized (this.lock) {
             try {
                 this.lock.wait();
-                logger.debug(vServerUpdate.toString());
-                logger.debug(initialUpdate.toString());
-            } catch (InterruptedException e) {
+                voiceWss = new VoiceWss(bot, vServerUpdate, initialUpdate, vServerUpdate.getEndpoint());
+            } catch (InterruptedException | IOException | WebSocketException e) {
                 e.printStackTrace();
             }
         }

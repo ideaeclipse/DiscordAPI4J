@@ -1,6 +1,6 @@
 package DiscordAPI.webSocket;
 
-import DiscordAPI.listener.dispatcher.listenerEvents.*;
+import DiscordAPI.listener.discordApiListener.listenerEvents.*;
 
 public enum WebSocket_Events {
     PRESENCE_UPDATE(Presence_Update.class),

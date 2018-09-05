@@ -1,7 +1,8 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.utils.Json;
-import DiscordAPI.webSocket.OpCodes;
+import DiscordAPI.webSocket.TextOpCodes;
+import DiscordAPI.webSocket.VoiceOpCodes;
 import org.json.simple.JSONObject;
 
 import java.lang.reflect.Field;
@@ -11,9 +12,12 @@ import java.util.Map;
 /**
  * This class is used for Building Json {@link JSONObject}
  * Based on the payload structure Discord's Websocket handles
+ * SurpressWarnings due to not used warnings because data is accessed
+ * using java reflections
  *
  * @author Ideaeclipse
  */
+@SuppressWarnings("ALL")
 public class Builder {
     static class CreateDmChannel {
         Long recipient_id;
@@ -24,6 +28,13 @@ public class Builder {
         Long channel_id;
         Boolean self_mute = false;
         Boolean self_deaf = false;
+    }
+
+    public static class VoiceIdentify {
+        public Long server_id;
+        public Long user_id;
+        public String session_id;
+        public String token;
     }
 
     /**
@@ -92,11 +103,18 @@ public class Builder {
     /**
      * Method is used to create a payload to send over the Discord TextWss {@link DiscordAPI.webSocket.Wss}
      *
-     * @param code OpCode Value {@link OpCodes}
+     * @param code OpCode Value {@link TextOpCodes}
      * @param data Json Object to file 'd' param use {@link Builder#buildData(Object)}
      * @return Complete payload ready to send over the websocket
      */
-    public static Json buildPayload(OpCodes code, Object data) {
+    public static Json buildPayload(TextOpCodes code, Object data) {
+        Json object = new Json();
+        object.put("op", code.ordinal());
+        object.put("d", data);
+        return object;
+    }
+
+    public static Json buildPayload(VoiceOpCodes code, Object data) {
         Json object = new Json();
         object.put("op", code.ordinal());
         object.put("d", data);
@@ -104,13 +122,13 @@ public class Builder {
     }
 
     /**
-     * This method is used for the Object param in buildPayload {@link Builder#buildPayload(OpCodes, Object)}
+     * This method is used for the Object param in buildPayload {@link Builder#buildPayload(TextOpCodes, Object)}
      *
      * @param <T>     is the generic Type
      * @param generic is an instance of an Object that in the Builder Class {@link Builder}
-     * @return Returns a Json Data used for the 'd' value in the Wss payload
+     * @return Returns a Json DiscordBot.Data used for the 'd' value in the Wss payload
      */
-    static <T> Map<String, Object> buildData(T generic) {
+    public static <T> Map<String, Object> buildData(T generic) {
         Json data = new Json();
         for (Field f : generic.getClass().getDeclaredFields()) {
             try {

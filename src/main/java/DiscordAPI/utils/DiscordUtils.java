@@ -148,8 +148,10 @@ public class DiscordUtils {
     public static class Search {
         public static IChannel CHANNEL(final List<IChannel> channels, final String channelName) {
             for (IChannel channel : channels) {
-                if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
-                    return channel;
+                if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
+                    if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
+                        return channel;
+                    }
                 }
             }
             return null;

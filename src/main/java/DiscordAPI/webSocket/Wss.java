@@ -1,8 +1,7 @@
 package DiscordAPI.webSocket;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.IDiscordBot;
-import DiscordAPI.listener.listenerTypes.ListenerEvent;
+import DiscordAPI.listener.discordApiListener.listenerTypes.ListenerEvent;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.utils.*;
 import DiscordAPI.objects.Payloads;
@@ -34,14 +33,14 @@ public class Wss extends WebSocketFactory {
                 .addListener(new WebSocketAdapter() {
                     public void onTextMessage(WebSocket webSocket1, String message) {
                         Json payload = new Json(message);
-                        OpCodes opCodes = OpCodes.values()[Integer.parseInt(String.valueOf(payload.get("op")))];
+                        Payloads.General g = Parser.convertToPayload(payload,Payloads.General.class);
+                        TextOpCodes opCodes = TextOpCodes.values()[g.op];
                         switch (opCodes) {
                             case Dispatch:
-                                String currentEvent = String.valueOf(payload.get("t"));
                                 Async.queue(() -> {
                                     try {
                                         for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
-                                            if (currentEvent.equals(webSocket_events.toString())) {
+                                            if (g.t.equals(webSocket_events.toString())) {
                                                 Class<?> cl = webSocket_events.getaClass();
                                                 Constructor constructor = cl.getConstructor(IPrivateBot.class, Json.class);
                                                 Object t = constructor.newInstance(bot, new Json((String) payload.get("d")));
@@ -52,7 +51,7 @@ public class Wss extends WebSocketFactory {
                                         e.printStackTrace();
                                     }
                                     return null;
-                                }, currentEvent);
+                                }, g.t);
                                 break;
                             case Heartbeat:
                                 break;
@@ -78,10 +77,9 @@ public class Wss extends WebSocketFactory {
                                 Thread.currentThread().setName("TextWss");
                                 logger.info("Connected to webSocket");
                                 logger.info("Received initial Message");
-                                Json d = new Json(String.valueOf(payload.get("d")));
-                                w = Parser.convertToPayload(d, Payloads.DWelcome.class);
+                                w = Parser.convertToPayload(g.d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
-                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new HeartBeat(wss, w.heartbeat_interval));
+                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new TextHeartBeat(wss, w.heartbeat_interval));
                                 startTime = System.currentTimeMillis();
                                 heartbeat.start();
                                 sendText(bot.getIdentity());

@@ -1,5 +1,9 @@
 package DiscordAPI.objects;
 
+import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
+import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Delete;
+import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Update;
+import DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
 import DiscordAPI.utils.Json;
 
 import java.util.List;
@@ -39,7 +43,7 @@ public class Payloads {
      * @author Ideaeclipse
      * @see Message
      * @see DiscordAPI.objects.Parser.MessageCreate
-     * @see DiscordAPI.listener.dispatcher.listenerEvents.Message_Create
+     * @see Message_Create
      */
     static class DMessage {
         Long channel_id;
@@ -106,9 +110,9 @@ public class Payloads {
      * @see DiscordAPI.objects.Parser.ChannelCreate
      * @see DiscordAPI.objects.Parser.ChannelDelete
      * @see DiscordAPI.objects.Parser.ChannelUpdate
-     * @see DiscordAPI.listener.dispatcher.listenerEvents.Channel_Create
-     * @see DiscordAPI.listener.dispatcher.listenerEvents.Channel_Delete
-     * @see DiscordAPI.listener.dispatcher.listenerEvents.Channel_Update
+     * @see Channel_Create
+     * @see Channel_Delete
+     * @see Channel_Update
      */
     static class DChannel {
         Long id;
@@ -182,5 +186,12 @@ public class Payloads {
     public static class DWelcome {
         public String _trace;
         public Long heartbeat_interval;
+    }
+
+    public static class General {
+        public Integer op;
+        public Json d;
+        public String t;
+        public Integer s;
     }
 }

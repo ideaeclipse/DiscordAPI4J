@@ -91,22 +91,11 @@ public class Json {
             if (object.charAt(0) == '{') {
                 object = object.substring(1, object.length());
             } else {
-                try {
-                    System.out.println(object);
-                    throw new InvalidString();
-                } catch (InvalidString invalidString) {
-                    invalidString.printStackTrace();
-                }
                 return null;
             }
             if (object.charAt(object.length() - 1) == '}') {
                 object = object.substring(0, object.length() - 1);
             } else {
-                try {
-                    throw new InvalidString();
-                } catch (InvalidString invalidString) {
-                    invalidString.printStackTrace();
-                }
                 return null;
             }
             map = splitString(convertToList(object));
@@ -118,7 +107,7 @@ public class Json {
             //System.out.println("Formated String: " + object);
             List<Integer> indexs = test(object.toCharArray());
             List<String> strings = new ArrayList<>();
-            if (indexs.size() > 0) {
+            if (indexs.size() > 1) {
                 for (int i = 0; i < indexs.size(); i++) {
                     if (i == 0) {
                         strings.add(object.substring(0, indexs.get(i)).trim());
@@ -129,6 +118,9 @@ public class Json {
                         strings.add(object.substring(indexs.get(i - 1) + 1, indexs.get(i)).trim());
                     }
                 }
+            } else if (indexs.size() == 1) {
+                strings.add(object.substring(0, indexs.get(0)).trim());
+                strings.add(object.substring(indexs.get(0) + 1, object.length()).trim());
             } else {
                 strings.add(object);
             }
@@ -199,10 +191,6 @@ public class Json {
         }
     }
 
-    private static class InvalidString extends Exception {
-
-    }
-
     private String convertToString(Map<String, Object> map) {
         StringBuilder builder = new StringBuilder();
         builder.append("{");
@@ -212,6 +200,7 @@ public class Json {
                     .append("\"")
                     .append(":")
                     .append((map.get(s) instanceof Integer ||
+                            map.get(s) instanceof Long ||
                             map.get(s) instanceof ArrayList ||
                             map.get(s) instanceof Boolean ||
                             map.get(s) instanceof Json ||
@@ -219,6 +208,7 @@ public class Json {
                             map.get(s) == null) ? "" : "\""
                     ).append((map.get(s) instanceof HashMap) ? convertToString((Map<String, Object>) map.get(s)) : map.get(s))
                     .append((map.get(s) instanceof Integer ||
+                            map.get(s) instanceof Long ||
                             map.get(s) instanceof ArrayList ||
                             map.get(s) instanceof Boolean ||
                             map.get(s) instanceof Json ||

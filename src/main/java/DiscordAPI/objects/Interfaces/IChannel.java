@@ -15,3 +15,4 @@ public interface IChannel {
 
     void sendMessage(final String messageContent);
 }
+

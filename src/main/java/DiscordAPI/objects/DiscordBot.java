@@ -7,9 +7,10 @@ import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.*;
-import DiscordAPI.webSocket.OpCodes;
+import DiscordAPI.utils.Properties;
+import DiscordAPI.webSocket.TextOpCodes;
 import DiscordAPI.webSocket.Wss;
-import DiscordAPI.listener.dispatcher.TDispatcher;
+import DiscordAPI.listener.discordApiListener.IDispatcher;
 import com.neovisionaries.ws.client.WebSocketException;
 
 import java.io.IOException;
@@ -28,10 +29,11 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 @SuppressWarnings("ALL")
 class DiscordBot implements IDiscordBot, IPrivateBot {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final Properties properties;
+    private TerminalManager terminalManager;
     private final Json identity;
-    private final TDispatcher dispatcher;
+    private final IDispatcher dispatcher;
     private final long guildId;
-    private final AudioManager audioManager;
     private List<IChannel> channels;
     private List<IUser> users;
     private List<IRole> roles;
@@ -45,6 +47,12 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final long guildID) {
+        properties = new Properties();
+        try {
+            properties.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         DiscordUtils.DefaultLinks.bot = this;
         logger.setLevel(DiscordLogger.Level.TRACE);
         DiscordUtils.DefaultLinks.token = token;
@@ -52,15 +60,16 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         logger.info("Starting Rate Limit Monitor");
         DiscordUtils.DefaultLinks.rateLimitRecorder = new RateLimitRecorder();
         this.guildId = guildID;
-        dispatcher = new TDispatcher();
-        audioManager = new AudioManager(this);
+        dispatcher = new IDispatcher();
+        //audioManager = new AudioManager(this);
     }
 
     /**
      * @return Current AudioManager
      */
+
     public AudioManager getAudioManager() {
-        return this.audioManager;
+        return null;
     }
 
     /**
@@ -123,7 +132,10 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
             synchronized (this.textWss.getLock()) {
                 this.textWss.getLock().wait();
                 logger.info("DiscordBot " + user.getName() + " Started");
-                audioManager.joinChannel(DiscordUtils.Search.VOICECHANNEL(getChannels(), "Bot"));
+                if (getProperties().getProperty("useTerminal").equals("true")) {
+                    terminalManager = new TerminalManager(this);
+                }
+                //audioManager.joinChannel(DiscordUtils.Search.VOICECHANNEL(getChannels(), "Bot"));
             }
         } catch (IOException | WebSocketException | InterruptedException e) {
             e.printStackTrace();
@@ -148,14 +160,19 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
 
     @Override
     public Json getIdentity() {
-        return Builder.buildPayload(OpCodes.Identify, this.identity);
+        return Builder.buildPayload(TextOpCodes.Identify, this.identity);
+    }
+
+    @Override
+    public Properties getProperties() {
+        return this.properties;
     }
 
     /**
      * @return Listener Dispatcher
      */
     @Override
-    public TDispatcher getDispatcher() {
+    public IDispatcher getDispatcher() {
         return this.dispatcher;
     }
 
@@ -270,6 +287,6 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         g.name = gameName;
         g.type = gameType.ordinal();
         p.game = Builder.buildData(g);
-        rateLimitRecorder.queue(new WebSocketEvent(this.textWss.getWebSocket(), Builder.buildPayload(OpCodes.Status_Update, Builder.buildData(p))));
+        rateLimitRecorder.queue(new WebSocketEvent(this.textWss.getWebSocket(), Builder.buildPayload(TextOpCodes.Status_Update, Builder.buildData(p))));
     }
 }
