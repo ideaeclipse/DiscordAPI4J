@@ -1,4 +1,4 @@
-package DiscordAPI.Terminal.Input;
+package DiscordAPI.Terminal;
 
 import java.util.ArrayList;
 import java.util.Arrays;

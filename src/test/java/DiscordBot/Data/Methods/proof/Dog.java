@@ -1,6 +1,6 @@
 package DiscordBot.Data.Methods.proof;
 
-import DiscordAPI.Terminal.Interfaces.CustomTerminal;
+import DiscordAPI.Terminal.CustomTerminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.CustomAnnotation;
 
 public class Dog implements CustomTerminal {

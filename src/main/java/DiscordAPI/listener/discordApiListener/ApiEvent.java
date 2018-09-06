@@ -10,13 +10,13 @@ import DiscordAPI.IDiscordBot;
  *
  * @author Ideaeclipse
  */
-public abstract class ApiListener {
+public abstract class ApiEvent {
     private IPrivateBot DiscordBot;
 
     /**
      * @param b DiscordBot {@link DiscordAPI.objects.DiscordBot}
      */
-    public ApiListener(final IPrivateBot b) {
+    public ApiEvent(final IPrivateBot b) {
         this.DiscordBot = b;
     }
 

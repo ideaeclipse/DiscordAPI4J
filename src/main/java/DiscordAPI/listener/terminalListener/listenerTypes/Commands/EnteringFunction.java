@@ -9,6 +9,7 @@ public class EnteringFunction extends TerminalEvent implements ListenerFeatures 
 
     private EnteringFunction(Terminal t) {
         super(t);
+        t.setCurrentFunction(function);
     }
 
     public EnteringFunction(Terminal t, String functionName) {

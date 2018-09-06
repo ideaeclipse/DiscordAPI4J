@@ -3,7 +3,7 @@ package DiscordAPI.listener.discordApiListener.listenerEvents;
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Parser;
-import DiscordAPI.listener.discordApiListener.ApiListener;
+import DiscordAPI.listener.discordApiListener.ApiEvent;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
 
@@ -14,7 +14,7 @@ import DiscordAPI.webSocket.Wss;
  *
  * @author Ideaeclipse
  */
-public class Channel_Delete extends ApiListener {
+public class Channel_Delete extends ApiEvent {
     private IChannel channel;
 
 

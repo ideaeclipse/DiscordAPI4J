@@ -1,9 +1,6 @@
 package DiscordAPI.Terminal;
 
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.Terminal.Input.ParseInput;
-import DiscordAPI.Terminal.logic.Compare;
-import DiscordAPI.Terminal.logic.Execute;
 import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturnValues;
 import DiscordAPI.objects.Interfaces.IDiscordUser;
@@ -49,7 +46,7 @@ public class Terminal {
         return compare.Initiate(pi.getWords(new ArrayList<>()), this);
     }
 
-    public void changeStatus(boolean b) {
+    void changeStatus(boolean b) {
         status = b;
     }
 
@@ -64,7 +61,7 @@ public class Terminal {
         ArrayList<String> words = compare.getWords();
         if (e == null) {
             try {
-                e = new Execute(methods.get(index).toString(), words, this);
+                e = new Execute(methods.get(index).toString(), words, this, compare.getDefaultClass(), compare.getAdminClass());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                 e1.printStackTrace();
             } catch (NoSuchMethodException e) {
@@ -74,16 +71,7 @@ public class Terminal {
                 }
             }
         } else {
-            try {
-                e.method(e.getObject(), e.getCalledClass());
-            } catch (InvocationTargetException | IllegalAccessException e1) {
-                e1.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                Object o = checkDefault(this.getAdditionalInput());
-                if (o != null) {
-                    this.getDispatcher().notify(new ProgramReturnValues(this, (String) o));
-                }
-            }
+            e.method(e.getObject(), e.getCalledClass(), compare.getDefaultClass(), compare.getAdminClass());
         }
     }
 
@@ -99,7 +87,7 @@ public class Terminal {
         return o;
     }
 
-    public ArrayList<String> getAdditionalInput() {
+    ArrayList<String> getAdditionalInput() {
         ParseInput pi = new ParseInput(this.additionalInput);
         return pi.getWords(new ArrayList<>());
     }

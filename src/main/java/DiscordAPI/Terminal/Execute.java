@@ -1,11 +1,12 @@
-package DiscordAPI.Terminal.logic;
+package DiscordAPI.Terminal;
 
-import DiscordAPI.Terminal.Terminal;
+import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ClassInfo;
 import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ExitingFunction;
 import DiscordAPI.listener.terminalListener.listenerTypes.Commands.NoSuchMethod;
 import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturnValues;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongNumberOfArgs;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongType;
+import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
 
 import java.lang.reflect.Constructor;
@@ -21,27 +22,26 @@ import java.util.List;
  * In your methods you must have it to be public in order to be called
  * They all must either return string or void
  */
-public class Execute {
+class Execute {
     private static final DiscordLogger LOGGER = new DiscordLogger(Execute.class.getName());
-    private static final String fmt = "%24s: %s%n";
     private Terminal t;
     private Class<?> calledClass;
     private Object ob;
 
-    public Execute(String file, List<String> input, Terminal Terminal) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        t = Terminal;
+    Execute(final String file, final List<String> input, final Terminal terminal, final Class<?> defaultClass, final Class<?> adminClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        t = terminal;
         calledClass = Class.forName(file);
         if (input.size() > 2) {
             LOGGER.info("Looking for valid constructor formats");
-            method(constructor(calledClass, (ArrayList<String>) input), calledClass);
+            method(constructor(calledClass, input), calledClass, defaultClass, adminClass);
         } else {
             LOGGER.info("Executing blank function");
-            ob = calledClass.newInstance();
-            method(ob, calledClass);
+            ob = calledClass.getDeclaredConstructors()[0].newInstance();
+            method(ob, calledClass, defaultClass, adminClass);
         }
     }
 
-    private Object constructor(Class<?> c, ArrayList<String> input) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    private Object constructor(final Class<?> c, final List<String> input) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<?>[] constructor = c.getConstructors();
         input.remove(0);
         input.remove(0);
@@ -57,42 +57,67 @@ public class Execute {
         return ob;
     }
 
-    public void method(Object ob, Class<?> c) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void method(final Object ob, final Class<?> c, final Class<?> defaultClass, final Class<?> adminClass) {
         ArrayList<String> input = getInput();
         LOGGER.info("Input: " + input);
         Class<?>[] paramTypes = getParameters(c, input.get(0));
-        if (!input.get(0).equals("done") && !input.get(0).equals("help")) {
-            if (paramTypes.length > 0) {
-                LOGGER.info("Params: " + Arrays.toString(paramTypes));
-                Method method = ob.getClass().getMethod(input.get(0), paramTypes);
-                input.remove(0);
-                if (input.size() == paramTypes.length) {
-                    Object[] convertedArgs = convertArgs(input, paramTypes);
-                    if (convertedArgs != null) {
-                        LOGGER.info("Converted Args: " + Arrays.toString(convertedArgs));
-                        Object o = method.invoke(ob, convertedArgs);
-                        if (o != null) {
-                            t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
+        Async.AsyncList<?> list = new Async.AsyncList<>();
+        list.add(() -> {
+            try {
+                if (!input.get(0).equals("done") && !input.get(0).equals("help")) {
+                    if (paramTypes.length > 0) {
+                        LOGGER.info("Params: " + Arrays.toString(paramTypes));
+                        Method method = ob.getClass().getMethod(input.get(0), paramTypes);
+                        input.remove(0);
+                        if (input.size() == paramTypes.length) {
+                            Object[] convertedArgs = convertArgs(input, paramTypes);
+                            if (convertedArgs != null) {
+                                LOGGER.info("Converted Args: " + Arrays.toString(convertedArgs));
+                                Object o = method.invoke(ob, convertedArgs);
+                                if (o != null) {
+                                    t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
+                                }
+                            }
+                        } else {
+                            t.getDispatcher().notify(new WrongNumberOfArgs(t, paramTypes));
+                        }
+                    } else {
+                        try {
+                            Method method = ob.getClass().getMethod(input.get(0));
+                            Object o = method.invoke(ob);
+                            if (o != null) {
+                                t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
+                            }
+                        } catch (NoSuchMethodException ignored) {
+                            t.getDispatcher().notify(new NoSuchMethod(t));
                         }
                     }
-                } else {
-                    t.getDispatcher().notify(new WrongNumberOfArgs(t, paramTypes));
                 }
-            } else {
-                Method method = ob.getClass().getMethod(input.get(0));
-                Object o = method.invoke(ob);
-                if (o != null) {
-                    t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
-                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
             }
-        } else if (input.get(0).equals("help")) {
-            Compare.getClassData(c, t);
-        } else if (input.get(0).equals("done")) {
-            t.changeStatus(false);
-            t.getDispatcher().notify(new ExitingFunction(t));
-            Method m = ob.getClass().getMethod("done");
-            m.invoke(ob);
-        }
+            return null;
+        }).add(() -> {
+            if (input.get(0).equals("help")) {
+                t.getDispatcher().notify(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
+            }
+            return null;
+        }).add(() -> {
+            try {
+                if (input.get(0).equals("done")) {
+                    t.changeStatus(false);
+                    t.getDispatcher().notify(new ExitingFunction(t));
+                    if (ob != null) {
+                        Method m = ob.getClass().getMethod("done");
+                        m.invoke(ob);
+                    }
+                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return null;
+        });
+        Async.execute(list);
     }
 
     private ArrayList<String> getInput() {
@@ -113,7 +138,7 @@ public class Execute {
         return new Class[0];
     }
 
-    private Object[] convertArgs(ArrayList<String> input, Class<?>[] params) {
+    private Object[] convertArgs(List<String> input, Class<?>[] params) {
         Object[] args = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             if (params[i] == String.class) {
@@ -139,7 +164,7 @@ public class Execute {
         t.getDispatcher().notify(new WrongType(t));
     }
 
-    public Class<?> getCalledClass() {
+    Class<?> getCalledClass() {
         return this.calledClass;
     }
 
@@ -147,18 +172,18 @@ public class Execute {
         return this.ob;
     }
 
-    public Execute(Terminal t) {
+    Execute(Terminal t) {
         this.t = t;
     }
 
-    public Object invoke(Class<?> calledClass, ArrayList<String> words) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    Object invoke(Class<?> calledClass, ArrayList<String> words) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         if (words.size() >= 1) {
-            return test(calledClass, words);
+            return invokeClass(calledClass, words);
         }
         return null;
     }
 
-    private Object test(Class<?> c, ArrayList<String> words) throws IllegalAccessException, InvocationTargetException, InstantiationException, IndexOutOfBoundsException {
+    private Object invokeClass(Class<?> c, ArrayList<String> words) throws IllegalAccessException, InvocationTargetException, InstantiationException, IndexOutOfBoundsException {
         int count = 0;
         for (Method m : c.getDeclaredMethods()) {
             if (words.get(0).toLowerCase().equals(m.getName().toLowerCase())) {

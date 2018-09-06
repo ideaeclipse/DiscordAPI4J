@@ -1,4 +1,4 @@
-package DiscordAPI.Terminal.Interfaces;
+package DiscordAPI.Terminal;
 
 public interface CustomTerminal {
     void done();

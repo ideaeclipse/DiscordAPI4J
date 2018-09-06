@@ -1,11 +1,11 @@
 package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.listener.discordApiListener.ApiListener;
+import DiscordAPI.listener.discordApiListener.ApiEvent;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.utils.Json;
 
-public class Voice_Server_Update extends ApiListener {
+public class Voice_Server_Update extends ApiEvent {
     /**
      * @param b DiscordBot {@link DiscordAPI.objects.DiscordBot}
      */

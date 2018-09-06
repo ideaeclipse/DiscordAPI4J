@@ -1,7 +1,6 @@
-package DiscordAPI.Terminal.Commands;
+package DiscordAPI.Terminal;
 
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.IPrivateBot;
 import DiscordAPI.utils.DiscordLogger;
 
 import java.io.File;
@@ -19,18 +18,18 @@ public class CommandList {
     private HashMap<String, List> commandMethods;
     private Class<?> defaultCommands, adminCommands;
 
-    public CommandList(final IDiscordBot bot) throws IOException, ClassNotFoundException {
+    CommandList(final IDiscordBot bot) throws IOException, ClassNotFoundException {
         commands = new HashMap<>();
         commandMethods = new HashMap<>();
         defaultCommands = getClass(bot.getProperties().getProperty("genericDirectory") + "." + bot.getProperties().getProperty("defaultFileDirectory"));
         adminCommands = getClass(bot.getProperties().getProperty("genericDirectory") + "." + bot.getProperties().getProperty("adminFileDir"));
         Map map = getClasses(bot.getProperties().getProperty("commandsDirectory"));
-        Map convertedMap = test((List) map.get("names"), (List) map.get("methods"), (List) map.get("classes"));
+        Map convertedMap = convertMap((List) map.get("names"), (List) map.get("methods"), (List) map.get("classes"));
         addCommands((List) convertedMap.get("commands"), (List) convertedMap.get("methods"));
         addCommandMethods((List) convertedMap.get("commandMethods"), (List) convertedMap.get("methods"));
     }
 
-    private Map test(List names, List Methods, List classes) {
+    private Map convertMap(List names, List Methods, List classes) {
         List<List> commands = new ArrayList<>();
         List<List> commandMethods = new ArrayList<>();
         Set set = new HashSet(Methods);

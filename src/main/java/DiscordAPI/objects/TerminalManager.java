@@ -2,13 +2,14 @@ package DiscordAPI.objects;
 
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.Terminal.Terminal;
-import DiscordAPI.listener.discordApiListener.ApiListener;
+import DiscordAPI.listener.discordApiListener.ApiEvent;
 import DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
 import DiscordAPI.listener.terminalListener.listenerTypes.Commands.*;
 import DiscordAPI.listener.genericListener.IListener;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.*;
 import DiscordAPI.listener.terminalListener.listenerTypes.terminal.NeedsMoreInput;
+import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IMessage;
 import DiscordAPI.utils.DiscordLogger;
@@ -20,14 +21,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * This class is online turned on if the config option useTerminal is set to true
+ * This class manages all things related to the custom terminal
+ *
+ * @author Myles
+ * @see TerminalEvent
+ * @see DiscordAPI.listener.genericListener.IDispatcher
+ */
 class TerminalManager {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final IDiscordBot bot;
     private final List<Terminal> terminalList;
 
+    /**
+     * @param bot passes the bot to get properties
+     */
     TerminalManager(final IDiscordBot bot) {
         logger.info("Starting Terminal Manager");
-        if(bot.getProperties().getProperty("debug").equals("true")){
+        if (bot.getProperties().getProperty("debug").equals("true")) {
             logger.setLevel(DiscordLogger.Level.TRACE);
         }
         this.bot = bot;
@@ -35,7 +47,13 @@ class TerminalManager {
         terminalLogic();
     }
 
-    private Terminal getCurrentTerminal(IDiscordUser user) {
+    /**
+     * Method searches for a terminal linked to a past user
+     *
+     * @param user user passed
+     * @return linked terminal to user if there is one
+     */
+    private Terminal getCurrentTerminal(final IDiscordUser user) {
         for (Terminal t : terminalList) {
             if (t.getUser().equals(user)) {
                 return t;
@@ -44,45 +62,38 @@ class TerminalManager {
         return null;
     }
 
+    /**
+     * Main logic for terminal control
+     */
     private void terminalLogic() {
-        bot.getDispatcher().addListener((IListener<ApiListener,Message_Create>) messageReceivedEvent -> {
+        bot.getDispatcher().addListener((IListener<ApiEvent, Message_Create>) messageReceivedEvent -> {
             IMessage m = messageReceivedEvent.getMessage();
             Terminal terminal = getCurrentTerminal(m.getUser());
+            //Get Channel
             if (m.getChannel().getId().equals(Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).getId())) {
-                logger.debug("TERMINAL SIZE: " + terminalList.size());
+                //Is there a current terminal for the message user?
                 if (terminal != null) {
-                    if (terminal.requiresMoreInput() && terminal.getUser().equals(m.getUser())) {
+                    //If it needs more input notify the NeedsMoreInput Function
+                    if (terminal.requiresMoreInput()) {
                         terminal.setMessage(m);
                         terminal.getDispatcher().notify(new NeedsMoreInput(terminal, m));
-                    } else {
-                        if (!m.getContent().startsWith("cm"))
-                            m.getChannel().sendMessage("You currently aren't attached to a terminal session please type cm $ParentArg $SubArg to start a session");
                     }
-                }
-                if (m.getContent().equals("cm") || m.getContent().startsWith("cm")) {
-                    if (terminalList.size() > 0) {
-                        for (Terminal t : terminalList) {
-                            if (t.getUser() == m.getUser()) {
-                                if (Objects.requireNonNull(terminal).requiresMoreInput()) {
-                                    m.getChannel().sendMessage("Commands that start with cm are for when you're outside a function");
-                                } else {
-                                    terminalList.remove(t);
-                                    terminalList.add(addListeners(new Terminal(m.getUser(), bot)));
-                                    invoke(terminalList.get(terminalList.size() - 1), m);
-                                }
-                            } else {
+                } else {
+                    //Terminal search couldn't find a terminal for the messaged user
+                    if (m.getContent().equals("cm") || m.getContent().startsWith("cm")) {
+                        // checks size
+                        if (m.getContent().equals("cm help")) {
+                            invoke(addListeners(new Terminal(m.getUser(), bot)), m);
+                        } else {
+                            if (terminalList.size() > 0) {
                                 terminalList.add(addListeners(new Terminal(m.getUser(), bot)));
                                 invoke(terminalList.get(terminalList.size() - 1), m);
+                            } else {
+                                terminalList.add(addListeners(new Terminal(m.getUser(), bot)));
+                                if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
+                                    terminalList.remove(terminalList.size() - 1);
+                                }
                             }
-                        }
-                    } else {
-                        if (!m.getContent().contains("help")) {
-                            terminalList.add(addListeners(new Terminal(m.getUser(), bot)));
-                            if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
-                                terminalList.remove(terminalList.size() - 1);
-                            }
-                        } else {
-                            invoke(addListeners(new Terminal(m.getUser(), bot)), m);
                         }
                     }
                 }
@@ -93,59 +104,50 @@ class TerminalManager {
         });
     }
 
-
-    private Terminal addListeners(Terminal terminal) {
+    /**
+     * Adds all listener events to each terminal
+     *
+     * @param terminal passes terminal to add listeners
+     * @return terminal with all listeners added
+     */
+    private Terminal addListeners(final Terminal terminal) {
+        final IChannel botChannel = Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot"));
         //terminal
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,NeedsMoreInput>) a -> {
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, NeedsMoreInput>) a -> {
             Terminal t = a.getTerminal();
             IMessage me = a.getMessage();
             t.addMoreInput(me.getContent());
         });
         //commands
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,BotCommands>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,ClassInfo>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,EnteringFunction>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,ExitingFunction>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, BotCommands>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, ClassInfo>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, EnteringFunction>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, ExitingFunction>) a -> {
+            botChannel.sendMessage(a.getReturn());
             terminalList.remove(a.getTerminal());
         });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,ProgramReturnValues>) a -> {
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, ProgramReturnValues>) a -> {
             if (a.getReturn().length() > 0) {
-                Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
+                botChannel.sendMessage(a.getReturn());
             }
         });
         //errors
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,InvalidArgument>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,InvalidCommand>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,InvalidHelpFormat>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,MissingParameters>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,NoSuchMethod>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,WrongNumberOfArgs>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
-        terminal.getDispatcher().addListener((IListener<TerminalEvent,WrongType>) a -> {
-            Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).sendMessage(a.getReturn());
-        });
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, InvalidArgument>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, InvalidCommand>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, InvalidHelpFormat>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, MissingParameters>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, NoSuchMethod>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, WrongNumberOfArgs>) a -> botChannel.sendMessage(a.getReturn()));
+        terminal.getDispatcher().addListener((IListener<TerminalEvent, WrongType>) a -> botChannel.sendMessage(a.getReturn()));
         return terminal;
     }
 
-    private boolean invoke(Terminal t, IMessage m) {
+    /**
+     * @param t Terminal
+     * @param m M
+     * @return if true it will require more input if false delete the terminal
+     */
+    private boolean invoke(final Terminal t, final IMessage m) {
         boolean status = false;
         try {
             status = t.initate(m.getContent().substring(3, m.getContent().length()));
