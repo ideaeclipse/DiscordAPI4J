@@ -1,16 +1,13 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.DiscordUtils;
 import DiscordAPI.utils.Json;
 
 import java.util.Objects;
 
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.GUILD;
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.MEMBER;
-import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
+import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
 /**
@@ -20,16 +17,19 @@ import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  * @see DiscordAPI.objects.Payloads.DUser
  */
 class DiscordUser implements IDiscordUser {
+    private final IPrivateBot bot;
     private final Long id;
     private final String name;
     private final Integer discriminator;
+    private IUser user;
 
     /**
      * @param id            DiscordUser Id
      * @param Name          DiscordUser Name
      * @param discriminator DiscordUser discriminator
      */
-    private DiscordUser(final Long id, final String Name, final Integer discriminator) {
+    private DiscordUser(final Long id, final String Name, final Integer discriminator, final IPrivateBot bot) {
+        this.bot = bot;
         this.id = id;
         this.name = Name;
         this.discriminator = discriminator;
@@ -42,6 +42,7 @@ class DiscordUser implements IDiscordUser {
     public Integer getDiscriminator() {
         return discriminator;
     }
+
 
     public Long getId() {
         return id;
@@ -77,7 +78,7 @@ class DiscordUser implements IDiscordUser {
          * @param object
          * @param bot
          */
-        UserP(Json object, IPrivateBot bot) {
+        UserP(final Json object, final IPrivateBot bot) {
             this.object = object;
             this.bot = bot;
             this.id = null;
@@ -86,7 +87,7 @@ class DiscordUser implements IDiscordUser {
         UserP logicId() {
             object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + bot.getGuildId() + MEMBER + "/" + id)));
             Payloads.DUser u = Parser.convertToPayload(new Json((String) object.get("user")), Payloads.DUser.class);
-            user = new DiscordUser(u.id, u.username, u.discriminator);
+            user = new DiscordUser(u.id, u.username, u.discriminator, bot);
             return this;
         }
 
@@ -98,7 +99,7 @@ class DiscordUser implements IDiscordUser {
                 }
                 if (temp == null) {
                     Payloads.DUser u = Parser.convertToPayload(object, Payloads.DUser.class);
-                    user = new DiscordUser(u.id, u.username, u.discriminator);
+                    user = new DiscordUser(u.id, u.username, u.discriminator, bot);
                 } else {
                     user = temp.getDiscordUser();
                 }

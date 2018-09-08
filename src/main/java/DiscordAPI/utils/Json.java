@@ -1,7 +1,5 @@
 package DiscordAPI.utils;
 
-import org.eclipse.jetty.websocket.api.SuspendToken;
-
 import java.util.*;
 
 public class Json {
@@ -41,35 +39,6 @@ public class Json {
         return map;
     }
 
-    public static List<String> asList(String message) {
-        List<String> strings = new ArrayList<>();
-        List<Integer> integers = new ArrayList<>();
-        message = message.substring(1, message.length() - 1);
-        if (message.contains(",")) {
-            int index = message.indexOf(',');
-            while (index >= 0) {
-                integers.add(index);
-                index = message.indexOf(',', index + 1);
-            }
-            for (int i = 0; i < integers.size(); i++) {
-                if (i == integers.size() - 1 && i == 0) {
-                    strings.add(message.substring(0, integers.get(i)).trim());
-                    strings.add(message.substring(integers.get(i) + 1, message.length()).trim());
-                } else if (i == integers.size() - 1) {
-                    strings.add(message.substring(integers.get(i - 1), integers.get(i)).trim());
-                    strings.add(message.substring(integers.get(i) + 1, message.length()).trim());
-                } else if (i == 0) {
-                    strings.add(message.substring(0, integers.get(i)).trim());
-                } else {
-                    strings.add(message.substring(integers.get(i - 1), integers.get(i)).trim());
-                }
-            }
-        } else {
-            strings.add(message);
-        }
-        return strings;
-    }
-
     public Set<String> keySet() {
         return map.keySet();
     }
@@ -103,44 +72,41 @@ public class Json {
 
         }
 
-        static List<String> convertToList(final String object) {
-            //System.out.println("Formated String: " + object);
-            List<Integer> indexs = test(object.toCharArray());
+        static Iterator<String> convertToList(final String object) {
+            Iterator<Integer> indexs = toIndexes(object.toCharArray());
             List<String> strings = new ArrayList<>();
-            if (indexs.size() > 1) {
-                for (int i = 0; i < indexs.size(); i++) {
-                    if (i == 0) {
-                        strings.add(object.substring(0, indexs.get(i)).trim());
-                    } else if (i == indexs.size() - 1) {
-                        strings.add(object.substring(indexs.get(i) + 1, object.length()).trim());
-                        strings.add(object.substring(indexs.get(i - 1) + 1, indexs.get(i)).trim());
-                    } else {
-                        strings.add(object.substring(indexs.get(i - 1) + 1, indexs.get(i)).trim());
+            int current, previous = 0;
+            if (indexs.hasNext()) {
+                while (indexs.hasNext()) {
+                    current = indexs.next();
+                    if (previous == 0) {
+                        strings.add(object.substring(previous, current));
+                        previous = current + 1;
+                        continue;
                     }
+                    strings.add(object.substring(previous, current));
+                    if (!indexs.hasNext()) {
+                        strings.add(object.substring(current + 1, object.length()));
+                    }
+                    previous = current + 1;
                 }
-            } else if (indexs.size() == 1) {
-                strings.add(object.substring(0, indexs.get(0)).trim());
-                strings.add(object.substring(indexs.get(0) + 1, object.length()).trim());
             } else {
                 strings.add(object);
             }
-            //System.out.println("LIST: " + strings);
-            return strings;
+            return strings.iterator();
         }
 
-        static List<Integer> test(final char[] chars) {
+        static Iterator<Integer> toIndexes(final char[] chars) {
             List<Integer> index = new ArrayList<>();
             boolean run = true;
             boolean array = true;
             int counter = 0;
             for (int i = 0; i < chars.length; i++) {
                 if (chars[i] == '{') {
-                    //System.out.println("{ " + counter);
                     if (counter == 0)
                         run = false;
                     counter++;
                 } else if (chars[i] == '}') {
-                    //System.out.println("} " + counter);
                     if (counter == 1)
                         run = true;
                     counter--;
@@ -149,31 +115,23 @@ public class Json {
                 } else if (chars[i] == ']') {
                     array = true;
                 } else if (chars[i] == ',' && run && array) {
-                    //System.out.println("split");
                     index.add(i);
                 }
             }
-            //System.out.println(index);
-            return index;
+            return index.iterator();
         }
 
 
-        private Map<String, Object> splitString(List<String> strings) {
-            //System.out.println("!!!!!!!! " + strings);
+        private Map<String, Object> splitString(final Iterator<String> strings) {
             Map<String, Object> map = new HashMap<>();
-            for (String s : strings) {
-                //System.out.println(s);
+            while (strings.hasNext()) {
+                String s = strings.next();
                 List<String> list = new ArrayList<>();
                 int index = s.indexOf(":");
-                //System.out.println(index);
                 list.add(s.substring(0, index).trim());
                 list.add(s.substring(index + 1, s.length()).trim());
-                //System.out.println(list);
-                //System.out.println(list.get(1));
                 if (list.get(1).startsWith("{")) {
-                    //System.out.println(s + " " + list.get(1));
                     Map<String, Object> m = new ConvertToMap(list.get(1)).getMap();
-                    //System.out.println("Test " + m);
                     map.put(list.get(0), m);
                 } else {
                     if (list.get(1).contains("null")) {

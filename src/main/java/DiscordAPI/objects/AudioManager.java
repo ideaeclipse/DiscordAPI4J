@@ -9,7 +9,7 @@ import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 
 import java.io.IOException;
-
+@Deprecated
 public class AudioManager {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final DiscordBot bot;

@@ -133,7 +133,6 @@ public class DiscordUtils {
         }
     }
 
-
     public static ThreadFactory createDaemonThreadFactory(String threadName) {
         return (runnable) -> {
             Thread thread = Executors.defaultThreadFactory().newThread(runnable);
@@ -189,6 +188,15 @@ public class DiscordUtils {
         public static IRole ROLES(final List<IRole> roles, final Long id) {
             for (IRole role : roles) {
                 if (role.getId().equals(id)) {
+                    return role;
+                }
+            }
+            return null;
+        }
+
+        public static IRole ROLES(final List<IRole> roles, final String id) {
+            for (IRole role : roles) {
+                if (role.getName().toLowerCase().equals(id.toLowerCase())) {
                     return role;
                 }
             }

@@ -4,7 +4,6 @@ import DiscordAPI.IPrivateBot;
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.objects.Interfaces.IChannel;
-import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.*;
@@ -69,7 +68,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     /**
      * @return Current AudioManager
      */
-
+    @Deprecated
     public AudioManager getAudioManager() {
         return null;
     }
@@ -111,6 +110,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     @Override
     public IDiscordBot login() {
         //Updates Roles
+
         roles = Async.queue(uRoles(), "RoleUpdate");
         Async.AsyncList list = new Async.AsyncList().add(uChannels()).add(uUsers()).add(uBotUser());
         List asyncList = Async.execute(list);
@@ -128,6 +128,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
             logger.debug(u.toString());
         }
         logger.debug(user.toString());
+
         try {
             logger.info("Connecting to webSocket");
             this.textWss = new Wss(this);

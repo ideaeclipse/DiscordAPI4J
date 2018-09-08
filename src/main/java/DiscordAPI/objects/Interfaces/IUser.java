@@ -1,5 +1,7 @@
 package DiscordAPI.objects.Interfaces;
 
+import DiscordAPI.objects.IDiscordUser;
+
 import java.util.List;
 
 public interface IUser {

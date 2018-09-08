@@ -1,7 +1,6 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IGame;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;

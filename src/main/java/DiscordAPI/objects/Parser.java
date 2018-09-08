@@ -131,9 +131,9 @@ public class Parser {
             Payloads.DMessage m = convertToPayload(payload, Payloads.DMessage.class);
             DiscordUser.UserP pd = new DiscordUser.UserP(user, b).logic();
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
-            message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, m.content);
+            message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, (m.content == null) ? "N/A" : m.content);
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
-                logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
+                logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " +  message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
             } else {
                 logger.info("Dm Sent: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n"));
             }
@@ -165,14 +165,6 @@ public class Parser {
             logger.info("Presence Update: DiscordUser: " + user.getDiscordUser().getName() + " Status: " + user.getStatus() + (user.getGame() != null ? " Game: " + ((user.getGame().getType() == Payloads.GameTypes.Playing) ?
                     "Playing " + user.getGame().getName() + " Details: " + user.getGame().getState() + " " + user.getGame().getDetails()
                     : "Listening to " + user.getGame().getState() + " Song: " + user.getGame().getDetails() + " on " + user.getGame().getName()) : ""));
-
-            /*
-            final Payloads.DUser user = convertToPayload(new Json(String.valueOf(payload.get("user"))), Payloads.DUser.class);
-            final DiscordUser.UserP pd = new DiscordUser.UserP(user.id, b).logic();
-            final Game.GameP gd = payload.get("game") != null ? new Game.GameP(new Json((String) payload.get("game"))).logic() : null;
-            status = new Status(gd != null ? gd.getGame() : null, pd.getUser(), String.valueOf(payload.get("status")));
-
-        */
         }
 
         public User getUser() {

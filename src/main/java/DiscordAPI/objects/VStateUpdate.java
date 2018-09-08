@@ -3,7 +3,7 @@ package DiscordAPI.objects;
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.Json;
-
+@Deprecated
 public class VStateUpdate {
     private final Long user_id;
     private final Boolean suppress;

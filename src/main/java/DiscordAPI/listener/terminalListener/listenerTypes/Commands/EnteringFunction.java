@@ -7,14 +7,14 @@ import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 public class EnteringFunction extends TerminalEvent implements ListenerFeatures {
     private String function;
 
-    private EnteringFunction(Terminal t) {
+    private EnteringFunction(final Terminal t) {
         super(t);
-        t.setCurrentFunction(function);
     }
 
-    public EnteringFunction(Terminal t, String functionName) {
+    public EnteringFunction(final Terminal t, final String functionName) {
         this(t);
         function = functionName;
+        t.setCurrentFunction(function);
     }
 
     @Override

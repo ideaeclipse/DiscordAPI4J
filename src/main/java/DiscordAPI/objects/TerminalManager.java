@@ -10,8 +10,8 @@ import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.*;
 import DiscordAPI.listener.terminalListener.listenerTypes.terminal.NeedsMoreInput;
 import DiscordAPI.objects.Interfaces.IChannel;
-import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IMessage;
+import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
 
@@ -69,34 +69,32 @@ class TerminalManager {
         bot.getDispatcher().addListener((IListener<ApiEvent, Message_Create>) messageReceivedEvent -> {
             IMessage m = messageReceivedEvent.getMessage();
             Terminal terminal = getCurrentTerminal(m.getUser());
-            //Get Channel
             if (m.getChannel().getId().equals(Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).getId())) {
-                //Is there a current terminal for the message user?
-                if (terminal != null) {
-                    //If it needs more input notify the NeedsMoreInput Function
-                    if (terminal.requiresMoreInput()) {
-                        terminal.setMessage(m);
-                        terminal.getDispatcher().notify(new NeedsMoreInput(terminal, m));
+                Async.AsyncList<?> list = new Async.AsyncList<>();
+                list.add(() -> {
+                    if (terminal != null) {
+                        if (terminal.requiresMoreInput()) {
+                            terminal.getDispatcher().notify(new NeedsMoreInput(terminal, m));
+                        }
                     }
-                } else {
-                    //Terminal search couldn't find a terminal for the messaged user
-                    if (m.getContent().equals("cm") || m.getContent().startsWith("cm")) {
-                        // checks size
-                        if (m.getContent().equals("cm help")) {
-                            invoke(addListeners(new Terminal(m.getUser(), bot)), m);
-                        } else {
-                            if (terminalList.size() > 0) {
-                                terminalList.add(addListeners(new Terminal(m.getUser(), bot)));
-                                invoke(terminalList.get(terminalList.size() - 1), m);
+                    return null;
+                }).add(() -> {
+                    if (terminal == null) {
+                        if (m.getContent().startsWith("cm")) {
+                            if (m.getContent().equals("cm help")) {
+                                invoke(addListeners(new Terminal(m.getUser(), bot)), m);
                             } else {
                                 terminalList.add(addListeners(new Terminal(m.getUser(), bot)));
                                 if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
                                     terminalList.remove(terminalList.size() - 1);
                                 }
+
                             }
                         }
                     }
-                }
+                    return null;
+                });
+                Async.execute(list);
             } else {
                 if (m.getContent().equals("cm") || m.getContent().startsWith("cm"))
                     m.getChannel().sendMessage("Use the bot channel to execute bot related commands");
@@ -150,7 +148,7 @@ class TerminalManager {
     private boolean invoke(final Terminal t, final IMessage m) {
         boolean status = false;
         try {
-            status = t.initate(m.getContent().substring(3, m.getContent().length()));
+            status = t.initiate(m.getContent().substring(3, m.getContent().length()));
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IOException | InvocationTargetException e) {
             e.printStackTrace();
         }

@@ -2,26 +2,24 @@ package DiscordAPI.Terminal;
 
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.listener.genericListener.IDispatcher;
-import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturnValues;
-import DiscordAPI.objects.Interfaces.IDiscordUser;
-import DiscordAPI.objects.Interfaces.IMessage;
+import DiscordAPI.objects.IDiscordUser;
+import DiscordAPI.objects.Interfaces.IRole;
+import DiscordAPI.utils.Async;
+import DiscordAPI.utils.DiscordUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class Terminal {
-    private static Logger LOGGER = Logger.getLogger(Terminal.class.getName());
     private final IDiscordBot bot;
     private String additionalInput;
     private boolean status;
     private Compare compare;
     private IDiscordUser user;
-    private Execute e;
+    private Execute execute;
     private IDispatcher dispatcher;
-    private IMessage m;
     private boolean isAdmin = false;
     private String currentFunction;
 
@@ -29,8 +27,19 @@ public class Terminal {
         this.bot = bot;
         user = u;
         dispatcher = new IDispatcher();
-        if (u.getName().toLowerCase().equals(bot.getProperties().getProperty("adminUser"))) {
+        if (user.getName().toLowerCase().equals(bot.getProperties().getProperty("adminUser"))) {
             isAdmin = true;
+        } else {
+            Async.queue(() -> {
+                String adminGroup = bot.getProperties().getProperty("adminGroup");
+                for (IRole role : IDiscordUser.getServerUniqueUser(user).getRoles()) {
+                    if (role.equals(DiscordUtils.Search.ROLES(bot.getRoles(), adminGroup))) {
+                        isAdmin = true;
+                        break;
+                    }
+                }
+                return null;
+            }, "adminGroup");
         }
     }
 
@@ -38,7 +47,7 @@ public class Terminal {
         return this.bot;
     }
 
-    public boolean initate(String command) throws
+    public boolean initiate(String command) throws
             ClassNotFoundException, InstantiationException, IllegalAccessException, IOException, InvocationTargetException {
         compare = new Compare();
         status = false;
@@ -46,8 +55,8 @@ public class Terminal {
         return compare.Initiate(pi.getWords(new ArrayList<>()), this);
     }
 
-    void changeStatus(boolean b) {
-        status = b;
+    void changeStatus(boolean newStatus) {
+        status = newStatus;
     }
 
     public boolean requiresMoreInput() {
@@ -59,32 +68,15 @@ public class Terminal {
         List methods = compare.getMethods();
         int index = compare.getIndex();
         ArrayList<String> words = compare.getWords();
-        if (e == null) {
+        if (execute == null) {
             try {
-                e = new Execute(methods.get(index).toString(), words, this, compare.getDefaultClass(), compare.getAdminClass());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException e1) {
+                execute = new Execute(methods.get(index).toString(), words, this, compare.getDefaultClass(), compare.getAdminClass());
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
                 e1.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                Object o = checkDefault(this.getAdditionalInput());
-                if (o != null) {
-                    this.getDispatcher().notify(new ProgramReturnValues(this, (String) o));
-                }
             }
         } else {
-            e.method(e.getObject(), e.getCalledClass(), compare.getDefaultClass(), compare.getAdminClass());
+            execute.method(execute.getObject(), execute.getCalledClass(), compare.getDefaultClass(), compare.getAdminClass());
         }
-    }
-
-    private Object checkDefault(ArrayList<String> words) {
-        LOGGER.info("CHECK default");
-        Execute m = new Execute(this);
-        Object o = null;
-        try {
-            o = m.invoke(compare.getDefaultClass(), words);
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e1) {
-            e1.printStackTrace();
-        }
-        return o;
     }
 
     ArrayList<String> getAdditionalInput() {
@@ -100,19 +92,11 @@ public class Terminal {
         return this.dispatcher;
     }
 
-    public void setMessage(IMessage m) {
-        this.m = m;
-    }
-
-    public IMessage getMessage() {
-        return this.m;
-    }
-
     public boolean isAdmin() {
         return isAdmin;
     }
 
-    public void setCurrentFunction(String function) {
+    public void setCurrentFunction(final String function) {
         this.currentFunction = function;
     }
 

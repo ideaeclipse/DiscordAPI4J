@@ -24,13 +24,14 @@ import java.util.List;
  */
 class Execute {
     private static final DiscordLogger LOGGER = new DiscordLogger(Execute.class.getName());
-    private Terminal t;
-    private Class<?> calledClass;
+    private final Terminal t;
+    private Class<?> calledClass, defaultClass;
     private Object ob;
 
     Execute(final String file, final List<String> input, final Terminal terminal, final Class<?> defaultClass, final Class<?> adminClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         t = terminal;
         calledClass = Class.forName(file);
+        this.defaultClass = defaultClass;
         if (input.size() > 2) {
             LOGGER.info("Looking for valid constructor formats");
             method(constructor(calledClass, input), calledClass, defaultClass, adminClass);
@@ -89,8 +90,14 @@ class Execute {
                                 t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
                             }
                         } catch (NoSuchMethodException ignored) {
-                            t.getDispatcher().notify(new NoSuchMethod(t));
+                            Object o = checkDefault(input);
+                            if (o != null) {
+                                t.getDispatcher().notify(new ProgramReturnValues(t, (String) o));
+                            } else {
+                                t.getDispatcher().notify(new NoSuchMethod(t));
+                            }
                         }
+
                     }
                 }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -117,11 +124,24 @@ class Execute {
             }
             return null;
         });
-        Async.execute(list);
+        if (input.size() > 0)
+            Async.execute(list);
     }
 
     private ArrayList<String> getInput() {
         return t.getAdditionalInput();
+    }
+
+    private Object checkDefault(ArrayList<String> words) {
+        LOGGER.info("CHECK default");
+        Execute m = new Execute(t);
+        Object o = null;
+        try {
+            o = m.invoke(defaultClass, words);
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException e1) {
+            e1.printStackTrace();
+        }
+        return o;
     }
 
     private Class<?>[] getParameters(Class<?> c, String method) {

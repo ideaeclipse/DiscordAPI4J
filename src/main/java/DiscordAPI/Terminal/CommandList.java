@@ -29,7 +29,7 @@ public class CommandList {
         addCommandMethods((List) convertedMap.get("commandMethods"), (List) convertedMap.get("methods"));
     }
 
-    private Map convertMap(List names, List Methods, List classes) {
+    private Map convertMap(final List names, final List Methods, final List classes) {
         List<List> commands = new ArrayList<>();
         List<List> commandMethods = new ArrayList<>();
         Set set = new HashSet(Methods);
@@ -70,15 +70,15 @@ public class CommandList {
         return commands;
     }
 
-    public HashMap<String, List> getCommandMethods() {
+    HashMap<String, List> getCommandMethods() {
         return commandMethods;
     }
 
-    public Class<?> getDefaultCommands() {
+    Class<?> getDefaultCommands() {
         return defaultCommands;
     }
 
-    public Class<?> getAdminCommands() {
+    Class<?> getAdminCommands() {
         return adminCommands;
     }
 
@@ -120,7 +120,7 @@ public class CommandList {
         return map;
     }
 
-    private static Map findClasses(File directory, String packageName) throws IOException, ClassNotFoundException {
+    private static Map findClasses(final File directory, String packageName) throws IOException, ClassNotFoundException {
         List classes = new ArrayList();
         List names = new ArrayList();
         Map<String, List> map = new HashMap<>();
@@ -150,7 +150,7 @@ public class CommandList {
                         Class<?> c = Class.forName(s);
                         if (c.getModifiers() == Modifier.PUBLIC) {
                             classes.add(s);
-                            names.add(f.getName().substring(0, f.getName().length() - 6).toLowerCase());
+                            names.add(f.getName().substring(0, f.getName().length() - 6));
                         }
                     }
                 }
@@ -173,7 +173,7 @@ public class CommandList {
                     Class<?> c = Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6));
                     if (c.getModifiers() == Modifier.PUBLIC) {
                         classes.add(packageName + '.' + file.getName().substring(0, file.getName().length() - 6));
-                        names.add(file.getName().substring(0, file.getName().length() - 6).toLowerCase());
+                        names.add(file.getName().substring(0, file.getName().length() - 6));
                     }
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
@@ -185,7 +185,7 @@ public class CommandList {
         return map;
     }
 
-    private Class<?> getClass(String s) {
+    private Class<?> getClass(final String s) {
         try {
             return Class.forName(s);
         } catch (ClassNotFoundException e) {

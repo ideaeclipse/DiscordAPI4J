@@ -1,5 +1,5 @@
 package DiscordAPI.objects;
-
+@Deprecated
 public class VServerUpdate {
     private final String token;
     private final String endpoint;

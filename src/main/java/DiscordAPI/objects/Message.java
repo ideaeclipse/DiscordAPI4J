@@ -1,7 +1,6 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.objects.Interfaces.IChannel;
-import DiscordAPI.objects.Interfaces.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IMessage;
 
 /**

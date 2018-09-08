@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
-
+@Deprecated
 public class VoiceWss extends WebSocketFactory {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final VoiceWss wss;

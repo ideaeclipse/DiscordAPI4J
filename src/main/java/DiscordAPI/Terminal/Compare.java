@@ -39,8 +39,8 @@ class Compare {
     }
 
     private boolean errorHandling() {
-        Async.AsyncList<Boolean> list = new Async.AsyncList<>();
-        list.add(() -> {
+        Async.AsyncList<Boolean> genericList = new Async.AsyncList<>();
+        genericList.add(() -> {
             if (checkGeneric(words.get(0), defaultClass.getDeclaredMethods())) {
                 LOGGER.debug("Executing default command");
                 Execute e = new Execute(t);
@@ -56,6 +56,7 @@ class Compare {
                 } else {
                     LOGGER.error("Default return value was null");
                 }
+                return true;
             }
             return false;
         }).add(() -> {
@@ -74,10 +75,13 @@ class Compare {
                     } else {
                         LOGGER.error("Admin return value was null");
                     }
+                    return true;
                 }
             }
             return false;
-        }).add(() -> {
+        });
+        Async.AsyncList<Boolean> list = new Async.AsyncList<>();
+        list.add(() -> {
             if (commands.get(words.get(0)) == null && !words.get(0).equals("help")) {
                 t.getDispatcher().notify(new InvalidCommand(t));
             }
@@ -139,7 +143,15 @@ class Compare {
             }
             return false;
         });
-        return Objects.requireNonNull(Async.execute(list)).get(4);
+        if (words.size() > 0) {
+            for (Boolean b : Objects.requireNonNull(Async.execute(genericList))) {
+                if (b) {
+                    return false;
+                }
+            }
+            return Objects.requireNonNull(Async.execute(list)).get(2);
+        }
+        return false;
     }
 
     private int getMethod(ArrayList<String> words, List args, int compare) {
