@@ -37,5 +37,12 @@ public class DiscordBot.Main {
 }
 
 ```
-# Documentation
- * Some list
+# Configuration
+ * adminGroup=admin
+**debug=true
+**adminUser=luminol
+**useTerminal=true
+**genericDirectory=DiscordBot.Data.Generic
+**adminFileDir=adminCommands
+**commandsDirectory=DiscordBot.Data.Methods
+**defaultFileDirectory=defaultCommands
