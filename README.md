@@ -38,11 +38,11 @@ public class DiscordBot.Main {
 
 ```
 # Configuration
- * adminGroup=admin
-**debug=true
-**adminUser=luminol
-**useTerminal=true
-**genericDirectory=DiscordBot.Data.Generic
-**adminFileDir=adminCommands
-**commandsDirectory=DiscordBot.Data.Methods
-**defaultFileDirectory=defaultCommands
+ * adminGroup: the group you want to give admin privilleges to
+ * debug: if you want to log debug messages
+ * adminUser: your user name
+ * useTerminal: if you want to use the custom terminal
+ * genericDirectory: where your code is stored for the generic terminal commands
+ * adminFileDir: admin commands
+ * commandsDirectory: where your code is stored for the custom terminal commands
+ * defaultFileDirectory: default commands(anyone can use them)
