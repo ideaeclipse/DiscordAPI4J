@@ -46,3 +46,9 @@ public class DiscordBot.Main {
  * adminFileDir: admin commands
  * commandsDirectory: where your code is stored for the custom terminal commands
  * defaultFileDirectory: default commands(anyone can use them)
+ 
+# Api Logic(If you plan on forking this project)
+ * Once the user runs the code with a valid token and guild id all the users/roles/channels get loaded in for the server
+ * Then a websocket connection is started where an identity token is sent over the websocket, after this point the bot while show up in the server
+ * Next all events will go through the 'Dispatch' case in the switch statement in the textWss file.
+ * From here everything is event driven and in order to write code for each event use the IDiscordBot method (addListener)
