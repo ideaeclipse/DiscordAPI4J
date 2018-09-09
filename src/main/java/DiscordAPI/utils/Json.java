@@ -73,19 +73,19 @@ public class Json {
         }
 
         static Iterator<String> convertToList(final String object) {
-            Iterator<Integer> indexs = toIndexes(object.toCharArray());
+            Iterator<Integer> indexes = toIndexes(object.toCharArray());
             List<String> strings = new ArrayList<>();
             int current, previous = 0;
-            if (indexs.hasNext()) {
-                while (indexs.hasNext()) {
-                    current = indexs.next();
+            if (indexes.hasNext()) {
+                while (indexes.hasNext()) {
+                    current = indexes.next();
                     if (previous == 0) {
                         strings.add(object.substring(previous, current));
                         previous = current + 1;
                         continue;
                     }
                     strings.add(object.substring(previous, current));
-                    if (!indexs.hasNext()) {
+                    if (!indexes.hasNext()) {
                         strings.add(object.substring(current + 1, object.length()));
                     }
                     previous = current + 1;

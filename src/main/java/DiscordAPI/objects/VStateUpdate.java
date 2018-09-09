@@ -3,6 +3,11 @@ package DiscordAPI.objects;
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.Json;
+/**
+ * Deprecated due to not complete
+ *
+ * @author ideaeclipse
+ */
 @Deprecated
 public class VStateUpdate {
     private final Long user_id;
@@ -67,9 +72,10 @@ public class VStateUpdate {
     public String toString() {
         return "{Voice State Update} User_id: " + getUser_id() + " Suppress: " + getSuppress() + " Session_Id: " + getSession_id() + " Self_video: " + getSelf_video() + " Self_mute: " + getSelf_mute() + " Mute: " + getMute() + " Deaf: " + getDeaf() + " Guild: " + getGuild_id() + " Channel: " + channel_id;
     }
-
-    /*
-    See if refactoring is possible
+    /**
+     * Deprecated due to not complete
+     *
+     * @author ideaeclipse
      */
     public static class VStateUpdateP {
         private final IPrivateBot bot;

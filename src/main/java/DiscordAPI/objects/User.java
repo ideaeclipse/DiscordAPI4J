@@ -9,7 +9,12 @@ import DiscordAPI.utils.Json;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * This is the user that is guild specific
+ *
+ * @author ideaeclipse
+ * @see IDiscordUser#getServerUniqueUser(IDiscordUser)
+ */
 class User implements IUser {
     private final String nick;
     private final String joined_at;
@@ -74,6 +79,11 @@ class User implements IUser {
         return "{User} Nick: " + nick + " Joined_At: " + joined_at + " Roles: " + roles + " Deaf: " + deaf + " Mute: " + mute + " Session: " + session_id + " DiscordUser: " + user + " Status: " + status + " Game: " + game;
     }
 
+    /**
+     * Parses a json payload into a user
+     *
+     * @author ideaeclipse
+     */
     static class ServerUniqueUserP {
         private final IPrivateBot bot;
         private final Json payload;

@@ -18,9 +18,10 @@ import java.util.Arrays;
 import java.util.List;
 
 
-/*
- * In your methods you must have it to be public in order to be called
- * They all must either return string or void
+/**
+ * This file instantiates the functions/executes the specified method
+ *
+ * @author ideaeclipse
  */
 class Execute {
     private static final DiscordLogger LOGGER = new DiscordLogger(Execute.class.getName());
@@ -28,6 +29,18 @@ class Execute {
     private Class<?> calledClass, defaultClass;
     private Object ob;
 
+    /**
+     * @param file         the function name
+     * @param input        all words inputted
+     * @param terminal     current terminal
+     * @param defaultClass default class
+     * @param adminClass   admin class
+     * @throws ClassNotFoundException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
     Execute(final String file, final List<String> input, final Terminal terminal, final Class<?> defaultClass, final Class<?> adminClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
         t = terminal;
         calledClass = Class.forName(file);
@@ -42,6 +55,16 @@ class Execute {
         }
     }
 
+    /**
+     * This method allows users to instantiate an object that has parameters inside a constructor
+     *
+     * @param c     class
+     * @param input inputted words
+     * @return returns an object
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
     private Object constructor(final Class<?> c, final List<String> input) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<?>[] constructor = c.getConstructors();
         input.remove(0);
@@ -58,6 +81,12 @@ class Execute {
         return ob;
     }
 
+    /**
+     * @param ob           functions instance
+     * @param c            function class
+     * @param defaultClass default class
+     * @param adminClass   admin class
+     */
     public void method(final Object ob, final Class<?> c, final Class<?> defaultClass, final Class<?> adminClass) {
         ArrayList<String> input = getInput();
         LOGGER.info("Input: " + input);
@@ -105,18 +134,22 @@ class Execute {
             }
             return null;
         }).add(() -> {
-            if (input.get(0).equals("help")) {
-                t.getDispatcher().notify(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
+            if (input.size() > 0) {
+                if (input.get(0).equals("help")) {
+                    t.getDispatcher().notify(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
+                }
             }
             return null;
         }).add(() -> {
             try {
-                if (input.get(0).equals("done")) {
-                    t.changeStatus(false);
-                    t.getDispatcher().notify(new ExitingFunction(t));
-                    if (ob != null) {
-                        Method m = ob.getClass().getMethod("done");
-                        m.invoke(ob);
+                if (input.size() > 0) {
+                    if (input.get(0).equals("done")) {
+                        t.changeStatus(false);
+                        t.getDispatcher().notify(new ExitingFunction(t));
+                        if (ob != null) {
+                            Method m = ob.getClass().getMethod("done");
+                            m.invoke(ob);
+                        }
                     }
                 }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -132,7 +165,13 @@ class Execute {
         return t.getAdditionalInput();
     }
 
-    private Object checkDefault(ArrayList<String> words) {
+    /**
+     * checks if the command is a default command
+     *
+     * @param words all words
+     * @return returns an instance of the default command
+     */
+    private Object checkDefault(final ArrayList<String> words) {
         LOGGER.info("CHECK default");
         Execute m = new Execute(t);
         Object o = null;
@@ -144,7 +183,12 @@ class Execute {
         return o;
     }
 
-    private Class<?>[] getParameters(Class<?> c, String method) {
+    /**
+     * @param c class
+     * @param method method name
+     * @return array of parameter types
+     */
+    private Class<?>[] getParameters(final Class<?> c, final String method) {
         Method[] allMethods = c.getDeclaredMethods();
         for (Method m : allMethods) {
             if (m.getModifiers() == Modifier.PUBLIC) {
@@ -158,7 +202,12 @@ class Execute {
         return new Class[0];
     }
 
-    private Object[] convertArgs(List<String> input, Class<?>[] params) {
+    /**
+     * @param input words
+     * @param params parameter types
+     * @return converted
+     */
+    private Object[] convertArgs(final List<String> input, final Class<?>[] params) {
         Object[] args = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             if (params[i] == String.class) {
@@ -216,9 +265,6 @@ class Execute {
             } else {
                 count++;
             }
-        }
-        if (count == c.getDeclaredMethods().length) {
-            t.getDispatcher().notify(new NoSuchMethod(t));
         }
         return null;
     }

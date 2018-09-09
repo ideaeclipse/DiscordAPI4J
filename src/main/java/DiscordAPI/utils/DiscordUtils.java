@@ -20,13 +20,13 @@ import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 /**
  * This class is the utility class and has various function each described in their class header
  *
- * @author Myles
+ * @author ideaeclipse
  */
 public class DiscordUtils {
     /**
      * This class is used to Handle all Http Api Requests
      *
-     * @author Myles
+     * @author ideaeclipse
      */
     static class HttpRequests {
         /**

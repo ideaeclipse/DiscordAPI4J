@@ -5,24 +5,39 @@ import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 import java.util.Arrays;
+import java.util.List;
 
+/**
+ * This function is for when a help command is of the improper format
+ *
+ * @author ideaeclipse
+ */
 public class InvalidHelpFormat extends TerminalEvent implements ListenerFeatures {
     private String word;
-    private String[] strings;
+    private List<String> strings;
 
-    private InvalidHelpFormat(Terminal t) {
+    private InvalidHelpFormat(final Terminal t) {
         super(t);
     }
 
-    public InvalidHelpFormat(Terminal t, String word1, String[] subargs) {
+    /**
+     * @param t       current terminal session
+     * @param word1   first word
+     * @param subargs all possible subargs
+     */
+    public InvalidHelpFormat(final Terminal t, final String word1, final List<String> subargs) {
         this(t);
         word = word1;
         strings = subargs;
     }
+
+    /**
+     * @return return statement to be printed to user
+     */
     @Override
     public String getReturn() {
         StringBuilder string = new StringBuilder();
-        string.append("Please enter a command looking like help ").append(word).append(" $Subargs").append(" $Subargs = ").append(Arrays.toString(strings));
+        string.append("Please enter a command looking like help ").append(word).append(" $Subargs").append(" $Subargs = ").append(strings);
         return String.valueOf(string);
     }
 

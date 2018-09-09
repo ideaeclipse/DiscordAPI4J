@@ -10,17 +10,29 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+/**
+ * This class is used for when a user has entered a custom function and calls the 'help' function
+ *
+ * @author ideaeclipse
+ */
 public class ClassInfo extends TerminalEvent implements ListenerFeatures {
     private Constructor[] c;
     private Method[] m;
     private Class<?> d, a;
     private Terminal t;
 
-    private ClassInfo(Terminal t) {
+    private ClassInfo(final Terminal t) {
         super(t);
     }
 
-    public ClassInfo(Terminal t, Constructor[] constructors, Method[] methods, Class<?> def, Class<?> admin) {
+    /**
+     * @param t            current terminal instance
+     * @param constructors all constructors of the function
+     * @param methods      all methods of the function
+     * @param def          default class
+     * @param admin        admin class
+     */
+    public ClassInfo(final Terminal t, final Constructor[] constructors, final Method[] methods, final Class<?> def, final Class<?> admin) {
         this(t);
         this.t = t;
         this.c = constructors;
@@ -29,6 +41,9 @@ public class ClassInfo extends TerminalEvent implements ListenerFeatures {
         this.a = admin;
     }
 
+    /**
+     * @return returns a string composed of all the data of the function
+     */
     @Override
     public String getReturn() {
         StringBuilder string = new StringBuilder();
@@ -51,7 +66,16 @@ public class ClassInfo extends TerminalEvent implements ListenerFeatures {
         return String.valueOf(string);
     }
 
-    static StringBuilder genericCommands(StringBuilder string, Terminal t, Class<?> d2, Class<?> a2) {
+    /**
+     * Adds all generic class info
+     *
+     * @param string current string builder
+     * @param t      current terminal instances
+     * @param d2     default class
+     * @param a2     admin class
+     * @return returns an updated string builder
+     */
+    static StringBuilder genericCommands(final StringBuilder string, final Terminal t, final Class<?> d2, final Class<?> a2) {
         string.append("***Default commands***").append("\n");
         for (Method m : d2.getDeclaredMethods()) {
             string.append("    -> ").append(m.getName().toLowerCase()).append(" ").append(NameConversion.convert(m.getParameterTypes())).append("\n");

@@ -7,23 +7,28 @@ import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This function is called when a user types cm help, the {@link #getReturn()} function returns all custom commands that are possible
+ *
+ * @author ideaeclipse
+ */
 public class BotCommands extends TerminalEvent implements ListenerFeatures {
     private Map map;
     private List list;
-    private Class<?> d, a;
+    private Class<?> defaultClass, adminClass;
     private Terminal t;
 
-    private BotCommands(Terminal t) {
+    private BotCommands(final Terminal t) {
         super(t);
     }
 
-    public BotCommands(Terminal t, List l, Map m, Class<?> def, Class<?> admin) {
-        this(t);
-        this.t = t;
-        this.list = l;
-        this.map = m;
-        this.d = def;
-        this.a = admin;
+    public BotCommands(final Terminal terminal, final List list, final Map map, final Class<?> defaultClass, final Class<?> admin) {
+        this(terminal);
+        this.t = terminal;
+        this.list = list;
+        this.map = map;
+        this.defaultClass = defaultClass;
+        this.adminClass = admin;
     }
 
     @Override
@@ -35,7 +40,7 @@ public class BotCommands extends TerminalEvent implements ListenerFeatures {
             string.append("    -> Sub Commands: ").append(map.get(list.get(i))).append("\n");
         }
         string.append("To get help for a specific sub command and to see its options type help ${parent command} ${sub command}").append("\n");
-        string = ClassInfo.genericCommands(string, t, d, a);
+        string = ClassInfo.genericCommands(string, t, defaultClass, adminClass);
         return String.valueOf(string);
     }
 }

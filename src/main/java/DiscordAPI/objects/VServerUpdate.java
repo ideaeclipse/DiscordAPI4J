@@ -1,4 +1,10 @@
 package DiscordAPI.objects;
+
+/**
+ * Deprecated due to not complete
+ *
+ * @author ideaeclipse
+ */
 @Deprecated
 public class VServerUpdate {
     private final String token;

@@ -12,12 +12,23 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.zip.ZipFile;
 
+
+/**
+ * This file loads all custom 'commands' in the specified directory in config.properties (commandsDirectory)
+ *
+ * @author ideaeclipse
+ */
 public class CommandList {
     private static final DiscordLogger LOGGER = new DiscordLogger(CommandList.class.getName());
     private HashMap<String, List> commands;
     private HashMap<String, List> commandMethods;
     private Class<?> defaultCommands, adminCommands;
 
+    /**
+     * @param bot discordBot
+     * @throws IOException            if you don't have permission to view files (run with sudo or admin)
+     * @throws ClassNotFoundException if class can't be found (this never gets thrown)
+     */
     CommandList(final IDiscordBot bot) throws IOException, ClassNotFoundException {
         commands = new HashMap<>();
         commandMethods = new HashMap<>();
@@ -29,6 +40,12 @@ public class CommandList {
         addCommandMethods((List) convertedMap.get("commandMethods"), (List) convertedMap.get("methods"));
     }
 
+    /**
+     * @param names   names of files
+     * @param Methods full file path
+     * @param classes class
+     * @return full map of all data
+     */
     private Map convertMap(final List names, final List Methods, final List classes) {
         List<List> commands = new ArrayList<>();
         List<List> commandMethods = new ArrayList<>();
@@ -52,14 +69,22 @@ public class CommandList {
 
     }
 
-    private void addCommands(List names, List Methods) {
+    /**
+     * @param names   keys
+     * @param Methods values
+     */
+    private void addCommands(final List names, final List Methods) {
         for (int i = 0; i < Methods.size(); i++) {
             commands.put(String.valueOf(Methods.get(i)), (List) names.get(i));
         }
         LOGGER.debug("commands added");
     }
 
-    private void addCommandMethods(List classes, List Methods) {
+    /**
+     * @param classes keys
+     * @param Methods values
+     */
+    private void addCommandMethods(final List classes, final List Methods) {
         for (int i = 0; i < Methods.size(); i++) {
             commandMethods.put(String.valueOf(Methods.get(i)), (List) classes.get(i));
         }
@@ -82,7 +107,13 @@ public class CommandList {
         return adminCommands;
     }
 
-    private static Map getClasses(String packageName)
+    /**
+     * @param packageName genericDirectory
+     * @return map of all data
+     * @throws ClassNotFoundException if class isn't found
+     * @throws IOException            if you don't have permission
+     */
+    private static Map getClasses(final String packageName)
             throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         assert classLoader != null;
@@ -120,6 +151,15 @@ public class CommandList {
         return map;
     }
 
+    /**
+     * This is different if the program is being run inside a jar container or not. view source
+     *
+     * @param directory directory name
+     * @param packageName package name
+     * @return map of data
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     private static Map findClasses(final File directory, String packageName) throws IOException, ClassNotFoundException {
         List classes = new ArrayList();
         List names = new ArrayList();

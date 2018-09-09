@@ -4,9 +4,15 @@ import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
 import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
+/**
+ * This function is notified when there is an invalid argument i.e a string instead of an integer
+ *
+ * @author ideaeclipse
+ * @see WrongType
+ */
 public class InvalidArgument extends TerminalEvent implements ListenerFeatures {
 
-    public InvalidArgument(Terminal t) {
+    public InvalidArgument(final Terminal t) {
         super(t);
     }
 

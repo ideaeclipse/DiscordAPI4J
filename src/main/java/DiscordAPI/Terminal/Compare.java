@@ -7,7 +7,6 @@ import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturn
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidArgument;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidCommand;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidHelpFormat;
-import DiscordAPI.listener.terminalListener.listenerTypes.errors.MissingParameters;
 import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
 
@@ -16,6 +15,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+/**
+ * This file is the entire logic of what to do once a user is inside a function
+ *
+ * @author ideaeclipse
+ */
 class Compare {
     private static final DiscordLogger LOGGER = new DiscordLogger(Compare.class.getName());
     private HashMap commands;
@@ -27,7 +31,14 @@ class Compare {
     private List methods;
     private int index;
 
-    boolean Initiate(ArrayList<String> input, Terminal terminal) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
+    /**
+     * @param input    words inputted
+     * @param terminal current terminal
+     * @return if there is more required input
+     * @throws IOException            permissions
+     * @throws ClassNotFoundException if class isn't found
+     */
+    boolean Initiate(final ArrayList<String> input, final Terminal terminal) throws IOException, ClassNotFoundException {
         t = terminal;
         words = input;
         CommandList cl = new CommandList(t.getBot());
@@ -35,47 +46,54 @@ class Compare {
         commandMethods = cl.getCommandMethods();
         defaultClass = cl.getDefaultCommands();
         adminClass = cl.getAdminCommands();
-        return errorHandling();
+        return logic();
     }
 
-    private boolean errorHandling() {
+    /**
+     * @return if there is more required input
+     */
+    private boolean logic() {
         Async.AsyncList<Boolean> genericList = new Async.AsyncList<>();
         genericList.add(() -> {
-            if (checkGeneric(words.get(0), defaultClass.getDeclaredMethods())) {
-                LOGGER.debug("Executing default command");
-                Execute e = new Execute(t);
-                Object o = null;
-                try {
-                    o = e.invoke(defaultClass, words);
-                } catch (IllegalAccessException | InvocationTargetException | InstantiationException e1) {
-                    e1.printStackTrace();
+            if (words.size() > 0) {
+                if (checkGeneric(words.get(0), defaultClass.getDeclaredMethods())) {
+                    LOGGER.debug("Executing default command");
+                    Execute e = new Execute(t);
+                    Object o = null;
+                    try {
+                        o = e.invoke(defaultClass, words);
+                    } catch (IllegalAccessException | InvocationTargetException | InstantiationException e1) {
+                        e1.printStackTrace();
+                    }
+                    if (o != null) {
+                        LOGGER.debug("Default return value: " + o.toString());
+                        t.getDispatcher().notify(new ProgramReturnValues(t, (String) o));
+                    } else {
+                        LOGGER.error("Default return value was null");
+                    }
+                    return true;
                 }
-                if (o != null) {
-                    LOGGER.debug("Default return value: " + o.toString());
-                    t.getDispatcher().notify(new ProgramReturnValues(t, (String) o));
-                } else {
-                    LOGGER.error("Default return value was null");
-                }
-                return true;
             }
             return false;
         }).add(() -> {
-            if (checkGeneric(words.get(0), adminClass.getDeclaredMethods())) {
-                if (t.isAdmin()) {
-                    LOGGER.debug("Executing admin command");
-                    Object o = null;
-                    try {
-                        o = executeGeneric(adminClass, words.get(0));
-                    } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                        e.printStackTrace();
+            if (words.size() > 0) {
+                if (checkGeneric(words.get(0), adminClass.getDeclaredMethods())) {
+                    if (t.isAdmin()) {
+                        LOGGER.debug("Executing admin command");
+                        Object o = null;
+                        try {
+                            o = executeGeneric(adminClass, words.get(0));
+                        } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                        if (o != null) {
+                            LOGGER.debug("Admin return value: " + o.toString());
+                            t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
+                        } else {
+                            LOGGER.error("Admin return value was null");
+                        }
+                        return true;
                     }
-                    if (o != null) {
-                        LOGGER.debug("Admin return value: " + o.toString());
-                        t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
-                    } else {
-                        LOGGER.error("Admin return value was null");
-                    }
-                    return true;
                 }
             }
             return false;
@@ -102,12 +120,12 @@ class Compare {
                         t.getDispatcher().notify(new BotCommands(t, l, m, defaultClass, adminClass));
                         break;
                     case 2:
-                        t.getDispatcher().notify(new InvalidHelpFormat(t, words.get(1), (String[]) commands.get(words.get(1))));
+                        t.getDispatcher().notify(new InvalidHelpFormat(t, words.get(1), (List<String>) commands.get(words.get(1))));
                         break;
                     case 3:
                         List args = (List) commands.get(words.get(1));
                         List methods = (List) commandMethods.get(words.get(1));
-                        int index = getMethod(words, args, 2);
+                        int index = getMethod(words, args.iterator(), 2);
                         if (index != -1) {
                             Class<?> c = null;
                             try {
@@ -127,7 +145,7 @@ class Compare {
                 if (words.size() > 1) {
                     List args = (List) commands.get(words.get(0));
                     methods = (List) commandMethods.get(words.get(0));
-                    index = getMethod(words, args, 1);
+                    index = getMethod(words, args.iterator(), 1);
                     if (index != -1) {
                         LOGGER.info("Terminal function is awaiting more input");
                         t.changeStatus(true);
@@ -136,8 +154,6 @@ class Compare {
                     } else {
                         t.getDispatcher().notify(new InvalidArgument(t));
                     }
-                } else {
-                    t.getDispatcher().notify(new MissingParameters(t, (List) commands.get(words.get(0))));
                 }
 
             }
@@ -154,12 +170,16 @@ class Compare {
         return false;
     }
 
-    private int getMethod(ArrayList<String> words, List args, int compare) {
-        int index = -1;
-        for (int i = 0; i < args.size(); i++) {
-            if (words.get(compare).equals(args.get(i).toString())) {
-                index = i;
-                break;
+    private int getMethod(final ArrayList<String> words, final Iterator args, final int compare) {
+        int index = -1, count = 0;
+        if (args != null) {
+            while (args.hasNext()) {
+                Object object = args.next();
+                if (words.get(compare).equals(object.toString())) {
+                    index = count;
+                    break;
+                }
+                count++;
             }
         }
         return index;
@@ -178,7 +198,12 @@ class Compare {
         return index;
     }
 
-    private boolean checkGeneric(String s, Method[] m) {
+    /**
+     * @param s input
+     * @param m all methods from a generic file
+     * @return if the input is a generic command
+     */
+    private boolean checkGeneric(final String s, final Method[] m) {
         for (Method M : m) {
             if (s.toLowerCase().equals(M.getName().toLowerCase())) {
                 return true;
@@ -187,7 +212,15 @@ class Compare {
         return false;
     }
 
-    private Object executeGeneric(Class<?> c, String s) throws IllegalAccessException, InstantiationException, InvocationTargetException {
+    /**
+     * @param c generic class
+     * @param s input
+     * @return new instance from the generic class
+     * @throws IllegalAccessException    n/a
+     * @throws InstantiationException    n/a
+     * @throws InvocationTargetException n/a
+     */
+    private Object executeGeneric(final Class<?> c, final String s) throws IllegalAccessException, InstantiationException, InvocationTargetException {
         Object o = null;
         for (Method m : c.getDeclaredMethods()) {
             if (s.toLowerCase().equals(m.getName().toLowerCase())) {

@@ -25,7 +25,7 @@ import java.util.Objects;
  * This class is online turned on if the config option useTerminal is set to true
  * This class manages all things related to the custom terminal
  *
- * @author Myles
+ * @author ideaeclipse
  * @see TerminalEvent
  * @see DiscordAPI.listener.genericListener.IDispatcher
  */
@@ -133,7 +133,6 @@ class TerminalManager {
         terminal.getDispatcher().addListener((IListener<TerminalEvent, InvalidArgument>) a -> botChannel.sendMessage(a.getReturn()));
         terminal.getDispatcher().addListener((IListener<TerminalEvent, InvalidCommand>) a -> botChannel.sendMessage(a.getReturn()));
         terminal.getDispatcher().addListener((IListener<TerminalEvent, InvalidHelpFormat>) a -> botChannel.sendMessage(a.getReturn()));
-        terminal.getDispatcher().addListener((IListener<TerminalEvent, MissingParameters>) a -> botChannel.sendMessage(a.getReturn()));
         terminal.getDispatcher().addListener((IListener<TerminalEvent, NoSuchMethod>) a -> botChannel.sendMessage(a.getReturn()));
         terminal.getDispatcher().addListener((IListener<TerminalEvent, WrongNumberOfArgs>) a -> botChannel.sendMessage(a.getReturn()));
         terminal.getDispatcher().addListener((IListener<TerminalEvent, WrongType>) a -> botChannel.sendMessage(a.getReturn()));

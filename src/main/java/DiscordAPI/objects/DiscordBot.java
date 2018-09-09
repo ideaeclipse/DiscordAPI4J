@@ -110,7 +110,6 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     @Override
     public IDiscordBot login() {
         //Updates Roles
-
         roles = Async.queue(uRoles(), "RoleUpdate");
         Async.AsyncList list = new Async.AsyncList().add(uChannels()).add(uUsers()).add(uBotUser());
         List asyncList = Async.execute(list);
