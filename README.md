@@ -52,3 +52,11 @@ public class DiscordBot.Main {
  * Then a websocket connection is started where an identity token is sent over the websocket, after this point the bot while show up in the server
  * Next all events will go through the 'Dispatch' case in the switch statement in the textWss file.
  * From here everything is event driven and in order to write code for each event use the IDiscordBot method (addListener)
+# Async
+ * There is a custom Async library that will return data about completion of each method in a synced order
+ * Make an AsyncList<?> and add new Async.IU for each index.
+ * Finally use the static method Async.Execute("Your async list here") and this will return a List<?>
+# ObjectMapper
+ * There is also a custom object mapper/builder if you are doing anything related to sending json data to the webapi or over the socket refer to https://discordapp.com/developers/docs/intro for proper formatting
+ * The object mapper is in a class called Parser (see method convertToPayload(final Json object, final Class<?> c)) if you pass the json object and a class with accessable variables (same name as each key value) and it will map each key to the corrosponding variable and will return an instance of that class
+ * The builder class works in the inverse way the convertToPayload method works. If you want to build a json string you need to first create a new instance of a class with public variables and set their values then pass that instance to the buildData method and if you're building it into a payload set that instance into buildPayload with an appropriate opCode
