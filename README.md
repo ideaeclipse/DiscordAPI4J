@@ -34,6 +34,15 @@ public class EventClass implements Listener {
 }
 ```
 
+If you want to import this into your maven project
+```xml
+ <dependency>
+    <groupId>com.ideaeclipse</groupId>
+    <artifactId>Discord4J</artifactId>
+    <version>1.1</version>
+ </dependency>
+```
+
 # Configuration
  * adminGroup: the group you want to give admin privilleges to
  * debug: if you want to log debug messages
