@@ -31,7 +31,8 @@ public class EventClass implements Listener {
     public void event1(Message_Create create) {
         System.out.println(create.getMessage().getContent());
     }
-}```
+}
+```
 
 # Configuration
  * adminGroup: the group you want to give admin privilleges to
