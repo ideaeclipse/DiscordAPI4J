@@ -79,11 +79,6 @@ public class Json {
             if (indexes.hasNext()) {
                 while (indexes.hasNext()) {
                     current = indexes.next();
-                    if (previous == 0) {
-                        strings.add(object.substring(previous, current));
-                        previous = current + 1;
-                        continue;
-                    }
                     strings.add(object.substring(previous, current));
                     if (!indexes.hasNext()) {
                         strings.add(object.substring(current + 1, object.length()));
