@@ -42,7 +42,34 @@ If you want to import this into your maven project
     <version>1.1</version>
  </dependency>
 ```
+Example of command cm proof Calculator
+This file is in the commandsDirectory and its parent package is called 'proof'
+```java
+import DiscordAPI.Terminal.CustomTerminal;
 
+public class Calculator implements CustomTerminal {
+    public Calculator(){
+
+    }
+    public float add(float a, float b){
+        return a + b;
+    }
+    public float subtract(float a,float b){
+        return a-b;
+    }
+    public float multiply(float a, float b){
+        return a*b;
+    }
+    public float divide(float a, float b){
+        return a/b;
+    }
+
+    @Override
+    public void done() {
+
+    }
+}
+```
 # Configuration
  * adminGroup: the group you want to give admin privilleges to
  * debug: if you want to log debug messages
