@@ -7,6 +7,7 @@ import DiscordAPI.objects.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Properties;
+import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface IDiscordBot {
 
     List<IRole> getRoles();
 
-    IDispatcher getDispatcher();
+    EventManager getDispatcher();
 
     //returns bot
     IDiscordUser getBotUser();

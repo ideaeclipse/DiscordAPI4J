@@ -2,6 +2,7 @@ package DiscordAPI.objects;
 
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.IDiscordBotBuilder;
+import ideaeclipse.reflectionListener.Listener;
 
 /**
  * Object is using to create a new discordBot instance
@@ -16,8 +17,8 @@ public class DiscordBotBuilder implements IDiscordBotBuilder {
      * @param token   bot token
      * @param guildId guildId
      */
-    public DiscordBotBuilder(final String token, final Long guildId) {
-        bot = new DiscordBot(token, guildId);
+    public DiscordBotBuilder(final String token, final Listener listener,final Long guildId) {
+        bot = new DiscordBot(token, listener, guildId);
     }
 
     /**

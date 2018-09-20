@@ -3,10 +3,10 @@ package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.*;
-import DiscordAPI.listener.discordApiListener.ApiEvent;
 import DiscordAPI.objects.Interfaces.IMessage;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
+import ideaeclipse.reflectionListener.Event;
 
 /**
  * This Class is called using java reflection
@@ -16,7 +16,7 @@ import DiscordAPI.webSocket.Wss;
  *
  * @author Ideaeclipse
  */
-public class Message_Create extends ApiEvent {
+public class Message_Create extends Event {
     private IMessage message;
 
     /**
@@ -27,7 +27,6 @@ public class Message_Create extends ApiEvent {
      * @see Wss under case Dispatch
      */
     public Message_Create(final IPrivateBot b, final Json payload) {
-        super(b);
         message = new Parser.MessageCreate(b, payload).getMessage();
     }
 

@@ -4,7 +4,6 @@ import DiscordAPI.Terminal.NameConversion;
 import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.CustomAnnotation;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -15,15 +14,11 @@ import java.lang.reflect.Modifier;
  *
  * @author ideaeclipse
  */
-public class ClassInfo extends TerminalEvent implements ListenerFeatures {
+public class ClassInfo extends TerminalEvent {
     private Constructor[] c;
     private Method[] m;
     private Class<?> d, a;
     private Terminal t;
-
-    private ClassInfo(final Terminal t) {
-        super(t);
-    }
 
     /**
      * @param t            current terminal instance
@@ -33,7 +28,7 @@ public class ClassInfo extends TerminalEvent implements ListenerFeatures {
      * @param admin        admin class
      */
     public ClassInfo(final Terminal t, final Constructor[] constructors, final Method[] methods, final Class<?> def, final Class<?> admin) {
-        this(t);
+        super(t);
         this.t = t;
         this.c = constructors;
         this.m = methods;
@@ -44,7 +39,6 @@ public class ClassInfo extends TerminalEvent implements ListenerFeatures {
     /**
      * @return returns a string composed of all the data of the function
      */
-    @Override
     public String getReturn() {
         StringBuilder string = new StringBuilder();
         string.append("***Function info***").append("\n");

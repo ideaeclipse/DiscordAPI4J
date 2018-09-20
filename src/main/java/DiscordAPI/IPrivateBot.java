@@ -1,12 +1,12 @@
 package DiscordAPI;
 
-import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.objects.AudioManager;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Json;
 import DiscordAPI.utils.Properties;
+import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public interface IPrivateBot {
 
     IDiscordBot getPublicBot();
 
-    IDispatcher getDispatcher();
+    EventManager getDispatcher();
 
     Json getIdentity();
 

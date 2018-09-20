@@ -157,5 +157,10 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.ideaeclipse</groupId>
+            <artifactId>reflectionListener</artifactId>
+            <version>LATEST</version>
+        </dependency>
     </dependencies>
 </project>

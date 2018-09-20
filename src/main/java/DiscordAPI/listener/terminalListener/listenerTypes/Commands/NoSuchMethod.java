@@ -2,7 +2,6 @@ package DiscordAPI.listener.terminalListener.listenerTypes.Commands;
 
 import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 /**
  * Function is called when there is a {@link NoSuchMethodException}
@@ -10,13 +9,12 @@ import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
  *
  * @author ideaeclipse
  */
-public class NoSuchMethod extends TerminalEvent implements ListenerFeatures {
+public class NoSuchMethod extends TerminalEvent {
 
     public NoSuchMethod(Terminal t) {
         super(t);
     }
 
-    @Override
     public String getReturn() {
         return "This method does not exist";
     }

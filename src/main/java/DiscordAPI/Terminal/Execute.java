@@ -105,25 +105,25 @@ class Execute {
                                 LOGGER.info("Converted Args: " + Arrays.toString(convertedArgs));
                                 Object o = method.invoke(ob, convertedArgs);
                                 if (o != null) {
-                                    t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
+                                    t.getDispatcher().callEvent(new ProgramReturnValues(t, o.toString()));
                                 }
                             }
                         } else {
-                            t.getDispatcher().notify(new WrongNumberOfArgs(t, paramTypes));
+                            t.getDispatcher().callEvent(new WrongNumberOfArgs(t, paramTypes));
                         }
                     } else {
                         try {
                             Method method = ob.getClass().getMethod(input.get(0));
                             Object o = method.invoke(ob);
                             if (o != null) {
-                                t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
+                                t.getDispatcher().callEvent(new ProgramReturnValues(t, o.toString()));
                             }
                         } catch (NoSuchMethodException ignored) {
                             Object o = checkDefault(input);
                             if (o != null) {
-                                t.getDispatcher().notify(new ProgramReturnValues(t, (String) o));
+                                t.getDispatcher().callEvent(new ProgramReturnValues(t, (String) o));
                             } else {
-                                t.getDispatcher().notify(new NoSuchMethod(t));
+                                t.getDispatcher().callEvent(new NoSuchMethod(t));
                             }
                         }
 
@@ -136,7 +136,7 @@ class Execute {
         }).add(() -> {
             if (input.size() > 0) {
                 if (input.get(0).equals("help")) {
-                    t.getDispatcher().notify(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
+                    t.getDispatcher().callEvent(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
                 }
             }
             return null;
@@ -145,7 +145,7 @@ class Execute {
                 if (input.size() > 0) {
                     if (input.get(0).equals("done")) {
                         t.changeStatus(false);
-                        t.getDispatcher().notify(new ExitingFunction(t));
+                        t.getDispatcher().callEvent(new ExitingFunction(t));
                         if (ob != null) {
                             Method m = ob.getClass().getMethod("done");
                             m.invoke(ob);
@@ -230,7 +230,7 @@ class Execute {
     }
 
     private void wrongTypeException() {
-        t.getDispatcher().notify(new WrongType(t));
+        t.getDispatcher().callEvent(new WrongType(t));
     }
 
     Class<?> getCalledClass() {
@@ -260,7 +260,7 @@ class Execute {
                 if (words.size() == m.getParameterTypes().length) {
                     return m.invoke(c.getConstructors()[0].newInstance(t), convertArgs(words, m.getParameterTypes()));
                 }
-                t.getDispatcher().notify(new WrongNumberOfArgs(t, m.getParameterTypes()));
+                t.getDispatcher().callEvent(new WrongNumberOfArgs(t, m.getParameterTypes()));
                 break;
             } else {
                 count++;

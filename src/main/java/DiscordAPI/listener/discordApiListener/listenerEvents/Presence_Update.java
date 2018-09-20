@@ -1,12 +1,12 @@
 package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.listener.discordApiListener.ApiEvent;
 import DiscordAPI.objects.*;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.TextOpCodes;
 import DiscordAPI.webSocket.Wss;
+import ideaeclipse.reflectionListener.Event;
 
 /**
  * This Class is called using java reflection
@@ -17,7 +17,7 @@ import DiscordAPI.webSocket.Wss;
  *
  * @author Ideaeclipse
  */
-public class Presence_Update extends ApiEvent {
+public class Presence_Update extends Event {
     private IUser status;
 
     /**
@@ -28,7 +28,6 @@ public class Presence_Update extends ApiEvent {
      * @see Wss under case Dispatch
      */
     public Presence_Update(final IPrivateBot b, final Json payload) {
-        super(b);
         status = new Parser.PresenceUpdate(b, payload).getUser();
     }
 

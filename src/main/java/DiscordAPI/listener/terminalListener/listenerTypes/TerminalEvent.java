@@ -1,13 +1,14 @@
 package DiscordAPI.listener.terminalListener.listenerTypes;
 
 import DiscordAPI.Terminal.Terminal;
+import ideaeclipse.reflectionListener.Event;
 
 /**
  * Base event for all Terminal Listeners
  *
  * @author ideaeclipse
  */
-public abstract class TerminalEvent {
+public class TerminalEvent extends Event {
     private final Terminal t;
 
     public TerminalEvent(final Terminal t) {

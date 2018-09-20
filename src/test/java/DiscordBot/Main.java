@@ -1,14 +1,19 @@
 package DiscordBot;
 
 import DiscordAPI.IDiscordBot;
+import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
+import DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
 import DiscordAPI.objects.DiscordBotBuilder;
+import ideaeclipse.reflectionListener.EventHandler;
+import ideaeclipse.reflectionListener.EventManager;
+import ideaeclipse.reflectionListener.Listener;
 
 
 public class Main {
     public static IDiscordBot bot;
 
     private Main(String token, Long guildId) {
-        bot = new DiscordBotBuilder(token, guildId).login();
+        bot = new DiscordBotBuilder(token, new EventClass(), guildId).login();
         /*
         bot.getDispatcher().addListener((IListener<Message_Create>) a -> {
             IMessage message = a.getMessage();

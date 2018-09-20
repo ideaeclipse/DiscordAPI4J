@@ -2,7 +2,6 @@ package DiscordAPI.objects;
 
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
@@ -11,6 +10,8 @@ import DiscordAPI.utils.Properties;
 import DiscordAPI.webSocket.TextOpCodes;
 import DiscordAPI.webSocket.Wss;
 import com.neovisionaries.ws.client.WebSocketException;
+import ideaeclipse.reflectionListener.EventManager;
+import ideaeclipse.reflectionListener.Listener;
 
 import java.io.IOException;
 import java.util.*;
@@ -31,7 +32,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     private final Properties properties;
     private TerminalManager terminalManager;
     private final Json identity;
-    private final IDispatcher dispatcher;
+    private final EventManager dispatcher;
     private final long guildId;
     private List<IChannel> channels;
     private List<IUser> users;
@@ -45,7 +46,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      * @param token   IPrivateBot token
      * @param guildID Guild id (Right click server and hit copy id)
      */
-    DiscordBot(final String token, final long guildID) {
+    DiscordBot(final String token, final Listener listener, final long guildID) {
         properties = new Properties();
         try {
             properties.start();
@@ -61,7 +62,8 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         logger.info("Starting Rate Limit Monitor");
         DiscordUtils.DefaultLinks.rateLimitRecorder = new RateLimitRecorder();
         this.guildId = guildID;
-        dispatcher = new IDispatcher();
+        dispatcher = new EventManager();
+        dispatcher.registerEvents(listener);
         //audioManager = new AudioManager(this);
     }
 
@@ -174,7 +176,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      * @return Listener Dispatcher
      */
     @Override
-    public IDispatcher getDispatcher() {
+    public EventManager getDispatcher() {
         return this.dispatcher;
     }
 

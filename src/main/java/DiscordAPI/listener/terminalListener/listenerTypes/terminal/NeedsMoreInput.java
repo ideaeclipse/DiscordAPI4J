@@ -3,7 +3,6 @@ package DiscordAPI.listener.terminalListener.listenerTypes.terminal;
 
 import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 import DiscordAPI.objects.Interfaces.IMessage;
 
 /**
@@ -11,19 +10,14 @@ import DiscordAPI.objects.Interfaces.IMessage;
  *
  * @author ideaeclipse
  */
-public class NeedsMoreInput extends TerminalEvent implements ListenerFeatures {
+public class NeedsMoreInput extends TerminalEvent {
     private IMessage m;
 
-    private NeedsMoreInput(final Terminal t) {
-        super(t);
-    }
 
     public NeedsMoreInput(final Terminal t, final IMessage message) {
-        this(t);
+        super(t);
         m = message;
     }
-
-    @Override
     public String getReturn() {
         return null;
     }

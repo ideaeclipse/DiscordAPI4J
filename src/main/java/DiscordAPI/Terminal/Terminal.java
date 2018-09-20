@@ -1,11 +1,12 @@
 package DiscordAPI.Terminal;
 
 import DiscordAPI.IDiscordBot;
-import DiscordAPI.listener.genericListener.IDispatcher;
 import DiscordAPI.objects.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordUtils;
+import ideaeclipse.reflectionListener.EventManager;
+import ideaeclipse.reflectionListener.Listener;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -19,14 +20,15 @@ public class Terminal {
     private Compare compare;
     private IDiscordUser user;
     private Execute execute;
-    private IDispatcher dispatcher;
+    private EventManager dispatcher;
     private boolean isAdmin = false;
     private String currentFunction;
 
-    public Terminal(final IDiscordUser u, final IDiscordBot bot) {
+    public Terminal(final IDiscordUser u, final IDiscordBot bot, final Listener eventListener) {
         this.bot = bot;
         user = u;
-        dispatcher = new IDispatcher();
+        dispatcher = new EventManager();
+        dispatcher.registerEvents(eventListener);
         if (user.getName().toLowerCase().equals(bot.getProperties().getProperty("adminUser"))) {
             isAdmin = true;
         } else {
@@ -88,7 +90,7 @@ public class Terminal {
         return user;
     }
 
-    public IDispatcher getDispatcher() {
+    public EventManager getDispatcher() {
         return this.dispatcher;
     }
 

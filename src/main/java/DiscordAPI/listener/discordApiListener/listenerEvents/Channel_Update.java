@@ -1,11 +1,11 @@
 package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.listener.discordApiListener.ApiEvent;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Parser;
 import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.Wss;
+import ideaeclipse.reflectionListener.Event;
 
 /**
  * This Class is called using java reflection
@@ -14,7 +14,7 @@ import DiscordAPI.webSocket.Wss;
  *
  * @author Ideaeclipse
  */
-public class Channel_Update extends ApiEvent {
+public class Channel_Update extends Event {
     private IChannel oldC;
     private IChannel newC;
 
@@ -26,7 +26,6 @@ public class Channel_Update extends ApiEvent {
      * @see Wss under case Dispatch
      */
     public Channel_Update(final IPrivateBot b, final Json payload) {
-        super(b);
         Parser.ChannelUpdate parser = new Parser.ChannelUpdate(b, payload);
         oldC = parser.getOldChannel();
         newC = parser.getNewChannel();

@@ -3,14 +3,13 @@ package DiscordAPI.listener.terminalListener.listenerTypes.errors;
 import DiscordAPI.Terminal.NameConversion;
 import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 /**
  * This function is notified when a user calls a method with the incorrect number of parameters
  *
  * @author ideaeclipse
  */
-public class WrongNumberOfArgs extends TerminalEvent implements ListenerFeatures {
+public class WrongNumberOfArgs extends TerminalEvent {
     private Class<?>[] args;
 
     private WrongNumberOfArgs(final Terminal t) {

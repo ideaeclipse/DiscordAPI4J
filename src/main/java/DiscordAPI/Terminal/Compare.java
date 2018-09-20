@@ -67,7 +67,7 @@ class Compare {
                     }
                     if (o != null) {
                         LOGGER.debug("Default return value: " + o.toString());
-                        t.getDispatcher().notify(new ProgramReturnValues(t, (String) o));
+                        t.getDispatcher().callEvent(new ProgramReturnValues(t, (String) o));
                     } else {
                         LOGGER.error("Default return value was null");
                     }
@@ -88,7 +88,7 @@ class Compare {
                         }
                         if (o != null) {
                             LOGGER.debug("Admin return value: " + o.toString());
-                            t.getDispatcher().notify(new ProgramReturnValues(t, o.toString()));
+                            t.getDispatcher().callEvent(new ProgramReturnValues(t, o.toString()));
                         } else {
                             LOGGER.error("Admin return value was null");
                         }
@@ -101,7 +101,7 @@ class Compare {
         Async.AsyncList<Boolean> list = new Async.AsyncList<>();
         list.add(() -> {
             if (commands.get(words.get(0)) == null && !words.get(0).equals("help")) {
-                t.getDispatcher().notify(new InvalidCommand(t));
+                t.getDispatcher().callEvent(new InvalidCommand(t));
             }
             return false;
         }).add(() -> {
@@ -117,10 +117,10 @@ class Compare {
                         assert cl != null;
                         Map m = cl.getCommands();
                         List l = new ArrayList(m.keySet());
-                        t.getDispatcher().notify(new BotCommands(t, l, m, defaultClass, adminClass));
+                        t.getDispatcher().callEvent(new BotCommands(t, l, m, defaultClass, adminClass));
                         break;
                     case 2:
-                        t.getDispatcher().notify(new InvalidHelpFormat(t, words.get(1), (List<String>) commands.get(words.get(1))));
+                        t.getDispatcher().callEvent(new InvalidHelpFormat(t, words.get(1), (List<String>) commands.get(words.get(1))));
                         break;
                     case 3:
                         List args = (List) commands.get(words.get(1));
@@ -134,7 +134,7 @@ class Compare {
                                 e.printStackTrace();
                             }
                             assert c != null;
-                            t.getDispatcher().notify(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
+                            t.getDispatcher().callEvent(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
                         }
                         break;
                 }
@@ -149,10 +149,10 @@ class Compare {
                     if (index != -1) {
                         LOGGER.info("Terminal function is awaiting more input");
                         t.changeStatus(true);
-                        t.getDispatcher().notify(new EnteringFunction(t, words.get(1)));
+                        t.getDispatcher().callEvent(new EnteringFunction(t, words.get(1)));
                         return true;
                     } else {
-                        t.getDispatcher().notify(new InvalidArgument(t));
+                        t.getDispatcher().callEvent(new InvalidArgument(t));
                     }
                 }
 

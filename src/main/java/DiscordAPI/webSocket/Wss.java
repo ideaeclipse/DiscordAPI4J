@@ -8,6 +8,7 @@ import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
+import ideaeclipse.reflectionListener.Event;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -46,7 +47,7 @@ public class Wss extends WebSocketFactory {
                                                 Class<?> cl = webSocket_events.getaClass();
                                                 Constructor constructor = cl.getConstructor(IPrivateBot.class, Json.class);
                                                 Object t = constructor.newInstance(bot, new Json((String) payload.get("d")));
-                                                bot.getDispatcher().notify(t);
+                                                bot.getDispatcher().callEvent((Event) t);
                                             }
                                         }
                                     } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {

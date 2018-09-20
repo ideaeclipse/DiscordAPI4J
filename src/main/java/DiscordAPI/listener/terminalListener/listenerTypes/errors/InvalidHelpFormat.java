@@ -2,9 +2,7 @@ package DiscordAPI.listener.terminalListener.listenerTypes.errors;
 
 import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,7 +10,7 @@ import java.util.List;
  *
  * @author ideaeclipse
  */
-public class InvalidHelpFormat extends TerminalEvent implements ListenerFeatures {
+public class InvalidHelpFormat extends TerminalEvent {
     private String word;
     private List<String> strings;
 
@@ -34,7 +32,6 @@ public class InvalidHelpFormat extends TerminalEvent implements ListenerFeatures
     /**
      * @return return statement to be printed to user
      */
-    @Override
     public String getReturn() {
         StringBuilder string = new StringBuilder();
         string.append("Please enter a command looking like help ").append(word).append(" $Subargs").append(" $Subargs = ").append(strings);

@@ -2,7 +2,6 @@ package DiscordAPI.listener.terminalListener.listenerTypes.Commands;
 
 import DiscordAPI.Terminal.Terminal;
 import DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
-import DiscordAPI.listener.terminalListener.listenerTypes.ListenerFeatures;
 
 import java.util.List;
 import java.util.Map;
@@ -12,18 +11,14 @@ import java.util.Map;
  *
  * @author ideaeclipse
  */
-public class BotCommands extends TerminalEvent implements ListenerFeatures {
+public class BotCommands extends TerminalEvent{
     private Map map;
     private List list;
     private Class<?> defaultClass, adminClass;
     private Terminal t;
 
-    private BotCommands(final Terminal t) {
-        super(t);
-    }
-
     public BotCommands(final Terminal terminal, final List list, final Map map, final Class<?> defaultClass, final Class<?> admin) {
-        this(terminal);
+        super(terminal);
         this.t = terminal;
         this.list = list;
         this.map = map;
@@ -31,7 +26,6 @@ public class BotCommands extends TerminalEvent implements ListenerFeatures {
         this.adminClass = admin;
     }
 
-    @Override
     public String getReturn() {
         StringBuilder string = new StringBuilder();
         string.append("***Custom Commands***").append("\n");
