@@ -19,6 +19,7 @@ import java.util.zip.ZipFile;
  * @author ideaeclipse
  */
 public class CommandList {
+
     private static final DiscordLogger LOGGER = new DiscordLogger(CommandList.class.getName());
     private HashMap<String, List> commands;
     private HashMap<String, List> commandMethods;
