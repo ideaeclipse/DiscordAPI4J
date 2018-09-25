@@ -113,12 +113,12 @@ class Execute {
                         }
                     } else {
                         try {
-                            Method method = ob.getClass().getMethod(input.get(0));
+                            Method method = ob.getClass().getDeclaredMethod(input.get(0));
                             Object o = method.invoke(ob);
                             if (o != null) {
                                 t.getDispatcher().callEvent(new ProgramReturnValues(t, o.toString()));
                             }
-                        } catch (NoSuchMethodException ignored) {
+                        } catch (NoSuchMethodException e) {
                             Object o = checkDefault(input);
                             if (o != null) {
                                 t.getDispatcher().callEvent(new ProgramReturnValues(t, (String) o));
