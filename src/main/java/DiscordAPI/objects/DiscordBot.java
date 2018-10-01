@@ -67,7 +67,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         DiscordUtils.DefaultLinks.rateLimitRecorder = new RateLimitRecorder();
         this.guildId = guildID;
         dispatcher = new EventManager();
-        dispatcher.registerEvents(listener);
+        dispatcher.registerListener(listener);
         //audioManager = new AudioManager(this);
     }
 

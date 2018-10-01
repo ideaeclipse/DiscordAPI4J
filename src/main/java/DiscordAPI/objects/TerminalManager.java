@@ -65,7 +65,7 @@ class TerminalManager {
     }
 
     private void terminalLogic() {
-        bot.getDispatcher().registerEvents(new terminalMessageListener());
+        bot.getDispatcher().registerListener(new terminalMessageListener());
     }
 
     /**

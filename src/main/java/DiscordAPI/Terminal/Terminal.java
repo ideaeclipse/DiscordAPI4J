@@ -28,7 +28,7 @@ public class Terminal {
         this.bot = bot;
         user = u;
         dispatcher = new EventManager();
-        dispatcher.registerEvents(eventListener);
+        dispatcher.registerListener(eventListener);
         if (user.getName().toLowerCase().equals(bot.getProperties().getProperty("adminUser"))) {
             isAdmin = true;
         } else {
