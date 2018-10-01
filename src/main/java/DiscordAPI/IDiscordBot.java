@@ -5,7 +5,7 @@ import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
-import DiscordAPI.utils.Properties;
+import ideaeclipse.CustomProperties.Properties;
 import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.List;

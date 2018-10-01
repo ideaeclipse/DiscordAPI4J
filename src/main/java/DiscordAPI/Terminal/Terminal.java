@@ -3,8 +3,8 @@ package DiscordAPI.Terminal;
 import DiscordAPI.IDiscordBot;
 import DiscordAPI.objects.IDiscordUser;
 import DiscordAPI.objects.Interfaces.IRole;
-import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordUtils;
+import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.reflectionListener.EventManager;
 import ideaeclipse.reflectionListener.Listener;
 

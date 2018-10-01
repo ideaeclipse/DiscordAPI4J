@@ -1,8 +1,9 @@
 package DiscordAPI.utils;
 
-import DiscordAPI.objects.Builder;
 import DiscordAPI.webSocket.VoiceOpCodes;
 import DiscordAPI.webSocket.VoiceWss;
+import ideaeclipse.JsonUtilities.Builder;
+import ideaeclipse.JsonUtilities.Json;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
@@ -25,7 +26,7 @@ public class VoiceHeartBeat implements Runnable {
         while (run) {
             try {
                 Nonce nonce = new Nonce();
-                Json object = Builder.buildPayload(VoiceOpCodes.HeartBeat, nonce.getRandom());
+                Json object = Builder.buildPayload(VoiceOpCodes.HeartBeat.ordinal(), nonce.getRandom());
                 webSocket.sendText(object);
                 Thread.sleep(this.heartbeat);
             } catch (InterruptedException e) {

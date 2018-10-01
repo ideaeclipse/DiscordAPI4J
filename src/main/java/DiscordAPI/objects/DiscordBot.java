@@ -6,15 +6,19 @@ import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.*;
-import DiscordAPI.utils.Properties;
 import DiscordAPI.webSocket.TextOpCodes;
 import DiscordAPI.webSocket.Wss;
 import com.neovisionaries.ws.client.WebSocketException;
+import ideaeclipse.AsyncUtility.Async;
+import ideaeclipse.JsonUtilities.Builder;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.JsonArray;
 import ideaeclipse.reflectionListener.EventManager;
 import ideaeclipse.reflectionListener.Listener;
 
 import java.io.IOException;
 import java.util.*;
+import ideaeclipse.CustomProperties.Properties;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 import static DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
@@ -47,7 +51,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final Listener listener, final long guildID) {
-        properties = new Properties();
+        properties = new Properties(new String[]{"adminUser", "adminGroup", "commandsDirectory", "genericDirectory", "adminFileDir", "defaultFileDirectory", "useTerminal", "debug"});
         try {
             properties.start();
         } catch (IOException e) {
@@ -81,13 +85,13 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      * @return Identity object
      */
     private Json buildIdentity() {
-        Builder.Identity i = new Builder.Identity();
+        BuilderObjects.Identity i = new BuilderObjects.Identity();
 
         i.token = token;
-        i.properties = Builder.buildData(new Builder.Identity.Properties());
+        i.properties = Builder.buildData(new BuilderObjects.Identity.Properties());
 
-        Builder.Identity.Presence p = new Builder.Identity.Presence();
-        p.game = Builder.buildData(new Builder.Identity.Presence.Game());
+        BuilderObjects.Identity.Presence p = new BuilderObjects.Identity.Presence();
+        p.game = Builder.buildData(new BuilderObjects.Identity.Presence.Game());
 
         i.presence = Builder.buildData(p);
         return new Json(Builder.buildData(i));
@@ -164,7 +168,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
 
     @Override
     public Json getIdentity() {
-        return Builder.buildPayload(TextOpCodes.Identify, this.identity);
+        return Builder.buildPayload(TextOpCodes.Identify.ordinal(), this.identity);
     }
 
     @Override
@@ -198,7 +202,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      */
     @Override
     public IChannel createDmChannel(final IUser user) {
-        Builder.CreateDmChannel cm = new Builder.CreateDmChannel();
+        BuilderObjects.CreateDmChannel cm = new BuilderObjects.CreateDmChannel();
         cm.recipient_id = user.getDiscordUser().getId();
         Channel.ChannelP parser = new Channel.ChannelP(new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, USERME + "/channels", new Json(Builder.buildData(cm)))))).logic();
         return parser.getChannel();
@@ -286,11 +290,11 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      */
     @Override
     public void setStatus(final Payloads.GameTypes gameType, final String gameName) {
-        Builder.Identity.Presence p = new Builder.Identity.Presence();
-        Builder.Identity.Presence.Game g = new Builder.Identity.Presence.Game();
+        BuilderObjects.Identity.Presence p = new BuilderObjects.Identity.Presence();
+        BuilderObjects.Identity.Presence.Game g = new BuilderObjects.Identity.Presence.Game();
         g.name = gameName;
         g.type = gameType.ordinal();
         p.game = Builder.buildData(g);
-        rateLimitRecorder.queue(new WebSocketEvent(this.textWss.getWebSocket(), Builder.buildPayload(TextOpCodes.Status_Update, Builder.buildData(p))));
+        rateLimitRecorder.queue(new WebSocketEvent(this.textWss.getWebSocket(), Builder.buildPayload(TextOpCodes.Status_Update.ordinal(), Builder.buildData(p))));
     }
 }

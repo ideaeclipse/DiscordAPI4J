@@ -6,8 +6,8 @@ import DiscordAPI.listener.terminalListener.listenerTypes.Commands.NoSuchMethod;
 import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturnValues;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongNumberOfArgs;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongType;
-import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
+import ideaeclipse.AsyncUtility.Async;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

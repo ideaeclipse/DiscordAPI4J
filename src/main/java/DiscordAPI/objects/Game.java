@@ -1,7 +1,8 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.objects.Interfaces.IGame;
-import DiscordAPI.utils.Json;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 /**
  * Game Object used to parse Game Json's
@@ -74,7 +75,7 @@ class Game implements IGame {
          * @return Updated instance of {@link GameP}
          */
         GameP logic() {
-            Payloads.DGame g = Parser.convertToPayload(object, Payloads.DGame.class);
+            Payloads.DGame g = ParserObjects.convertToPayload(object, Payloads.DGame.class);
             game = new Game(g.name, g.state, g.details, g.type);
             return this;
         }

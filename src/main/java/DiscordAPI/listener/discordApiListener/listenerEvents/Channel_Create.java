@@ -2,9 +2,9 @@ package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IChannel;
-import DiscordAPI.objects.Parser;
-import DiscordAPI.utils.Json;
+import DiscordAPI.objects.ParserObjects;
 import DiscordAPI.webSocket.Wss;
+import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
 
 /**
@@ -25,11 +25,11 @@ public class Channel_Create extends Event {
      * @see Wss under case Dispatch
      */
     public Channel_Create(final IPrivateBot b, final Json payload) {
-        channel = new Parser.ChannelCreate(b, payload).getChannel();
+        channel = new ParserObjects.ChannelCreate(b, payload).getChannel();
     }
 
     /**
-     * @return Channel created using {@link DiscordAPI.objects.Parser.ChannelCreate}
+     * @return Channel created using {@link DiscordAPI.objects.ParserObjects.ChannelCreate}
      */
     public IChannel getChannel() {
         return channel;

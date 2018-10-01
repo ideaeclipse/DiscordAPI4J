@@ -4,12 +4,12 @@ import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
 import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Delete;
 import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Update;
 import DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
-import DiscordAPI.utils.Json;
+import ideaeclipse.JsonUtilities.Json;
 
 import java.util.List;
 
 /**
- * This class is used for {@link Parser#convertToPayload(Json, Class)}
+ * This class is used for {@link ParserObjects.convertToPayload(Json, Class)}
  * and will return the class you passed to the method
  *
  * @author Ideaeclipse
@@ -42,40 +42,40 @@ public class Payloads {
      *
      * @author Ideaeclipse
      * @see Message
-     * @see DiscordAPI.objects.Parser.MessageCreate
+     * @see DiscordAPI.objects.ParserObjects.MessageCreate
      * @see Message_Create
      */
-    static class DMessage {
-        Long channel_id;
-        Long id;
-        Long guild_id;
-        String content;
+    public static class DMessage {
+        public Long channel_id;
+        public Long id;
+        public Long guild_id;
+        public String content;
 
         public DMessage() {
 
         }
     }
 
-    static class DVoiceServerUpdate {
-        String token;
-        Long guild_id;
-        String endpoint;
+    public static class DVoiceServerUpdate {
+        public String token;
+        public Long guild_id;
+        public String endpoint;
 
         public DVoiceServerUpdate() {
 
         }
     }
 
-    static class DVoiceStateUpdate {
-        Long user_id;
-        Boolean suppress;
-        String session_id;
-        Boolean self_video;
-        Boolean self_mute;
-        Boolean mute;
-        Boolean deaf;
-        Long guild_id;
-        Long channel_id;
+    public static class DVoiceStateUpdate {
+        public Long user_id;
+        public Boolean suppress;
+        public String session_id;
+        public Boolean self_video;
+        public Boolean self_mute;
+        public Boolean mute;
+        public Boolean deaf;
+        public Long guild_id;
+        public Long channel_id;
 
         public DVoiceStateUpdate() {
 
@@ -87,15 +87,15 @@ public class Payloads {
      *
      * @author Ideaeclipse
      * @see Game
-     * @see DiscordAPI.objects.Builder.Identity
+     * @see DiscordAPI.objects.BuilderObjects.Identity
      * @see DiscordBot#setStatus(GameTypes, String)
      * @see GameTypes
      */
-    static class DGame {
-        String name;
-        String state;
-        String details;
-        GameTypes type;
+    public static class DGame {
+        public String name;
+        public String state;
+        public String details;
+        public GameTypes type;
 
         public DGame() {
 
@@ -107,19 +107,19 @@ public class Payloads {
      *
      * @author Ideaeclipse
      * @see Channel
-     * @see DiscordAPI.objects.Parser.ChannelCreate
-     * @see DiscordAPI.objects.Parser.ChannelDelete
-     * @see DiscordAPI.objects.Parser.ChannelUpdate
+     * @see DiscordAPI.objects.ParserObjects.ChannelCreate
+     * @see DiscordAPI.objects.ParserObjects.ChannelDelete
+     * @see DiscordAPI.objects.ParserObjects.ChannelUpdate
      * @see Channel_Create
      * @see Channel_Delete
      * @see Channel_Update
      */
-    static class DChannel {
-        Long id;
-        ChannelTypes type;
-        String name;
-        Integer position;
-        Boolean nsfw;
+    public static class DChannel {
+        public Long id;
+        public ChannelTypes type;
+        public String name;
+        public Integer position;
+        public Boolean nsfw;
 
         public DChannel() {
 
@@ -132,28 +132,28 @@ public class Payloads {
      * @author Ideaeclipse
      * @see DiscordUser
      */
-    static class DUser {
-        Long id;
-        String username;
-        Integer discriminator;
-        Boolean deaf;
-        Boolean mute;
+    public static class DUser {
+        public Long id;
+        public String username;
+        public Integer discriminator;
+        public Boolean deaf;
+        public Boolean mute;
 
         public DUser() {
 
         }
     }
 
-    static class DServerUniqueUser {
-        String nick;
-        String joined_at;
-        List<Long> roles;
-        Boolean deaf;
-        Boolean mute;
-        String session_id;
-        DiscordUser user;
-        String status;
-        Game game;
+    public static class DServerUniqueUser {
+        public String nick;
+        public String joined_at;
+        public List<Long> roles;
+        public Boolean deaf;
+        public Boolean mute;
+        public String session_id;
+        public DiscordUser user;
+        public String status;
+        public Game game;
 
         public DServerUniqueUser() {
 
@@ -166,12 +166,12 @@ public class Payloads {
      * @author Ideaeclipse
      * @see Role
      */
-    static class DRole {
-        Long permissions;
-        String name;
-        Integer position;
-        Integer color;
-        Long id;
+    public static class DRole {
+        public Long permissions;
+        public String name;
+        public Integer position;
+        public Integer color;
+        public Long id;
 
         public DRole() {
 

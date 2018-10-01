@@ -2,11 +2,12 @@ package DiscordAPI.objects;
 
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.utils.DiscordLogger;
-import DiscordAPI.utils.Json;
 import DiscordAPI.webSocket.TextOpCodes;
 import DiscordAPI.webSocket.VoiceWss;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
+import ideaeclipse.JsonUtilities.Builder;
+import ideaeclipse.JsonUtilities.Json;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,10 +47,10 @@ public class AudioManager {
      * @param channel
      */
     void joinChannel(final IChannel channel) {
-        Builder.VoiceStateUpdate voiceStateUpdate = new Builder.VoiceStateUpdate();
+        BuilderObjects.VoiceStateUpdate voiceStateUpdate = new BuilderObjects.VoiceStateUpdate();
         voiceStateUpdate.channel_id = channel.getId();
         voiceStateUpdate.guild_id = bot.getGuildId();
-        Json json = Builder.buildPayload(TextOpCodes.Voice_State_Update, Builder.buildData(voiceStateUpdate));
+        Json json = Builder.buildPayload(TextOpCodes.Voice_State_Update.ordinal(), Builder.buildData(voiceStateUpdate));
         bot.getTextWss().sendText(json);
         /*
         only starts after both the update for the server and state are completed

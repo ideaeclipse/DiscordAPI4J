@@ -1,7 +1,8 @@
 package DiscordAPI.objects;
 
-import DiscordAPI.utils.Json;
 import DiscordAPI.utils.RateLimitRecorder;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.CHANNEL;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
@@ -46,7 +47,7 @@ class VoiceChannel extends Channel {
             if (object == null) {
                 object = new Json((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, CHANNEL + "/" + id)));
             }
-            Payloads.DChannel c = Parser.convertToPayload(object, Payloads.DChannel.class);
+            Payloads.DChannel c = ParserObjects.convertToPayload(object, Payloads.DChannel.class);
             channel = new VoiceChannel(c.id, c.name, c.position, c.nsfw);
             return this;
         }

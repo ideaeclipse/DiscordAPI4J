@@ -9,9 +9,9 @@ import DiscordAPI.listener.terminalListener.listenerTypes.errors.*;
 import DiscordAPI.listener.terminalListener.listenerTypes.terminal.NeedsMoreInput;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IMessage;
-import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
+import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
 

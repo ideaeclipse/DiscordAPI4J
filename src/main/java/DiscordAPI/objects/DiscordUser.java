@@ -3,7 +3,8 @@ package DiscordAPI.objects;
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IUser;
 import DiscordAPI.utils.DiscordUtils;
-import DiscordAPI.utils.Json;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 import java.util.Objects;
 
@@ -86,7 +87,7 @@ class DiscordUser implements IDiscordUser {
 
         UserP logicId() {
             object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + bot.getGuildId() + MEMBER + "/" + id)));
-            Payloads.DUser u = Parser.convertToPayload(new Json((String) object.get("user")), Payloads.DUser.class);
+            Payloads.DUser u = ParserObjects.convertToPayload(new Json((String) object.get("user")), Payloads.DUser.class);
             user = new DiscordUser(u.id, u.username, u.discriminator, bot);
             return this;
         }
@@ -98,7 +99,7 @@ class DiscordUser implements IDiscordUser {
                     temp = DiscordUtils.Search.USER(Objects.requireNonNull(bot.getUsers()), Long.parseUnsignedLong((String) object.get("id")));
                 }
                 if (temp == null) {
-                    Payloads.DUser u = Parser.convertToPayload(object, Payloads.DUser.class);
+                    Payloads.DUser u = ParserObjects.convertToPayload(object, Payloads.DUser.class);
                     user = new DiscordUser(u.id, u.username, u.discriminator, bot);
                 } else {
                     user = temp.getDiscordUser();

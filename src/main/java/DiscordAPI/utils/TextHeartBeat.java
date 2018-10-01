@@ -1,8 +1,9 @@
 package DiscordAPI.utils;
 
-import DiscordAPI.objects.Builder;
 import DiscordAPI.webSocket.Wss;
 import DiscordAPI.webSocket.TextOpCodes;
+import ideaeclipse.JsonUtilities.Builder;
+import ideaeclipse.JsonUtilities.Json;
 
 public class TextHeartBeat implements Runnable {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
@@ -21,7 +22,7 @@ public class TextHeartBeat implements Runnable {
     public void run() {
         while (run) {
             try {
-                Json object = Builder.buildPayload(TextOpCodes.Heartbeat, 251);
+                Json object = Builder.buildPayload(TextOpCodes.Heartbeat.ordinal(), 251);
                 webSocket.sendText(object);
                 Thread.sleep(this.heartbeat);
             } catch (InterruptedException e) {

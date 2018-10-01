@@ -3,7 +3,8 @@ package DiscordAPI.objects;
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.utils.DiscordUtils;
-import DiscordAPI.utils.Json;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 /**
  * This class is used for storing and parsing Role data
@@ -86,7 +87,7 @@ class Role implements IRole {
 
         RoleP logic() {
             if (object != null) {
-                Payloads.DRole r = Parser.convertToPayload(object, Payloads.DRole.class);
+                Payloads.DRole r = ParserObjects.convertToPayload(object, Payloads.DRole.class);
                 role = new Role(r.id, r.name, r.color, r.position, r.permissions);
             }else {
                 role = DiscordUtils.Search.ROLES(bot.getRoles(), id);

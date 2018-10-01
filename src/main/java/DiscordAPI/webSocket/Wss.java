@@ -1,13 +1,16 @@
 package DiscordAPI.webSocket;
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.objects.Parser;
+import DiscordAPI.objects.ParserObjects;
 import DiscordAPI.utils.*;
 import DiscordAPI.objects.Payloads;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
+import ideaeclipse.AsyncUtility.Async;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 import ideaeclipse.reflectionListener.Event;
 
 import java.io.*;
@@ -36,7 +39,7 @@ public class Wss extends WebSocketFactory {
                 .addListener(new WebSocketAdapter() {
                     public void onTextMessage(WebSocket webSocket1, String message) {
                         Json payload = new Json(message);
-                        Payloads.General g = Parser.convertToPayload(payload, Payloads.General.class);
+                        Payloads.General g = ParserObjects.convertToPayload(payload, Payloads.General.class);
                         TextOpCodes opCodes = TextOpCodes.values()[g.op];
                         switch (opCodes) {
                             case Dispatch:
@@ -80,7 +83,7 @@ public class Wss extends WebSocketFactory {
                                 Thread.currentThread().setName("TextWss");
                                 logger.info("Connected to webSocket");
                                 logger.info("Received initial Message");
-                                w = Parser.convertToPayload(g.d, Payloads.DWelcome.class);
+                                w = ParserObjects.convertToPayload(g.d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
                                 heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new TextHeartBeat(wss, w.heartbeat_interval));
                                 startTime = System.currentTimeMillis();

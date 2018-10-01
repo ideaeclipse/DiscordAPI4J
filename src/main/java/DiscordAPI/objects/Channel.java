@@ -1,8 +1,8 @@
 package DiscordAPI.objects;
 
 import DiscordAPI.objects.Interfaces.IChannel;
-import DiscordAPI.utils.Json;
-import org.json.simple.JSONObject;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.CHANNEL;
 import static DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
@@ -116,7 +116,7 @@ class Channel implements IChannel {
             if (object == null) {
                 object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id)));
             }
-            Payloads.DChannel c = Parser.convertToPayload(object, Payloads.DChannel.class);
+            Payloads.DChannel c = ParserObjects.convertToPayload(object, Payloads.DChannel.class);
             channel = new Channel(c.id, c.name, c.position, c.nsfw, c.type);
             return this;
         }

@@ -2,10 +2,10 @@ package DiscordAPI.listener.discordApiListener.listenerEvents;
 
 
 import DiscordAPI.IPrivateBot;
-import DiscordAPI.objects.*;
 import DiscordAPI.objects.Interfaces.IMessage;
-import DiscordAPI.utils.Json;
+import DiscordAPI.objects.ParserObjects;
 import DiscordAPI.webSocket.Wss;
+import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
 
 /**
@@ -27,11 +27,11 @@ public class Message_Create extends Event {
      * @see Wss under case Dispatch
      */
     public Message_Create(final IPrivateBot b, final Json payload) {
-        message = new Parser.MessageCreate(b, payload).getMessage();
+        message = new ParserObjects.MessageCreate(b, payload).getMessage();
     }
 
     /**
-     * @return returns Message created using {@link DiscordAPI.objects.Parser.MessageCreate}
+     * @return returns Message created using {@link DiscordAPI.objects.ParserObjects.MessageCreate}
      */
     public IMessage getMessage() {
         return this.message;

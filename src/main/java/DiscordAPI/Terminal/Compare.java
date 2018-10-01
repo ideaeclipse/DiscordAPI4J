@@ -7,8 +7,8 @@ import DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturn
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidArgument;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidCommand;
 import DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidHelpFormat;
-import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
+import ideaeclipse.AsyncUtility.Async;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

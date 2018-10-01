@@ -4,8 +4,8 @@ import DiscordAPI.objects.AudioManager;
 import DiscordAPI.objects.Interfaces.IChannel;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
-import DiscordAPI.utils.Json;
-import DiscordAPI.utils.Properties;
+import ideaeclipse.CustomProperties.Properties;
+import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.List;

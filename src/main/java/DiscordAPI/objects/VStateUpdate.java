@@ -2,7 +2,9 @@ package DiscordAPI.objects;
 
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IChannel;
-import DiscordAPI.utils.Json;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
+
 /**
  * Deprecated due to not complete
  *
@@ -90,7 +92,7 @@ public class VStateUpdate {
         }
 
         VStateUpdateP logic() {
-            Payloads.DVoiceStateUpdate v = Parser.convertToPayload(payload, Payloads.DVoiceStateUpdate.class);
+            Payloads.DVoiceStateUpdate v = ParserObjects.convertToPayload(payload, Payloads.DVoiceStateUpdate.class);
             vStateUpdate = new VStateUpdate(v.user_id, v.suppress, v.session_id, v.self_video, v.self_mute, v.mute, v.deaf, v.guild_id, v.channel_id);
             User.ServerUniqueUserP u = new User.ServerUniqueUserP(bot, new Json((String) payload.get("member"))).logic();
             user = u.getServerUniqueUser();

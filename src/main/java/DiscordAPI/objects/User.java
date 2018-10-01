@@ -4,7 +4,8 @@ import DiscordAPI.IPrivateBot;
 import DiscordAPI.objects.Interfaces.IGame;
 import DiscordAPI.objects.Interfaces.IRole;
 import DiscordAPI.objects.Interfaces.IUser;
-import DiscordAPI.utils.Json;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ class User implements IUser {
         }
 
         ServerUniqueUserP logic() {
-            Payloads.DServerUniqueUser u = Parser.convertToPayload(payload, Payloads.DServerUniqueUser.class);
+            Payloads.DServerUniqueUser u = ParserObjects.convertToPayload(payload, Payloads.DServerUniqueUser.class);
             List<IRole> roles = new ArrayList<>();
             if (u.roles != null) {
                 for (Long s : u.roles) {

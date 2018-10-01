@@ -3,15 +3,17 @@ package DiscordAPI.objects;
 import DiscordAPI.IPrivateBot;
 import DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
 import DiscordAPI.objects.Interfaces.IChannel;
-import DiscordAPI.utils.Async;
 import DiscordAPI.utils.DiscordLogger;
 import DiscordAPI.utils.DiscordUtils;
-import DiscordAPI.utils.Json;
+import ideaeclipse.AsyncUtility.Async;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -20,7 +22,7 @@ import java.util.*;
  *
  * @author Ideaeclipse
  */
-public class Parser {
+public class ParserObjects {
     /**
      * Parses payload sent from {@link DiscordAPI.webSocket.Wss} and converts it to a channel
      *
@@ -128,7 +130,7 @@ public class Parser {
          */
         public MessageCreate(final IPrivateBot b, final Json payload) {
             Json user = new Json(String.valueOf(payload.get("author")));
-            Payloads.DMessage m = convertToPayload(payload, Payloads.DMessage.class);
+            Payloads.DMessage m = ParserObjects.convertToPayload(payload, Payloads.DMessage.class);
             DiscordUser.UserP pd = new DiscordUser.UserP(user, b).logic();
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
             message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, (m.content == null) ? "N/A" : m.content);
@@ -177,7 +179,7 @@ public class Parser {
         private final VServerUpdate voiceServerUpdate;
 
         public VoiceServerUpdate(final IPrivateBot b, final Json payload) {
-            Payloads.DVoiceServerUpdate vsu = convertToPayload(payload, Payloads.DVoiceServerUpdate.class);
+            Payloads.DVoiceServerUpdate vsu = ParserObjects.convertToPayload(payload, Payloads.DVoiceServerUpdate.class);
             this.voiceServerUpdate = new VServerUpdate(vsu.token, vsu.endpoint);
             synchronized (b.getAudioManager().getLock()) {
                 b.getAudioManager().setVoiceServerUpdate(voiceServerUpdate);
@@ -204,7 +206,6 @@ public class Parser {
                 b.getAudioManager().setInitialUpdate(vStateUpdate);
         }
     }
-
     /**
      * This method takes in a Json and a Payload type {@link Payloads}
      *

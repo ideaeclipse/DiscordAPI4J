@@ -8,6 +8,9 @@ import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
+import ideaeclipse.JsonUtilities.Builder;
+import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.Parser;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -37,8 +40,7 @@ public class VoiceWss extends WebSocketFactory {
                     @Override
                     public void onTextMessage(WebSocket websocket, String message) throws Exception {
                         Json payload = new Json(message);
-                        System.out.println(payload);
-                        Payloads.General g = Parser.convertToPayload(payload, Payloads.General.class);
+                        Payloads.General g = ParserObjects.convertToPayload(payload, Payloads.General.class);
                         VoiceOpCodes opCodes = VoiceOpCodes.values()[g.op];
                         switch (opCodes) {
                             case Ready:
@@ -51,15 +53,15 @@ public class VoiceWss extends WebSocketFactory {
                             case Initial:
                                 Thread.currentThread().setName("VoiceWss");
                                 logger.debug("Initial");
-                                Payloads.DWelcome welcome = Parser.convertToPayload(g.d, Payloads.DWelcome.class);
+                                Payloads.DWelcome welcome = ParserObjects.convertToPayload(g.d, Payloads.DWelcome.class);
                                 Thread heartBeat = DiscordUtils.createDaemonThreadFactory("VoiceHeartBeat").newThread(new VoiceHeartBeat(wss, (int) (welcome.heartbeat_interval * .75)));
                                 logger.info("Starting Voice HeartBeat");
-                                Builder.VoiceIdentify v = new Builder.VoiceIdentify();
+                                BuilderObjects.VoiceIdentify v = new BuilderObjects.VoiceIdentify();
                                 v.server_id = bot.getGuildId();
                                 v.user_id = initialStateUpdate.getUser_id();
                                 v.token = initialServerUpdate.getToken();
                                 v.session_id = initialStateUpdate.getSession_id();
-                                sendText(Builder.buildPayload(VoiceOpCodes.zero, Builder.buildData(v)));
+                                sendText(Builder.buildPayload(VoiceOpCodes.zero.ordinal(), Builder.buildData(v)));
                                 heartBeat.start();
                                 break;
                         }

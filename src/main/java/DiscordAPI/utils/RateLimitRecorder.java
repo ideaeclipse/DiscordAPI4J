@@ -1,6 +1,7 @@
 package DiscordAPI.utils;
 
 import com.neovisionaries.ws.client.WebSocket;
+import ideaeclipse.JsonUtilities.Json;
 
 import java.util.Timer;
 import java.util.TimerTask;
