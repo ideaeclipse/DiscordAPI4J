@@ -1,6 +1,6 @@
 package DiscordBot.Data.Generic;
 
-import DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.Terminal.Terminal;
 
 public class defaultCommands {
     private Terminal t;

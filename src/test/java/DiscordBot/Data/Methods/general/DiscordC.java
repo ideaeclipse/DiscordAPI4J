@@ -1,6 +1,6 @@
 package DiscordBot.Data.Methods.general;
 
-import DiscordAPI.IDiscordBot;
+import ideaeclipse.DiscordAPI.IDiscordBot;
 import DiscordBot.Main;
 
 public class DiscordC {

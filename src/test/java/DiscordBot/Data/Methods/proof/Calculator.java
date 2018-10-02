@@ -1,6 +1,6 @@
 package DiscordBot.Data.Methods.proof;
 
-import DiscordAPI.Terminal.CustomTerminal;
+import ideaeclipse.DiscordAPI.Terminal.CustomTerminal;
 
 public class Calculator implements CustomTerminal {
     public Calculator(){

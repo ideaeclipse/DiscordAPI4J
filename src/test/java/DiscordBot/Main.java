@@ -1,7 +1,7 @@
 package DiscordBot;
 
-import DiscordAPI.IDiscordBot;
-import DiscordAPI.objects.DiscordBotBuilder;
+import ideaeclipse.DiscordAPI.IDiscordBot;
+import ideaeclipse.DiscordAPI.objects.DiscordBotBuilder;
 
 public class Main {
     public static IDiscordBot bot;
