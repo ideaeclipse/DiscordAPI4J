@@ -1,21 +1,24 @@
 package ideaeclipse.DiscordAPI.webSocket;
 
-import ideaeclipse.DiscordAPI.IPrivateBot;
-import ideaeclipse.DiscordAPI.objects.ParserObjects;
-import ideaeclipse.DiscordAPI.utils.*;
-import ideaeclipse.DiscordAPI.objects.Payloads;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import ideaeclipse.AsyncUtility.Async;
+import ideaeclipse.DiscordAPI.IPrivateBot;
+import ideaeclipse.DiscordAPI.objects.ParserObjects;
+import ideaeclipse.DiscordAPI.objects.Payloads;
+import ideaeclipse.DiscordAPI.utils.DiscordLogger;
+import ideaeclipse.DiscordAPI.utils.DiscordUtils;
+import ideaeclipse.DiscordAPI.utils.RateLimitRecorder;
+import ideaeclipse.DiscordAPI.utils.TextHeartBeat;
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.JsonUtilities.Parser;
 import ideaeclipse.reflectionListener.Event;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
@@ -43,7 +46,7 @@ public class Wss extends WebSocketFactory {
                         TextOpCodes opCodes = TextOpCodes.values()[g.op];
                         switch (opCodes) {
                             case Dispatch:
-                                Async.queue(() -> {
+                                Async.queue(x -> {
                                     try {
                                         for (WebSocket_Events webSocket_events : WebSocket_Events.values()) {
                                             if (g.t.equals(webSocket_events.toString())) {
@@ -56,7 +59,7 @@ public class Wss extends WebSocketFactory {
                                     } catch (NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
                                         e.printStackTrace();
                                     }
-                                    return null;
+                                    return Optional.empty();
                                 }, g.t);
                                 break;
                             case Heartbeat:

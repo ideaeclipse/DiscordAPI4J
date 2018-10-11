@@ -1,19 +1,20 @@
 package ideaeclipse.DiscordAPI.objects;
 
+import ideaeclipse.AsyncUtility.AsyncList;
+import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IPrivateBot;
 import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
-import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.JsonUtilities.Parser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -42,7 +43,6 @@ public class ParserObjects {
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
                 b.updateChannels();
-                System.out.println(b.getChannels());
                 logger.info("Text Channel Create: Channel Name: " + channel.getName() + " NSFW: " + channel.getNsfw() + " Position: " + channel.getPosition());
             } else if (channel.getType().equals(Payloads.ChannelTypes.dmChannel)) {
                 logger.info("Dm Channel Created");
@@ -216,9 +216,9 @@ public class ParserObjects {
      */
     public static <T> T convertToPayload(final Json object, final Class<?> c) {
         T o = getObject(c);
-        Async.AsyncList<T> list = new Async.AsyncList<>();
+        AsyncList<T> list = new ForEachList<>();
         for (Object s : object.keySet()) {
-            list.add(() -> {
+            list.add(x -> {
                 try {
                     Field f = null;
                     try {
@@ -250,10 +250,10 @@ public class ParserObjects {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
-                return null;
+                return Optional.empty();
             });
         }
-        Async.execute(list);
+        list.execute();
         return o;
     }
 

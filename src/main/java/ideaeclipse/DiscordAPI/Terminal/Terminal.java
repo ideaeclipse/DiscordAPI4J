@@ -1,10 +1,10 @@
 package ideaeclipse.DiscordAPI.Terminal;
 
+import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPI.IDiscordBot;
 import ideaeclipse.DiscordAPI.objects.IDiscordUser;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IRole;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
-import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.reflectionListener.EventManager;
 import ideaeclipse.reflectionListener.Listener;
 
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Terminal {
     private final IDiscordBot bot;
@@ -20,7 +21,7 @@ public class Terminal {
     private Compare compare;
     private IDiscordUser user;
     private Execute execute;
-    private EventManager dispatcher;
+    private final EventManager dispatcher;
     private boolean isAdmin = false;
     private String currentFunction;
 
@@ -32,7 +33,7 @@ public class Terminal {
         if (user.getName().toLowerCase().equals(bot.getProperties().getProperty("adminUser"))) {
             isAdmin = true;
         } else {
-            Async.queue(() -> {
+            Async.queue(x -> {
                 String adminGroup = bot.getProperties().getProperty("adminGroup");
                 for (IRole role : IDiscordUser.getServerUniqueUser(user).getRoles()) {
                     if (role.equals(DiscordUtils.Search.ROLES(bot.getRoles(), adminGroup))) {
@@ -40,7 +41,7 @@ public class Terminal {
                         break;
                     }
                 }
-                return null;
+                return Optional.empty();
             }, "adminGroup");
         }
     }

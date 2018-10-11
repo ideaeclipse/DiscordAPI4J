@@ -129,7 +129,6 @@ public class DiscordUtils {
                 response.append(string);
             }
             in.close();
-            //System.out.println("RESPONSE: " + response);
             return response.toString();
         }
     }

@@ -1,5 +1,7 @@
 package ideaeclipse.DiscordAPI.Terminal;
 
+import ideaeclipse.AsyncUtility.AsyncList;
+import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.BotCommands;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ClassInfo;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.EnteringFunction;
@@ -8,7 +10,6 @@ import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.Inv
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidCommand;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidHelpFormat;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
-import ideaeclipse.AsyncUtility.Async;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -53,8 +54,8 @@ class Compare {
      * @return if there is more required input
      */
     private boolean logic() {
-        Async.AsyncList<Boolean> genericList = new Async.AsyncList<>();
-        genericList.add(() -> {
+        AsyncList<Boolean> genericList = new ForEachList<>();
+        genericList.add(x -> {
             if (words.size() > 0) {
                 if (checkGeneric(words.get(0), defaultClass.getDeclaredMethods())) {
                     LOGGER.debug("Executing default command");
@@ -71,11 +72,11 @@ class Compare {
                     } else {
                         LOGGER.error("Default return value was null");
                     }
-                    return true;
+                    return Optional.of(true);
                 }
             }
-            return false;
-        }).add(() -> {
+            return Optional.of(false);
+        }).add(x -> {
             if (words.size() > 0) {
                 if (checkGeneric(words.get(0), adminClass.getDeclaredMethods())) {
                     if (t.isAdmin()) {
@@ -92,19 +93,19 @@ class Compare {
                         } else {
                             LOGGER.error("Admin return value was null");
                         }
-                        return true;
+                        return Optional.of(true);
                     }
                 }
             }
-            return false;
+            return Optional.of(false);
         });
-        Async.AsyncList<Boolean> list = new Async.AsyncList<>();
-        list.add(() -> {
+        AsyncList<Boolean> list = new ForEachList<>();
+        list.add(x -> {
             if (commands.get(words.get(0)) == null && !words.get(0).equals("help")) {
                 t.getDispatcher().callEvent(new InvalidCommand(t));
             }
-            return false;
-        }).add(() -> {
+            return Optional.of(false);
+        }).add(x -> {
             if (words.get(0).equals("help")) {
                 switch (words.size()) {
                     case 1:
@@ -139,8 +140,8 @@ class Compare {
                         break;
                 }
             }
-            return false;
-        }).add(() -> {
+            return Optional.of(false);
+        }).add(x -> {
             if (!words.get(0).equals("help")) {
                 if (words.size() > 1) {
                     List args = (List) commands.get(words.get(0));
@@ -150,22 +151,26 @@ class Compare {
                         LOGGER.info("Terminal function is awaiting more input");
                         t.changeStatus(true);
                         t.getDispatcher().callEvent(new EnteringFunction(t, words.get(1)));
-                        return true;
+                        return Optional.of(true);
                     } else {
                         t.getDispatcher().callEvent(new InvalidArgument(t));
                     }
                 }
 
             }
-            return false;
+            return Optional.of(false);
         });
         if (words.size() > 0) {
-            for (Boolean b : Objects.requireNonNull(Async.execute(genericList))) {
-                if (b) {
-                    return false;
+            Optional<List<Optional<Boolean>>> tempList = genericList.execute();
+            if (tempList.isPresent()) {
+                List<Optional<Boolean>> booleanTempList = tempList.get();
+                for (Optional<Boolean> b : booleanTempList) {
+                    if (b.isPresent() && b.get()) {
+                        return false;
+                    }
                 }
+                return list.execute().get().get(2).get();
             }
-            return Objects.requireNonNull(Async.execute(list)).get(2);
         }
         return false;
     }

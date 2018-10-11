@@ -1,5 +1,7 @@
 package ideaeclipse.DiscordAPI.objects;
 
+import ideaeclipse.AsyncUtility.AsyncList;
+import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IDiscordBot;
 import ideaeclipse.DiscordAPI.Terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
@@ -11,7 +13,6 @@ import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IMessage;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
-import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
 
@@ -20,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This class is online turned on if the config option useTerminal is set to true
@@ -27,7 +29,6 @@ import java.util.Objects;
  *
  * @author ideaeclipse
  * @see TerminalEvent
- *
  */
 class TerminalManager {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
@@ -82,27 +83,28 @@ class TerminalManager {
         }
         return status;
     }
-    public class terminalMessageListener implements Listener{
+
+    public class terminalMessageListener implements Listener {
         @EventHandler
         public void onMessageEvent(Message_Create create) {
             IMessage m = create.getMessage();
             Terminal terminal = getCurrentTerminal(m.getUser());
             if (m.getChannel().getId().equals(Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).getId())) {
-                Async.AsyncList<?> list = new Async.AsyncList<>();
-                list.add(() -> {
+                AsyncList<?> list = new ForEachList<>();
+                list.add(x -> {
                     if (terminal != null) {
                         if (terminal.requiresMoreInput()) {
                             terminal.getDispatcher().callEvent(new NeedsMoreInput(terminal, m));
                         }
                     }
-                    return null;
-                }).add(() -> {
+                    return Optional.empty();
+                }).add(x -> {
                     if (terminal == null) {
                         if (m.getContent().startsWith("cm")) {
                             if (m.getContent().equals("cm help")) {
-                                invoke(new Terminal(m.getUser(), bot,new terminalListener()), m);
+                                invoke(new Terminal(m.getUser(), bot, new terminalListener()), m);
                             } else {
-                                terminalList.add(new Terminal(m.getUser(), bot,new terminalListener()));
+                                terminalList.add(new Terminal(m.getUser(), bot, new terminalListener()));
                                 if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
                                     terminalList.remove(terminalList.size() - 1);
                                 }
@@ -110,9 +112,9 @@ class TerminalManager {
                             }
                         }
                     }
-                    return null;
+                    return Optional.empty();
                 });
-                Async.execute(list);
+                list.execute();
             } else {
                 if (m.getContent().equals("cm") || m.getContent().startsWith("cm"))
                     m.getChannel().sendMessage("Use the bot channel to execute bot related commands");
@@ -120,6 +122,7 @@ class TerminalManager {
         }
 
     }
+
     public class terminalListener implements Listener {
         @EventHandler
         public void needsMoreInput(NeedsMoreInput input) {
@@ -148,34 +151,41 @@ class TerminalManager {
             botChannel.sendMessage(function.getReturn());
             terminalList.remove(function.getTerminal());
         }
+
         @EventHandler
-        public void onProgramReturnValues(ProgramReturnValues values){
+        public void onProgramReturnValues(ProgramReturnValues values) {
             if (values.getReturn().length() > 0) {
                 botChannel.sendMessage(values.getReturn());
             }
         }
+
         @EventHandler
-        public void onInvalidArgument(InvalidArgument argument){
+        public void onInvalidArgument(InvalidArgument argument) {
             botChannel.sendMessage(argument.getReturn());
         }
+
         @EventHandler
-        public void onInvalidCommand(InvalidCommand argument){
+        public void onInvalidCommand(InvalidCommand argument) {
             botChannel.sendMessage(argument.getReturn());
         }
+
         @EventHandler
-        public void onInvalidHelpFormat(InvalidHelpFormat argument){
+        public void onInvalidHelpFormat(InvalidHelpFormat argument) {
             botChannel.sendMessage(argument.getReturn());
         }
+
         @EventHandler
-        public void onNoSuchMethod(NoSuchMethod argument){
+        public void onNoSuchMethod(NoSuchMethod argument) {
             botChannel.sendMessage(argument.getReturn());
         }
+
         @EventHandler
-        public void onWrongNumberOfArgs(WrongNumberOfArgs argument){
+        public void onWrongNumberOfArgs(WrongNumberOfArgs argument) {
             botChannel.sendMessage(argument.getReturn());
         }
+
         @EventHandler
-        public void onWrongType(WrongType argument){
+        public void onWrongType(WrongType argument) {
             botChannel.sendMessage(argument.getReturn());
         }
 

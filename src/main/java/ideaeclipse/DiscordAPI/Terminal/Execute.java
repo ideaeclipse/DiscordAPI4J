@@ -1,5 +1,7 @@
 package ideaeclipse.DiscordAPI.Terminal;
 
+import ideaeclipse.AsyncUtility.AsyncList;
+import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ClassInfo;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ExitingFunction;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.NoSuchMethod;
@@ -7,7 +9,6 @@ import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.P
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongNumberOfArgs;
 import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongType;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
-import ideaeclipse.AsyncUtility.Async;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +17,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -91,8 +93,8 @@ class Execute {
         ArrayList<String> input = getInput();
         LOGGER.info("Input: " + input);
         Class<?>[] paramTypes = getParameters(c, input.get(0));
-        Async.AsyncList<?> list = new Async.AsyncList<>();
-        list.add(() -> {
+        AsyncList<?> list = new ForEachList<>();
+        list.add(x -> {
             try {
                 if (!input.get(0).equals("done") && !input.get(0).equals("help")) {
                     if (paramTypes.length > 0) {
@@ -132,15 +134,15 @@ class Execute {
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            return null;
-        }).add(() -> {
+            return Optional.empty();
+        }).add(x -> {
             if (input.size() > 0) {
                 if (input.get(0).equals("help")) {
                     t.getDispatcher().callEvent(new ClassInfo(t, c.getConstructors(), c.getDeclaredMethods(), defaultClass, adminClass));
                 }
             }
-            return null;
-        }).add(() -> {
+            return Optional.empty();
+        }).add(x -> {
             try {
                 if (input.size() > 0) {
                     if (input.get(0).equals("done")) {
@@ -155,10 +157,11 @@ class Execute {
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            return null;
+            return Optional.empty();
         });
-        if (input.size() > 0)
-            Async.execute(list);
+        if (input.size() > 0) {
+            list.execute();
+        }
     }
 
     private ArrayList<String> getInput() {
@@ -184,7 +187,7 @@ class Execute {
     }
 
     /**
-     * @param c class
+     * @param c      class
      * @param method method name
      * @return array of parameter types
      */
@@ -203,7 +206,7 @@ class Execute {
     }
 
     /**
-     * @param input words
+     * @param input  words
      * @param params parameter types
      * @return converted
      */
