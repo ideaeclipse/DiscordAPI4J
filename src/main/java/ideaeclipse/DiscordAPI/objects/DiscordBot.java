@@ -128,13 +128,11 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         Async.queue(uRoles(), "RoleUpdate").ifPresent(o -> this.roles = o);
         AsyncList list = new ForEachList().add(uChannels()).add(uUsers()).add(uBotUser());
         Optional<List> optionalList = list.execute();
-        List<Optional> asyncList = optionalList.get();
-        asyncList.get(0).ifPresent(o -> this.channels = (List<IChannel>) o);
-        asyncList.get(1).ifPresent(o -> this.users = (List<IUser>) o);
-        asyncList.get(2).ifPresent(o -> {
-            List<DiscordUser> a = (List<DiscordUser>)o;
-            this.user = a.get(0);
-        });
+        List<Object> asyncList = optionalList.get();
+        this.channels = (List<IChannel>) asyncList.get(0);
+        this.users = (List<IUser>) asyncList.get(1);
+        List<IDiscordUser> temp = (List<IDiscordUser>) asyncList.get(2);
+        this.user = temp.get(0);
         for (IRole r : roles) {
             logger.debug(r.toString());
         }

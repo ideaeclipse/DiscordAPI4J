@@ -161,15 +161,15 @@ class Compare {
             return Optional.of(false);
         });
         if (words.size() > 0) {
-            Optional<List<Optional<Boolean>>> tempList = genericList.execute();
+            Optional<List<Boolean>> tempList = genericList.execute();
             if (tempList.isPresent()) {
-                List<Optional<Boolean>> booleanTempList = tempList.get();
-                for (Optional<Boolean> b : booleanTempList) {
-                    if (b.isPresent() && b.get()) {
+                List<Boolean> booleanTempList = tempList.get();
+                for (Boolean b : booleanTempList) {
+                    if (b) {
                         return false;
                     }
                 }
-                return list.execute().get().get(2).get();
+                return list.execute().get().get(2);
             }
         }
         return false;
