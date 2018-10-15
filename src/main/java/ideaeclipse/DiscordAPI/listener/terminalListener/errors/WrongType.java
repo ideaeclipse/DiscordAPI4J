@@ -1,7 +1,7 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors;
+package ideaeclipse.DiscordAPI.listener.terminalListener.errors;
 
 import ideaeclipse.DiscordAPI.Terminal.Terminal;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
+import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 
 /**
  * This function is notified when there is a wrong type of param inserted i.e String instead of int

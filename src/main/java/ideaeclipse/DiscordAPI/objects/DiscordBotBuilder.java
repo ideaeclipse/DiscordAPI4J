@@ -1,7 +1,6 @@
 package ideaeclipse.DiscordAPI.objects;
 
 import ideaeclipse.DiscordAPI.IDiscordBot;
-import ideaeclipse.DiscordAPI.IDiscordBotBuilder;
 import ideaeclipse.reflectionListener.Listener;
 
 /**
@@ -10,7 +9,7 @@ import ideaeclipse.reflectionListener.Listener;
  *
  * @author Ideaeclipse
  */
-public class DiscordBotBuilder implements IDiscordBotBuilder {
+public class DiscordBotBuilder{
     private final DiscordBot bot;
 
     /**
@@ -24,7 +23,6 @@ public class DiscordBotBuilder implements IDiscordBotBuilder {
     /**
      * @return updated Instance of IDiscordBot
      */
-    @Override
     public IDiscordBot login() {
         return bot.login();
     }

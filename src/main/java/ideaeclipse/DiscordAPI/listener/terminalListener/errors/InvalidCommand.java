@@ -1,7 +1,7 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors;
+package ideaeclipse.DiscordAPI.listener.terminalListener.errors;
 
 import ideaeclipse.DiscordAPI.Terminal.Terminal;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
+import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 
 /**
  * This class is notified when a function is called that doesn't exist

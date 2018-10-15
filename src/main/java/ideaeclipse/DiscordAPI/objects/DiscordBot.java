@@ -52,7 +52,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     private Wss textWss;
 
     /**
-     * Called from {@link DiscordBotBuilder} {@link ideaeclipse.DiscordAPI.IDiscordBotBuilder}
+     * Called from {@link DiscordBotBuilder} {@link ideaeclipse.DiscordAPI.objects.DiscordBotBuilder}
      *
      * @param token   IPrivateBot token
      * @param guildID Guild id (Right click server and hit copy id)
@@ -62,7 +62,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         try {
             properties.start();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Couldn't start properties manager can't start bot");
         }
         DiscordUtils.DefaultLinks.bot = this;
         if (bot.getProperties().getProperty("debug").equals("true")) {
@@ -77,7 +77,6 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         if(listener!=null) {
             dispatcher.registerListener(listener);
         }
-        //audioManager = new AudioManager(this);
     }
 
     /**
@@ -153,7 +152,6 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
                 if (getProperties().getProperty("useTerminal").equals("true")) {
                     terminalManager = new TerminalManager(this);
                 }
-                //audioManager.joinChannel(DiscordUtils.Search.VOICECHANNEL(getChannels(), "Bot"));
             }
         } catch (IOException | WebSocketException | InterruptedException e) {
             e.printStackTrace();

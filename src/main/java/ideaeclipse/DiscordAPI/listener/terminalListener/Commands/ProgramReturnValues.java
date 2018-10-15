@@ -1,7 +1,7 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands;
+package ideaeclipse.DiscordAPI.listener.terminalListener.Commands;
 
 import ideaeclipse.DiscordAPI.Terminal.Terminal;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
+import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 
 /**
  * This method is notified when a method has been called correcting and there is some sort of return values

@@ -1,4 +1,4 @@
-package ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents;
+package ideaeclipse.DiscordAPI.listener.discordApiListener;
 
 import ideaeclipse.DiscordAPI.IPrivateBot;
 import ideaeclipse.DiscordAPI.objects.*;

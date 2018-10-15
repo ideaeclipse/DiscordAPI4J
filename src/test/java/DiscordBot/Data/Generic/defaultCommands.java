@@ -14,7 +14,10 @@ public class defaultCommands {
     }
 
     public String getCurrentFunction() {
-        return "Your current function is: " + t.getCurrentFunction();
+        if (t.getCurrentFunction() != null)
+            return "Your current function is: " + t.getCurrentFunction();
+        else
+            return "You're not currently attached to a function";
     }
 
     public String showString(String s) {

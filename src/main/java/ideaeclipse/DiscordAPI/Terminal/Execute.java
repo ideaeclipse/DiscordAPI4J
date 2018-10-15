@@ -2,12 +2,12 @@ package ideaeclipse.DiscordAPI.Terminal;
 
 import ideaeclipse.AsyncUtility.AsyncList;
 import ideaeclipse.AsyncUtility.ForEachList;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ClassInfo;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ExitingFunction;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.NoSuchMethod;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturnValues;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongNumberOfArgs;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.WrongType;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.ClassInfo;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.ExitingFunction;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.NoSuchMethod;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.ProgramReturnValues;
+import ideaeclipse.DiscordAPI.listener.terminalListener.errors.WrongNumberOfArgs;
+import ideaeclipse.DiscordAPI.listener.terminalListener.errors.WrongType;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 
 import java.lang.reflect.Constructor;

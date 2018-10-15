@@ -1,10 +1,10 @@
 package ideaeclipse.DiscordAPI.utils;
 
 import ideaeclipse.DiscordAPI.IPrivateBot;
-import ideaeclipse.DiscordAPI.objects.*;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IRole;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IUser;
+import ideaeclipse.DiscordAPI.objects.Payloads;
 import ideaeclipse.JsonUtilities.Json;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -146,6 +146,7 @@ public class DiscordUtils {
 
     public static class Search {
         public static IChannel CHANNEL(final List<IChannel> channels, final String channelName) {
+
             for (IChannel channel : channels) {
                 if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
                     if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
@@ -153,6 +154,7 @@ public class DiscordUtils {
                     }
                 }
             }
+
             return null;
         }
 

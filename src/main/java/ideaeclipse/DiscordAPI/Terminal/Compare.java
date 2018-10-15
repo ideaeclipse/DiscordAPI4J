@@ -2,13 +2,13 @@ package ideaeclipse.DiscordAPI.Terminal;
 
 import ideaeclipse.AsyncUtility.AsyncList;
 import ideaeclipse.AsyncUtility.ForEachList;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.BotCommands;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ClassInfo;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.EnteringFunction;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.Commands.ProgramReturnValues;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidArgument;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidCommand;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors.InvalidHelpFormat;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.BotCommands;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.ClassInfo;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.EnteringFunction;
+import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.ProgramReturnValues;
+import ideaeclipse.DiscordAPI.listener.terminalListener.errors.InvalidArgument;
+import ideaeclipse.DiscordAPI.listener.terminalListener.errors.InvalidCommand;
+import ideaeclipse.DiscordAPI.listener.terminalListener.errors.InvalidHelpFormat;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 
 import java.io.IOException;

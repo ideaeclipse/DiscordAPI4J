@@ -1,8 +1,8 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.errors;
+package ideaeclipse.DiscordAPI.listener.terminalListener.errors;
 
 import ideaeclipse.DiscordAPI.Terminal.NameConversion;
 import ideaeclipse.DiscordAPI.Terminal.Terminal;
-import ideaeclipse.DiscordAPI.listener.terminalListener.listenerTypes.TerminalEvent;
+import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 
 /**
  * This function is notified when a user calls a method with the incorrect number of parameters

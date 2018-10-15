@@ -1,9 +1,9 @@
 package ideaeclipse.DiscordAPI.objects;
 
-import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
-import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Delete;
-import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Update;
-import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
+import ideaeclipse.DiscordAPI.listener.discordApiListener.Channel_Create;
+import ideaeclipse.DiscordAPI.listener.discordApiListener.Channel_Delete;
+import ideaeclipse.DiscordAPI.listener.discordApiListener.Channel_Update;
+import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Create;
 import ideaeclipse.JsonUtilities.Json;
 
 import java.util.List;

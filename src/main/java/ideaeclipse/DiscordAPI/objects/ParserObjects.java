@@ -3,7 +3,7 @@ package ideaeclipse.DiscordAPI.objects;
 import ideaeclipse.AsyncUtility.AsyncList;
 import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IPrivateBot;
-import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.Channel_Create;
+import ideaeclipse.DiscordAPI.listener.discordApiListener.Channel_Create;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;

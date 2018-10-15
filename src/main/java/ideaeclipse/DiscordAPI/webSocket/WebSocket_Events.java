@@ -1,6 +1,6 @@
 package ideaeclipse.DiscordAPI.webSocket;
 
-import ideaeclipse.DiscordAPI.listener.discordApiListener.listenerEvents.*;
+import ideaeclipse.DiscordAPI.listener.discordApiListener.*;
 
 public enum WebSocket_Events {
     PRESENCE_UPDATE(Presence_Update.class),
