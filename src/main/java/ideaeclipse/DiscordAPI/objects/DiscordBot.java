@@ -74,7 +74,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         DiscordUtils.DefaultLinks.rateLimitRecorder = new RateLimitRecorder();
         this.guildId = guildID;
         dispatcher = new EventManager();
-        if(listener!=null) {
+        if (listener != null) {
             dispatcher.registerListener(listener);
         }
     }
@@ -223,7 +223,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
 
     @Override
     public void updateUsers() {
-        Async.queue(uUsers(), "UserUpdate").ifPresent(o-> this.users = o);
+        Async.queue(uUsers(), "UserUpdate").ifPresent(o -> this.users = o);
     }
 
     @Override
@@ -251,12 +251,14 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
             logger.debug("Starting Channel Update");
             JsonArray array = new JsonArray((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + guildId + "/" + CHANNEL)));
             for (Json o : array) {
-                if (Integer.parseInt(String.valueOf(o.get("type"))) == 0) {
-                    Channel.ChannelP cd = new Channel.ChannelP(o).logic();
-                    channels.add(cd.getChannel());
-                } else if (Integer.parseInt(String.valueOf(o.get("type"))) == 2) {
-                    VoiceChannel.ChannelP cd = new VoiceChannel.ChannelP(o).logic();
-                    channels.add(cd.getChannel());
+                if (!String.valueOf(o.get("type")).equals("null")) {
+                    if (Integer.parseInt(String.valueOf(o.get("type"))) == 0) {
+                        Channel.ChannelP cd = new Channel.ChannelP(o).logic();
+                        channels.add(cd.getChannel());
+                    } else if (Integer.parseInt(String.valueOf(o.get("type"))) == 2) {
+                        VoiceChannel.ChannelP cd = new VoiceChannel.ChannelP(o).logic();
+                        channels.add(cd.getChannel());
+                    }
                 }
             }
             logger.info("Updated Channel Listings");

@@ -16,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.bot;
+
 /**
  * This file is the entire logic of what to do once a user is inside a function
  *
@@ -40,6 +42,9 @@ class Compare {
      * @throws ClassNotFoundException if class isn't found
      */
     boolean Initiate(final ArrayList<String> input, final Terminal terminal) throws IOException, ClassNotFoundException {
+        if (bot.getProperties().getProperty("debug").equals("true")) {
+            LOGGER.setLevel(DiscordLogger.Level.TRACE);
+        }
         t = terminal;
         words = input;
         CommandList cl = new CommandList(t.getBot());
@@ -148,7 +153,7 @@ class Compare {
                     methods = (List) commandMethods.get(words.get(0));
                     index = getMethod(words, args.iterator(), 1);
                     if (index != -1) {
-                        LOGGER.info("Terminal function is awaiting more input");
+                        LOGGER.debug("Terminal function is awaiting more input");
                         t.changeStatus(true);
                         t.getDispatcher().callEvent(new EnteringFunction(t, words.get(1)));
                         return Optional.of(true);

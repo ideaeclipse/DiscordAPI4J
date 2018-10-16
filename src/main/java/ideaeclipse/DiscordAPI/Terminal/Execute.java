@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.bot;
+
 
 /**
  * This file instantiates the functions/executes the specified method
@@ -44,14 +46,17 @@ class Execute {
      * @throws InvocationTargetException
      */
     Execute(final String file, final List<String> input, final Terminal terminal, final Class<?> defaultClass, final Class<?> adminClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        if (bot.getProperties().getProperty("debug").equals("true")) {
+            LOGGER.setLevel(DiscordLogger.Level.TRACE);
+        }
         t = terminal;
         calledClass = Class.forName(file);
         this.defaultClass = defaultClass;
         if (input.size() > 2) {
-            LOGGER.info("Looking for valid constructor formats");
+            LOGGER.debug("Looking for valid constructor formats");
             method(constructor(calledClass, input), calledClass, defaultClass, adminClass);
         } else {
-            LOGGER.info("Executing blank function");
+            LOGGER.debug("Executing blank function");
             ob = calledClass.getDeclaredConstructors()[0].newInstance();
             method(ob, calledClass, defaultClass, adminClass);
         }
@@ -91,20 +96,20 @@ class Execute {
      */
     public void method(final Object ob, final Class<?> c, final Class<?> defaultClass, final Class<?> adminClass) {
         ArrayList<String> input = getInput();
-        LOGGER.info("Input: " + input);
+        LOGGER.debug("Input: " + input);
         Class<?>[] paramTypes = getParameters(c, input.get(0));
         AsyncList<?> list = new ForEachList<>();
         list.add(x -> {
             try {
                 if (!input.get(0).equals("done") && !input.get(0).equals("help")) {
                     if (paramTypes.length > 0) {
-                        LOGGER.info("Params: " + Arrays.toString(paramTypes));
+                        LOGGER.debug("Params: " + Arrays.toString(paramTypes));
                         Method method = ob.getClass().getMethod(input.get(0), paramTypes);
                         input.remove(0);
                         if (input.size() == paramTypes.length) {
                             Object[] convertedArgs = convertArgs(input, paramTypes);
                             if (convertedArgs != null) {
-                                LOGGER.info("Converted Args: " + Arrays.toString(convertedArgs));
+                                LOGGER.debug("Converted Args: " + Arrays.toString(convertedArgs));
                                 Object o = method.invoke(ob, convertedArgs);
                                 if (o != null) {
                                     t.getDispatcher().callEvent(new ProgramReturnValues(t, o.toString()));
