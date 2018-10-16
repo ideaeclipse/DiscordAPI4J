@@ -1,19 +1,19 @@
 package ideaeclipse.DiscordAPI.webSocket;
 
-import ideaeclipse.DiscordAPI.IDiscordBot;
-import ideaeclipse.DiscordAPI.IPrivateBot;
-import ideaeclipse.DiscordAPI.objects.*;
-import ideaeclipse.DiscordAPI.utils.*;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
+import ideaeclipse.DiscordAPI.IPrivateBot;
+import ideaeclipse.DiscordAPI.objects.*;
+import ideaeclipse.DiscordAPI.utils.DiscordLogger;
+import ideaeclipse.DiscordAPI.utils.DiscordUtils;
+import ideaeclipse.DiscordAPI.utils.RateLimitRecorder;
+import ideaeclipse.DiscordAPI.utils.VoiceHeartBeat;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.JsonUtilities.Parser;
 
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 @Deprecated
@@ -48,7 +48,6 @@ public class VoiceWss extends WebSocketFactory {
                                 break;
                             case HeartBeat_Ack:
                                 System.out.println(payload);
-
                                 break;
                             case Initial:
                                 Thread.currentThread().setName("VoiceWss");

@@ -135,7 +135,7 @@ public class ParserObjects {
             Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
             message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, (m.content == null) ? "N/A" : m.content);
             if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
-                logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " +  message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
+                logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
             } else {
                 logger.info("Dm Sent: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n"));
             }
@@ -206,6 +206,7 @@ public class ParserObjects {
                 b.getAudioManager().setInitialUpdate(vStateUpdate);
         }
     }
+
     /**
      * This method takes in a Json and a Payload type {@link Payloads}
      *
