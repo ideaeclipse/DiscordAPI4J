@@ -10,8 +10,9 @@ import java.util.*;
 
 
 /**
- * getClass -> all class in genericDirectory
- * getMethods -> method per class
+ * This class queries all classes inside the directory specified in the config.properties, "genericDirectory" and "commandsDirectory"
+ *
+ * @author ideaeclipse
  */
 public class CommandList {
     private Map<String, List<Class<?>>> commandMap;
@@ -26,6 +27,11 @@ public class CommandList {
         }
     }
 
+    /**
+     * @param directory path to class files
+     * @return a map of subdirectory,list of functions
+     * @throws IOException if class isn't found
+     */
     private Map<String, List<Class<?>>> getClasses(String directory) throws IOException {
         Map<String, List<Class<?>>> map = new HashMap<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -59,10 +65,16 @@ public class CommandList {
         return map;
     }
 
+    /**
+     * @return returns the map of commands
+     */
     public Map<String, List<Class<?>>> getCommandMap() {
         return commandMap;
     }
 
+    /**
+     * @return returns the map of generic commands
+     */
     public Map<String, List<Class<?>>> getGenericCommandMap() {
         return genericCommandMap;
     }
