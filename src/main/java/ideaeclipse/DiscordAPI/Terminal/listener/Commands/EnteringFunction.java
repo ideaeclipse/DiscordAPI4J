@@ -1,6 +1,6 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.Commands;
+package ideaeclipse.DiscordAPI.terminal.listener.Commands;
 
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 
 public class EnteringFunction extends TerminalEvent {

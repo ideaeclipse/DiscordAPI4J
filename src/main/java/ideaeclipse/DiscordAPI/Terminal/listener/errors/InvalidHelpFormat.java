@@ -1,6 +1,6 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.errors;
+package ideaeclipse.DiscordAPI.terminal.listener.errors;
 
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 
 import java.util.List;

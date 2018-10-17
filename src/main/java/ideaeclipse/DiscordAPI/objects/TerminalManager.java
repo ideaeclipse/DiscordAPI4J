@@ -3,12 +3,13 @@ package ideaeclipse.DiscordAPI.objects;
 import ideaeclipse.AsyncUtility.AsyncList;
 import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IDiscordBot;
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.CommandList;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Create;
-import ideaeclipse.DiscordAPI.listener.terminalListener.Commands.*;
-import ideaeclipse.DiscordAPI.listener.terminalListener.errors.*;
+import ideaeclipse.DiscordAPI.terminal.listener.Commands.*;
+import ideaeclipse.DiscordAPI.terminal.listener.errors.*;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
-import ideaeclipse.DiscordAPI.listener.terminalListener.terminal.NeedsMoreInput;
+import ideaeclipse.DiscordAPI.terminal.listener.terminal.NeedsMoreInput;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IMessage;
 import ideaeclipse.DiscordAPI.utils.DiscordLogger;
@@ -16,8 +17,6 @@ import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +33,7 @@ class TerminalManager {
     private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
     private final IDiscordBot bot;
     private final List<Terminal> terminalList;
+    private final CommandList commandList;
     final IChannel botChannel;
 
     /**
@@ -41,6 +41,7 @@ class TerminalManager {
      */
     TerminalManager(final IDiscordBot bot) {
         logger.info("Starting Terminal Manager");
+        this.commandList = new CommandList(bot);
         if (bot.getProperties().getProperty("debug").equals("true")) {
             logger.setLevel(DiscordLogger.Level.TRACE);
         }
@@ -75,13 +76,7 @@ class TerminalManager {
      * @return if true it will require more input if false delete the terminal
      */
     private boolean invoke(final Terminal t, final IMessage m) {
-        boolean status = false;
-        try {
-            status = t.initiate(m.getContent().substring(3, m.getContent().length()));
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IOException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return status;
+        return t.initiate(m.getContent().substring(3));
     }
 
     public class terminalMessageListener implements Listener {
@@ -102,9 +97,9 @@ class TerminalManager {
                     if (terminal == null) {
                         if (m.getContent().startsWith("cm")) {
                             if (m.getContent().equals("cm help")) {
-                                invoke(new Terminal(m.getUser(), bot, new terminalListener()), m);
+                                invoke(new Terminal(m.getUser(), bot, new terminalListener(),commandList), m);
                             } else {
-                                terminalList.add(new Terminal(m.getUser(), bot, new terminalListener()));
+                                terminalList.add(new Terminal(m.getUser(), bot, new terminalListener(),commandList));
                                 if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
                                     terminalList.remove(terminalList.size() - 1);
                                 }
@@ -175,7 +170,7 @@ class TerminalManager {
         }
 
         @EventHandler
-        public void onNoSuchMethod(NoSuchMethod argument) {
+        public void onNoSuchMethod(NoSuchCommand argument) {
             botChannel.sendMessage(argument.getReturn());
         }
 

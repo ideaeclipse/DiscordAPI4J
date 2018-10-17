@@ -1,9 +1,9 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.Commands;
+package ideaeclipse.DiscordAPI.terminal.listener.Commands;
 
-import ideaeclipse.DiscordAPI.Terminal.NameConversion;
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.CustomAnnotation;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
+import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -44,15 +44,15 @@ public class ClassInfo extends TerminalEvent {
         string.append("***Function info***").append("\n");
         string.append("Constructors:").append("\n");
         for (Constructor a : c) {
-            string.append("    -> ").append(a.getName()).append(" ").append(NameConversion.convert(a.getParameterTypes())).append("\n");
+            string.append("    -> ").append(a.getName()).append(" ").append(DiscordUtils.CustomTerminal.convert(a.getParameterTypes())).append("\n");
         }
         string.append("Methods:").append("\n");
         for (Method a : m) {
             if (a.getModifiers() == Modifier.PUBLIC) {
                 if (a.getAnnotation(CustomAnnotation.class) != null) {
-                    string.append("    -> ").append(a.getName()).append(" ").append(NameConversion.convert(a.getParameterTypes())).append(" ").append(a.getAnnotation(CustomAnnotation.class).description()).append("\n");
+                    string.append("    -> ").append(a.getName()).append(" ").append(DiscordUtils.CustomTerminal.convert(a.getParameterTypes())).append(" ").append(a.getAnnotation(CustomAnnotation.class).description()).append("\n");
                 } else {
-                    string.append("    -> ").append(a.getName()).append(" ").append(NameConversion.convert(a.getParameterTypes())).append(" ").append("\n");
+                    string.append("    -> ").append(a.getName()).append(" ").append(DiscordUtils.CustomTerminal.convert(a.getParameterTypes())).append(" ").append("\n");
                 }
             }
         }
@@ -72,12 +72,12 @@ public class ClassInfo extends TerminalEvent {
     static StringBuilder genericCommands(final StringBuilder string, final Terminal t, final Class<?> d2, final Class<?> a2) {
         string.append("***Default commands***").append("\n");
         for (Method m : d2.getDeclaredMethods()) {
-            string.append("    -> ").append(m.getName().toLowerCase()).append(" ").append(NameConversion.convert(m.getParameterTypes())).append("\n");
+            string.append("    -> ").append(m.getName().toLowerCase()).append(" ").append(DiscordUtils.CustomTerminal.convert(m.getParameterTypes())).append("\n");
         }
         if (t.isAdmin()) {
             string.append("***Admin Commands***").append("\n");
             for (Method m : a2.getDeclaredMethods()) {
-                string.append("    -> ").append(m.getName().toLowerCase()).append(" ").append(NameConversion.convert(m.getParameterTypes())).append("\n");
+                string.append("    -> ").append(m.getName().toLowerCase()).append(" ").append(DiscordUtils.CustomTerminal.convert(m.getParameterTypes())).append("\n");
             }
         }
         return string;

@@ -1,4 +1,4 @@
-package ideaeclipse.DiscordAPI.Terminal;
+package ideaeclipse.DiscordAPI.terminal;
 
 import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPI.IDiscordBot;
@@ -12,26 +12,27 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class Terminal {
     private final IDiscordBot bot;
-    private String additionalInput;
-    private boolean status;
-    private Compare compare;
-    private IDiscordUser user;
-    private Execute execute;
     private final EventManager dispatcher;
+    private final IDiscordUser user;
+    private final CommandList commandList;
+    private InputHandler inputHandler;
+    private boolean status;
     private boolean isAdmin = false;
     private String currentFunction;
 
-    public Terminal(final IDiscordUser u, final IDiscordBot bot, final Listener eventListener) {
+    public Terminal(final IDiscordUser u, final IDiscordBot bot, final Listener eventListener, final CommandList commandMap) {
         this.bot = bot;
-        user = u;
-        dispatcher = new EventManager();
-        dispatcher.registerListener(eventListener);
+        this.user = u;
+        this.commandList = commandMap;
+        this.dispatcher = new EventManager();
+        this.dispatcher.registerListener(eventListener);
         if (user.getName().toLowerCase().equals(bot.getProperties().getProperty("adminUser"))) {
-            isAdmin = true;
+            this.isAdmin = true;
         } else {
             Async.queue(x -> {
                 String adminGroup = bot.getProperties().getProperty("adminGroup");
@@ -46,45 +47,16 @@ public class Terminal {
         }
     }
 
-    public IDiscordBot getBot() {
-        return this.bot;
-    }
-
-    public boolean initiate(String command) throws
-            ClassNotFoundException, InstantiationException, IllegalAccessException, IOException, InvocationTargetException {
-        compare = new Compare();
-        status = false;
-        ParseInput pi = new ParseInput(command);
-        return compare.Initiate(pi.getWords(new ArrayList<>()), this);
-    }
-
-    void changeStatus(boolean newStatus) {
-        status = newStatus;
-    }
-
-    public boolean requiresMoreInput() {
-        return status;
+    public boolean initiate(String command) {
+        this.inputHandler = new InputHandler(new ParseInput(command).getWords(new ArrayList<>()), this);
+        return this.inputHandler.start();
     }
 
     public void addMoreInput(String s) {
-        additionalInput = s;
-        List methods = compare.getMethods();
-        int index = compare.getIndex();
-        ArrayList<String> words = compare.getWords();
-        if (execute == null) {
-            try {
-                execute = new Execute(methods.get(index).toString(), words, this, compare.getDefaultClass(), compare.getAdminClass());
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e1) {
-                e1.printStackTrace();
-            }
-        } else {
-            execute.method(execute.getObject(), execute.getCalledClass(), compare.getDefaultClass(), compare.getAdminClass());
+        System.out.println("MORE INPUT:" + s);
+        if (this.inputHandler != null) {
+            this.inputHandler.getFunction().executeMethod(new ParseInput(s).getWords(new ArrayList<>()));
         }
-    }
-
-    ArrayList<String> getAdditionalInput() {
-        ParseInput pi = new ParseInput(this.additionalInput);
-        return pi.getWords(new ArrayList<>());
     }
 
     public IDiscordUser getUser() {
@@ -105,5 +77,21 @@ public class Terminal {
 
     public String getCurrentFunction() {
         return this.currentFunction;
+    }
+
+    void changeStatus(boolean newStatus) {
+        status = newStatus;
+    }
+
+    public boolean requiresMoreInput() {
+        return status;
+    }
+
+    public IDiscordBot getBot() {
+        return this.bot;
+    }
+
+    public CommandList getCommandList() {
+        return commandList;
     }
 }

@@ -5,9 +5,6 @@ import ideaeclipse.DuckDuckGoAPI4j.Search;
 import java.io.IOException;
 
 public class DuckDuckGo {
-    public DuckDuckGo() {
-
-    }
 
     public String search(String parameters) {
         try {

@@ -1,4 +1,4 @@
-package ideaeclipse.DiscordAPI.Terminal;
+package ideaeclipse.DiscordAPI.terminal;
 
 public interface CustomTerminal {
     void done();

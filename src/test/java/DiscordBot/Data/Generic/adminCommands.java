@@ -1,6 +1,6 @@
 package DiscordBot.Data.Generic;
 
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import DiscordBot.Main;
 
 public class adminCommands {

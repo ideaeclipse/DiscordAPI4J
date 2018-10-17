@@ -25,6 +25,21 @@ import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
  */
 public class DiscordUtils {
     /**
+     * Anything related to Custom terminal
+     *
+     * @author ideaeclipse
+     */
+
+    public static class CustomTerminal{
+        public static ArrayList<String> convert(Class<?>[] m) {
+            ArrayList<String> data = new ArrayList<>();
+            for (Class<?> c : m) {
+                data.add(c.getSimpleName());
+            }
+            return data;
+        }
+    }
+    /**
      * This class is used to Handle all Http Api Requests
      *
      * @author ideaeclipse

@@ -1,6 +1,6 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.Commands;
+package ideaeclipse.DiscordAPI.terminal.listener.Commands;
 
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 
 import java.util.List;
@@ -11,17 +11,13 @@ import java.util.Map;
  *
  * @author ideaeclipse
  */
-public class BotCommands extends TerminalEvent{
-    private Map map;
-    private List list;
+public class BotCommands extends TerminalEvent {
     private Class<?> defaultClass, adminClass;
     private Terminal t;
 
-    public BotCommands(final Terminal terminal, final List list, final Map map, final Class<?> defaultClass, final Class<?> admin) {
+    public BotCommands(final Terminal terminal, final Class<?> defaultClass, final Class<?> admin) {
         super(terminal);
         this.t = terminal;
-        this.list = list;
-        this.map = map;
         this.defaultClass = defaultClass;
         this.adminClass = admin;
     }
@@ -29,9 +25,11 @@ public class BotCommands extends TerminalEvent{
     public String getReturn() {
         StringBuilder string = new StringBuilder();
         string.append("***Custom Commands***").append("\n");
-        for (int i = 0; i < map.size(); i++) {
-            string.append("Parent Commands: ").append(list.get(i)).append("\n");
-            string.append("    -> Sub Commands: ").append(map.get(list.get(i))).append("\n");
+        for (String s : t.getCommandList().getCommandMap().keySet()) {
+            string.append("Parent Commands: ").append(s).append("\n");
+            for(Class<?> c: t.getCommandList().getCommandMap().get(s)){
+                string.append("    -> Sub Commands: ").append(c.getSimpleName()).append("\n");
+            }
         }
         string.append("To get help for a specific sub command and to see its options type help ${parent command} ${sub command}").append("\n");
         string = ClassInfo.genericCommands(string, t, defaultClass, adminClass);

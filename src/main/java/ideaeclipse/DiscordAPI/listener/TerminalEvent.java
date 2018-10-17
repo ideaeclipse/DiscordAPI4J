@@ -1,6 +1,6 @@
 package ideaeclipse.DiscordAPI.listener;
 
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.reflectionListener.Event;
 
 /**

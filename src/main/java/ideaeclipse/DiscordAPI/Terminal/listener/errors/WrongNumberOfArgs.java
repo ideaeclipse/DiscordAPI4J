@@ -1,8 +1,8 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.errors;
+package ideaeclipse.DiscordAPI.terminal.listener.errors;
 
-import ideaeclipse.DiscordAPI.Terminal.NameConversion;
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
+import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 
 /**
  * This function is notified when a user calls a method with the incorrect number of parameters
@@ -26,6 +26,6 @@ public class WrongNumberOfArgs extends TerminalEvent {
     }
 
     public String getReturn() {
-        return "Wrong Number of Args, you need to enter the following \n" + NameConversion.convert(args);
+        return "Wrong Number of Args, you need to enter the following \n" + DiscordUtils.CustomTerminal.convert(args);
     }
 }

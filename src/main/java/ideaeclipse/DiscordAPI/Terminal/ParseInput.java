@@ -1,16 +1,16 @@
-package ideaeclipse.DiscordAPI.Terminal;
+package ideaeclipse.DiscordAPI.terminal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ParseInput {
+class ParseInput {
     private String input;
 
-    public ParseInput(String string) {
+    ParseInput(String string) {
         this.input = string;
     }
 
-    public ArrayList<String> getWords(ArrayList<String> sl) {
+    ArrayList<String> getWords(ArrayList<String> sl) {
         if (input.contains("'") && sl.size() == 0) {
             sl = new ArrayList<>(Arrays.asList(input.split("'")));
             return getWords(sl);

@@ -1,7 +1,7 @@
-package ideaeclipse.DiscordAPI.listener.terminalListener.terminal;
+package ideaeclipse.DiscordAPI.terminal.listener.terminal;
 
 
-import ideaeclipse.DiscordAPI.Terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IMessage;
 
