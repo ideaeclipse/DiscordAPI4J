@@ -1,12 +1,13 @@
 package ideaeclipse.DiscordAPI.utils;
 
-import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.webSocket.TextOpCodes;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.CustomLogger;
 
 public class TextHeartBeat implements Runnable {
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
     private final Wss webSocket;
     private volatile Long heartbeat;
     private volatile boolean run;

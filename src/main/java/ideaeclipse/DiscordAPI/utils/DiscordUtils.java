@@ -6,6 +6,7 @@ import ideaeclipse.DiscordAPI.objects.Interfaces.IRole;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IUser;
 import ideaeclipse.DiscordAPI.objects.Payloads;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.CustomLogger;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -257,7 +258,7 @@ public class DiscordUtils {
     static class Exceptions {
 
         public static class HttpResponseError extends Exception implements IDiscordExceptions {
-            private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+            private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
 
             HttpResponseError(final Integer errorCode) {
                 switch (errorCode) {
@@ -281,7 +282,7 @@ public class DiscordUtils {
         }
 
         public static class AuthenticationError extends Exception implements IDiscordExceptions {
-            private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+            private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
             private final Integer errorCode;
 
             AuthenticationError(final Integer errorCode) {

@@ -1,13 +1,14 @@
 package ideaeclipse.DiscordAPI.objects;
 
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
-import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.webSocket.TextOpCodes;
 import ideaeclipse.DiscordAPI.webSocket.VoiceWss;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.CustomLogger;
+import ideaeclipse.customLogger.Level;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 @Deprecated
 public class AudioManager {
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
     private final DiscordBot bot;
     private final Object lock;
     private VServerUpdate vServerUpdate;
@@ -35,7 +36,7 @@ public class AudioManager {
      */
     AudioManager(final DiscordBot bot) {
         if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
+            logger.setLevel(Level.DEBUG);
         }
         this.lock = new Object();
         this.bot = bot;

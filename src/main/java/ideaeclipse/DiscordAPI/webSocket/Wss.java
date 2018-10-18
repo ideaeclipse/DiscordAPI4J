@@ -8,11 +8,12 @@ import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPI.IPrivateBot;
 import ideaeclipse.DiscordAPI.objects.ParserObjects;
 import ideaeclipse.DiscordAPI.objects.Payloads;
-import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.DiscordAPI.utils.RateLimitRecorder;
 import ideaeclipse.DiscordAPI.utils.TextHeartBeat;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.CustomLogger;
+import ideaeclipse.customLogger.Level;
 import ideaeclipse.reflectionListener.Event;
 
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.Optional;
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
 public class Wss extends WebSocketFactory {
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(Wss.class));
+    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
     private final Object lock = new Object();
     private Thread heartbeat;
     private Payloads.DWelcome w;
@@ -33,7 +34,7 @@ public class Wss extends WebSocketFactory {
 
     public Wss(final IPrivateBot bot) throws IOException, WebSocketException {
         if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
+            logger.setLevel(Level.DEBUG);
         }
         wss = this;
         webSocket = this

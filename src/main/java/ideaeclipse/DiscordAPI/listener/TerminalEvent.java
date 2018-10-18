@@ -4,7 +4,7 @@ import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.reflectionListener.Event;
 
 /**
- * Base event for all Terminal Listeners
+ * Base event for all terminal Listeners
  *
  * @author ideaeclipse
  */

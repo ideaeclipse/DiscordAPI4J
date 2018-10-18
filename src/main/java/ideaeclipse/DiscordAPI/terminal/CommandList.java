@@ -37,7 +37,13 @@ public class CommandList {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         Enumeration<URL> urlEnumeration = classLoader.getResources(directory.replace('.', '/'));
         while (urlEnumeration.hasMoreElements()) {
-            File file = new File(urlEnumeration.nextElement().getPath().substring(1));
+            String direcotry = urlEnumeration.nextElement().getPath();
+            File file;
+            if(System.getProperty("os.name").toLowerCase().contains("windows")){
+                file = new File(direcotry.substring(1));
+            }else{
+                file = new File(direcotry);
+            }
             URLClassLoader newClassLoader = new URLClassLoader(new URL[]{
                     new File(file.getPath().substring(0, (file.getPath().length() - directory.length()))).toURI().toURL()
             });

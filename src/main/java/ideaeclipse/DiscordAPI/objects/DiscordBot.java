@@ -10,7 +10,6 @@ import ideaeclipse.DiscordAPI.IPrivateBot;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IRole;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IUser;
-import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.DiscordAPI.utils.RateLimitRecorder;
 import ideaeclipse.DiscordAPI.webSocket.TextOpCodes;
@@ -18,6 +17,8 @@ import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
+import ideaeclipse.customLogger.CustomLogger;
+import ideaeclipse.customLogger.Level;
 import ideaeclipse.reflectionListener.EventManager;
 import ideaeclipse.reflectionListener.Listener;
 
@@ -39,7 +40,7 @@ import static ideaeclipse.DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  */
 @SuppressWarnings("ALL")
 class DiscordBot implements IDiscordBot, IPrivateBot {
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
     private final Properties properties;
     private TerminalManager terminalManager;
     private final Json identity;
@@ -66,7 +67,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         }
         DiscordUtils.DefaultLinks.bot = this;
         if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
+            logger.setLevel(Level.DEBUG);
         }
         DiscordUtils.DefaultLinks.token = token;
         this.identity = buildIdentity();

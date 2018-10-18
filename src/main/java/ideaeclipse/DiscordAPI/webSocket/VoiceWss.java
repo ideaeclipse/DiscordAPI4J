@@ -6,19 +6,20 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import ideaeclipse.DiscordAPI.IPrivateBot;
 import ideaeclipse.DiscordAPI.objects.*;
-import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.DiscordAPI.utils.RateLimitRecorder;
 import ideaeclipse.DiscordAPI.utils.VoiceHeartBeat;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.CustomLogger;
+import ideaeclipse.customLogger.Level;
 
 import java.io.IOException;
 
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 @Deprecated
 public class VoiceWss extends WebSocketFactory {
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
     private final VoiceWss wss;
     private final IPrivateBot bot;
     private final VServerUpdate initialServerUpdate;
@@ -31,7 +32,7 @@ public class VoiceWss extends WebSocketFactory {
         this.initialServerUpdate = vServerUpdate;
         this.initialStateUpdate = vStateUpdate;
         if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
+            logger.setLevel(Level.DEBUG);
         }
         webSocket = this
                 .setConnectionTimeout(5000)

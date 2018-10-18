@@ -3,17 +3,18 @@ package ideaeclipse.DiscordAPI.objects;
 import ideaeclipse.AsyncUtility.AsyncList;
 import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IDiscordBot;
-import ideaeclipse.DiscordAPI.terminal.CommandList;
-import ideaeclipse.DiscordAPI.terminal.Terminal;
-import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Create;
-import ideaeclipse.DiscordAPI.terminal.listener.Commands.*;
-import ideaeclipse.DiscordAPI.terminal.listener.errors.*;
 import ideaeclipse.DiscordAPI.listener.TerminalEvent;
-import ideaeclipse.DiscordAPI.terminal.listener.terminal.NeedsMoreInput;
+import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Create;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IMessage;
-import ideaeclipse.DiscordAPI.utils.DiscordLogger;
+import ideaeclipse.DiscordAPI.terminal.CommandList;
+import ideaeclipse.DiscordAPI.terminal.Terminal;
+import ideaeclipse.DiscordAPI.terminal.listener.Commands.*;
+import ideaeclipse.DiscordAPI.terminal.listener.errors.*;
+import ideaeclipse.DiscordAPI.terminal.listener.terminal.NeedsMoreInput;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
+import ideaeclipse.customLogger.CustomLogger;
+import ideaeclipse.customLogger.Level;
 import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
 
@@ -30,7 +31,7 @@ import java.util.Optional;
  * @see TerminalEvent
  */
 class TerminalManager {
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
     private final IDiscordBot bot;
     private final List<Terminal> terminalList;
     private final CommandList commandList;
@@ -40,10 +41,10 @@ class TerminalManager {
      * @param bot passes the bot to get properties
      */
     TerminalManager(final IDiscordBot bot) {
-        logger.info("Starting Terminal Manager");
+        logger.info("Starting terminal Manager");
         this.commandList = new CommandList(bot);
         if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(DiscordLogger.Level.TRACE);
+            logger.setLevel(Level.DEBUG);
         }
         this.bot = bot;
         terminalList = new LinkedList<>();
@@ -71,7 +72,7 @@ class TerminalManager {
     }
 
     /**
-     * @param t Terminal
+     * @param t terminal
      * @param m M
      * @return if true it will require more input if false delete the terminal
      */

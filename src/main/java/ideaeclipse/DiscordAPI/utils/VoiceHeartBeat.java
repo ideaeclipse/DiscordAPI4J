@@ -4,12 +4,13 @@ import ideaeclipse.DiscordAPI.webSocket.VoiceOpCodes;
 import ideaeclipse.DiscordAPI.webSocket.VoiceWss;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.CustomLogger;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
 
 public class VoiceHeartBeat implements Runnable {
-    private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
     private final VoiceWss webSocket;
     private volatile Integer heartbeat;
     private volatile boolean run;

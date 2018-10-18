@@ -5,9 +5,9 @@ import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IPrivateBot;
 import ideaeclipse.DiscordAPI.listener.discordApiListener.Channel_Create;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
-import ideaeclipse.DiscordAPI.utils.DiscordLogger;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.CustomLogger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 /**
  * This class is called from each listenerEvent {@link Channel_Create}
- * Each class logs there event using {@link DiscordLogger}
+ * Each class logs there event using CustomLogger
  *
  * @author Ideaeclipse
  */
@@ -31,7 +31,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#CHANNEL_CREATE
      */
     public static class ChannelCreate {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+        private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
         private volatile IChannel channel;
 
         /**
@@ -61,7 +61,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#CHANNEL_DELETE
      */
     public static class ChannelDelete {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+        private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
         private volatile IChannel channel;
 
         /**
@@ -87,7 +87,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#CHANNEL_UPDATE
      */
     public static class ChannelUpdate {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+        private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
         private volatile IChannel oldC;
         private volatile IChannel newC;
 
@@ -121,7 +121,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.objects.Payloads.ChannelTypes
      */
     public static class MessageCreate {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+        private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
         private volatile Message message;
 
         /**
@@ -154,7 +154,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#PRESENCE_UPDATE
      */
     public static class PresenceUpdate {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+        private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
         private final User user;
 
         /**
@@ -175,7 +175,7 @@ public class ParserObjects {
     }
 
     public static class VoiceServerUpdate {
-        private final DiscordLogger logger = new DiscordLogger(String.valueOf(this.getClass()));
+        private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
         private final VServerUpdate voiceServerUpdate;
 
         public VoiceServerUpdate(final IPrivateBot b, final Json payload) {
