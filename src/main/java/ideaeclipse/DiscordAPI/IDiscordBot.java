@@ -10,20 +10,8 @@ import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.List;
 
-public interface IDiscordBot {
+public interface IDiscordBot extends IPrivateBot {
     IDiscordBot login();
-
-    long getGuildId();
-
-    //void updateChannels();
-
-    List<IChannel> getChannels();
-
-    List<IUser> getUsers();
-
-    List<IRole> getRoles();
-
-    EventManager getDispatcher();
 
     //returns bot
     IDiscordUser getBotUser();
@@ -31,6 +19,4 @@ public interface IDiscordBot {
     IChannel createDmChannel(IUser user);
 
     void setStatus(Payloads.GameTypes gameType, String gameName);
-
-    Properties getProperties();
 }

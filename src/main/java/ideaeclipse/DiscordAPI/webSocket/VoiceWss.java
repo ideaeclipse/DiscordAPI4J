@@ -17,9 +17,10 @@ import ideaeclipse.customLogger.Level;
 import java.io.IOException;
 
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
+
 @Deprecated
 public class VoiceWss extends WebSocketFactory {
-    private final CustomLogger logger = new CustomLogger(this.getClass());
+    private final CustomLogger logger;
     private final VoiceWss wss;
     private final IPrivateBot bot;
     private final VServerUpdate initialServerUpdate;
@@ -27,6 +28,7 @@ public class VoiceWss extends WebSocketFactory {
     private final WebSocket webSocket;
 
     public VoiceWss(final IPrivateBot bot, final VServerUpdate vServerUpdate, final VStateUpdate vStateUpdate, final String endpoint) throws IOException, WebSocketException {
+        this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         wss = this;
         this.bot = bot;
         this.initialServerUpdate = vServerUpdate;
@@ -54,7 +56,7 @@ public class VoiceWss extends WebSocketFactory {
                                 Thread.currentThread().setName("VoiceWss");
                                 logger.debug("Initial");
                                 Payloads.DWelcome welcome = ParserObjects.convertToPayload(g.d, Payloads.DWelcome.class);
-                                Thread heartBeat = DiscordUtils.createDaemonThreadFactory("VoiceHeartBeat").newThread(new VoiceHeartBeat(wss, (int) (welcome.heartbeat_interval * .75)));
+                                Thread heartBeat = DiscordUtils.createDaemonThreadFactory("VoiceHeartBeat").newThread(new VoiceHeartBeat(wss, (int) (welcome.heartbeat_interval * .75), bot.getLoggerManager()));
                                 logger.info("Starting Voice HeartBeat");
                                 BuilderObjects.VoiceIdentify v = new BuilderObjects.VoiceIdentify();
                                 v.server_id = bot.getGuildId();

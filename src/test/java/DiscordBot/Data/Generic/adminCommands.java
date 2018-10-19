@@ -14,4 +14,8 @@ public class adminCommands {
         return String.valueOf(Main.bot.getUsers());
     }
 
+    public String dumpToLogs() {
+        return Main.bot.getLoggerManager().dump()? "Info Dumped to logs": "Error dumping files";
+    }
+
 }

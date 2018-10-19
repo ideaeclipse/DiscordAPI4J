@@ -19,6 +19,7 @@ import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
 import ideaeclipse.customLogger.CustomLogger;
 import ideaeclipse.customLogger.Level;
+import ideaeclipse.customLogger.LoggerManager;
 import ideaeclipse.reflectionListener.EventManager;
 import ideaeclipse.reflectionListener.Listener;
 
@@ -40,7 +41,8 @@ import static ideaeclipse.DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  */
 @SuppressWarnings("ALL")
 class DiscordBot implements IDiscordBot, IPrivateBot {
-    private final CustomLogger logger = new CustomLogger(this.getClass());
+    private final LoggerManager loggerManager;
+    private final CustomLogger logger;
     private final Properties properties;
     private TerminalManager terminalManager;
     private final Json identity;
@@ -59,11 +61,13 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final Listener listener, final long guildID) {
+        this.loggerManager = new LoggerManager(System.getProperty("user.dir") + "/logs/");
+        this.logger = new CustomLogger(this.getClass(), loggerManager);
         properties = new Properties(new String[]{"adminUser", "adminGroup", "commandsDirectory", "genericDirectory", "adminFileDir", "defaultFileDirectory", "useTerminal", "debug"});
         try {
             properties.start();
         } catch (IOException e) {
-            logger.error("Couldn't start properties manager can't start bot");
+            logger.error("Couldn't start properties manager therefor the bot can't start");
         }
         DiscordUtils.DefaultLinks.bot = this;
         if (bot.getProperties().getProperty("debug").equals("true")) {
@@ -183,6 +187,11 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     @Override
     public Properties getProperties() {
         return this.properties;
+    }
+
+    @Override
+    public LoggerManager getLoggerManager() {
+        return this.loggerManager;
     }
 
     /**

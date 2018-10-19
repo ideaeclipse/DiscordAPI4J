@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Deprecated
 public class AudioManager {
-    private final CustomLogger logger = new CustomLogger(this.getClass());
+    private final CustomLogger logger;
     private final DiscordBot bot;
     private final Object lock;
     private VServerUpdate vServerUpdate;
@@ -35,6 +35,7 @@ public class AudioManager {
      * @param bot passes the bot
      */
     AudioManager(final DiscordBot bot) {
+        this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         if (bot.getProperties().getProperty("debug").equals("true")) {
             logger.setLevel(Level.DEBUG);
         }

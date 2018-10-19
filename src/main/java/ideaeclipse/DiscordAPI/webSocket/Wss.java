@@ -24,7 +24,7 @@ import java.util.Optional;
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
 public class Wss extends WebSocketFactory {
-    private final CustomLogger logger = new CustomLogger(this.getClass());
+    private final CustomLogger logger;
     private final Object lock = new Object();
     private Thread heartbeat;
     private Payloads.DWelcome w;
@@ -33,6 +33,7 @@ public class Wss extends WebSocketFactory {
     private final WebSocket webSocket;
 
     public Wss(final IPrivateBot bot) throws IOException, WebSocketException {
+        this.logger = new CustomLogger(this.getClass(),bot.getLoggerManager());
         if (bot.getProperties().getProperty("debug").equals("true")) {
             logger.setLevel(Level.DEBUG);
         }
@@ -89,7 +90,7 @@ public class Wss extends WebSocketFactory {
                                 logger.info("Received initial Message");
                                 w = ParserObjects.convertToPayload(g.d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
-                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new TextHeartBeat(wss, w.heartbeat_interval));
+                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new TextHeartBeat(wss, w.heartbeat_interval,bot.getLoggerManager()));
                                 startTime = System.currentTimeMillis();
                                 heartbeat.start();
                                 sendText(bot.getIdentity());

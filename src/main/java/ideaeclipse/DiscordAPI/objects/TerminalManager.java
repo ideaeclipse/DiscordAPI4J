@@ -31,7 +31,7 @@ import java.util.Optional;
  * @see TerminalEvent
  */
 class TerminalManager {
-    private final CustomLogger logger = new CustomLogger(this.getClass());
+    private final CustomLogger logger;
     private final IDiscordBot bot;
     private final List<Terminal> terminalList;
     private final CommandList commandList;
@@ -41,6 +41,7 @@ class TerminalManager {
      * @param bot passes the bot to get properties
      */
     TerminalManager(final IDiscordBot bot) {
+        this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         logger.info("Starting terminal Manager");
         this.commandList = new CommandList(bot);
         if (bot.getProperties().getProperty("debug").equals("true")) {
@@ -98,9 +99,9 @@ class TerminalManager {
                     if (terminal == null) {
                         if (m.getContent().startsWith("cm")) {
                             if (m.getContent().equals("cm help")) {
-                                invoke(new Terminal(m.getUser(), bot, new terminalListener(),commandList), m);
+                                invoke(new Terminal(m.getUser(), bot, new terminalListener(), commandList), m);
                             } else {
-                                terminalList.add(new Terminal(m.getUser(), bot, new terminalListener(),commandList));
+                                terminalList.add(new Terminal(m.getUser(), bot, new terminalListener(), commandList));
                                 if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
                                     terminalList.remove(terminalList.size() - 1);
                                 }

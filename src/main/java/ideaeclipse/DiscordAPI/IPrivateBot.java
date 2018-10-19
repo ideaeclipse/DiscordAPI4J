@@ -6,6 +6,7 @@ import ideaeclipse.DiscordAPI.objects.Interfaces.IRole;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IUser;
 import ideaeclipse.CustomProperties.Properties;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.customLogger.LoggerManager;
 import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.List;
@@ -34,4 +35,6 @@ public interface IPrivateBot {
     Json getIdentity();
 
     Properties getProperties();
+
+    LoggerManager getLoggerManager();
 }

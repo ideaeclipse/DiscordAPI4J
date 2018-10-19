@@ -31,7 +31,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#CHANNEL_CREATE
      */
     public static class ChannelCreate {
-        private final CustomLogger logger = new CustomLogger(this.getClass());
+        private final CustomLogger logger;
         private volatile IChannel channel;
 
         /**
@@ -39,6 +39,7 @@ public class ParserObjects {
          * @param payload Payload from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
          */
         public ChannelCreate(final IPrivateBot b, final Json payload) {
+            this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
@@ -61,7 +62,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#CHANNEL_DELETE
      */
     public static class ChannelDelete {
-        private final CustomLogger logger = new CustomLogger(this.getClass());
+        private final CustomLogger logger;
         private volatile IChannel channel;
 
         /**
@@ -69,6 +70,7 @@ public class ParserObjects {
          * @param payload Payload from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
          */
         public ChannelDelete(final IPrivateBot b, final Json payload) {
+            this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             channel = cd.getChannel();
             //b.updateChannels();
@@ -87,7 +89,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#CHANNEL_UPDATE
      */
     public static class ChannelUpdate {
-        private final CustomLogger logger = new CustomLogger(this.getClass());
+        private final CustomLogger logger;
         private volatile IChannel oldC;
         private volatile IChannel newC;
 
@@ -96,6 +98,7 @@ public class ParserObjects {
          * @param payload Payload from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
          */
         public ChannelUpdate(final IPrivateBot b, final Json payload) {
+            this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
             Channel.ChannelP cd = new Channel.ChannelP(payload).logic();
             oldC = DiscordUtils.Search.CHANNEL(b.getChannels(), cd.getChannel().getName());
             newC = cd.getChannel();
@@ -121,7 +124,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.objects.Payloads.ChannelTypes
      */
     public static class MessageCreate {
-        private final CustomLogger logger = new CustomLogger(this.getClass());
+        private final CustomLogger logger;
         private volatile Message message;
 
         /**
@@ -129,6 +132,7 @@ public class ParserObjects {
          * @param payload Payload from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
          */
         public MessageCreate(final IPrivateBot b, final Json payload) {
+            this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
             Json user = new Json(String.valueOf(payload.get("author")));
             Payloads.DMessage m = ParserObjects.convertToPayload(payload, Payloads.DMessage.class);
             DiscordUser.UserP pd = new DiscordUser.UserP(user, b).logic();
@@ -154,7 +158,7 @@ public class ParserObjects {
      * @see ideaeclipse.DiscordAPI.webSocket.WebSocket_Events#PRESENCE_UPDATE
      */
     public static class PresenceUpdate {
-        private final CustomLogger logger = new CustomLogger(this.getClass());
+        private final CustomLogger logger;
         private final User user;
 
         /**
@@ -162,6 +166,7 @@ public class ParserObjects {
          * @param payload Payload from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
          */
         public PresenceUpdate(final IPrivateBot b, final Json payload) {
+            this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
             final User.ServerUniqueUserP u = new User.ServerUniqueUserP(b, payload).logic();
             user = u.getServerUniqueUser();
             logger.info("Presence Update: DiscordUser: " + user.getDiscordUser().getName() + " Status: " + user.getStatus() + (user.getGame() != null ? " Game: " + ((user.getGame().getType() == Payloads.GameTypes.Playing) ?
@@ -175,10 +180,11 @@ public class ParserObjects {
     }
 
     public static class VoiceServerUpdate {
-        private final CustomLogger logger = new CustomLogger(this.getClass());
+        private final CustomLogger logger;
         private final VServerUpdate voiceServerUpdate;
 
         public VoiceServerUpdate(final IPrivateBot b, final Json payload) {
+            this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
             Payloads.DVoiceServerUpdate vsu = ParserObjects.convertToPayload(payload, Payloads.DVoiceServerUpdate.class);
             this.voiceServerUpdate = new VServerUpdate(vsu.token, vsu.endpoint);
             synchronized (b.getAudioManager().getLock()) {
