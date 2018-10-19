@@ -40,7 +40,7 @@ import static ideaeclipse.DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
  */
 @SuppressWarnings("ALL")
 class DiscordBot implements IDiscordBot, IPrivateBot {
-    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+    private final CustomLogger logger = new CustomLogger(this.getClass());
     private final Properties properties;
     private TerminalManager terminalManager;
     private final Json identity;

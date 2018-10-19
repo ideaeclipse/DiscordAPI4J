@@ -106,7 +106,7 @@ class Function {
      * @param params params
      * @param m      method you whish to envoke
      */
-    static void invoke(final Object object, final List<String> params, final Method m, final Terminal t) {
+    private static void invoke(final Object object, final List<String> params, final Method m, final Terminal t) {
         params.remove(0);
         try {
             Object[] convertedArgs = convertArgs(params, m.getParameterTypes(), t);

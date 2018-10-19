@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 
 public class VoiceHeartBeat implements Runnable {
-    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+    private final CustomLogger logger = new CustomLogger(this.getClass());
     private final VoiceWss webSocket;
     private volatile Integer heartbeat;
     private volatile boolean run;

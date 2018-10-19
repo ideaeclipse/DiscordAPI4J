@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Deprecated
 public class AudioManager {
-    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+    private final CustomLogger logger = new CustomLogger(this.getClass());
     private final DiscordBot bot;
     private final Object lock;
     private VServerUpdate vServerUpdate;

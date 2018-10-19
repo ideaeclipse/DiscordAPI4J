@@ -19,7 +19,7 @@ import java.io.IOException;
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 @Deprecated
 public class VoiceWss extends WebSocketFactory {
-    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+    private final CustomLogger logger = new CustomLogger(this.getClass());
     private final VoiceWss wss;
     private final IPrivateBot bot;
     private final VServerUpdate initialServerUpdate;

@@ -258,7 +258,7 @@ public class DiscordUtils {
     static class Exceptions {
 
         public static class HttpResponseError extends Exception implements IDiscordExceptions {
-            private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+            private final CustomLogger logger = new CustomLogger(this.getClass());
 
             HttpResponseError(final Integer errorCode) {
                 switch (errorCode) {
@@ -282,7 +282,7 @@ public class DiscordUtils {
         }
 
         public static class AuthenticationError extends Exception implements IDiscordExceptions {
-            private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+            private final CustomLogger logger = new CustomLogger(this.getClass());
             private final Integer errorCode;
 
             AuthenticationError(final Integer errorCode) {

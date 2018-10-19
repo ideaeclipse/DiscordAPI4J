@@ -31,7 +31,7 @@ import java.util.Optional;
  * @see TerminalEvent
  */
 class TerminalManager {
-    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+    private final CustomLogger logger = new CustomLogger(this.getClass());
     private final IDiscordBot bot;
     private final List<Terminal> terminalList;
     private final CommandList commandList;

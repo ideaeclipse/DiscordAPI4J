@@ -53,7 +53,6 @@ public class Terminal {
     }
 
     public void addMoreInput(String s) {
-        System.out.println("MORE INPUT:" + s);
         if (this.inputHandler != null) {
             this.inputHandler.getFunction().executeMethod(new ParseInput(s).getWords(new ArrayList<>()));
         }

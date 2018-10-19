@@ -24,7 +24,7 @@ import java.util.Optional;
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
 
 public class Wss extends WebSocketFactory {
-    private final CustomLogger logger = new CustomLogger(Thread.currentThread(),this.getClass());
+    private final CustomLogger logger = new CustomLogger(this.getClass());
     private final Object lock = new Object();
     private Thread heartbeat;
     private Payloads.DWelcome w;
