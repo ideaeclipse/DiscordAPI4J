@@ -72,12 +72,12 @@ public class ClassInfo extends TerminalEvent {
     static StringBuilder genericCommands(final StringBuilder string, final Terminal t, final Class<?> d2, final Class<?> a2) {
         string.append("***Default commands***").append("\n");
         for (Method m : d2.getDeclaredMethods()) {
-            string.append("    -> ").append(m.getName().toLowerCase()).append(" ").append(DiscordUtils.CustomTerminal.convert(m.getParameterTypes())).append("\n");
+            string.append("    -> ").append(m.getName()).append(" ").append(DiscordUtils.CustomTerminal.convert(m.getParameterTypes())).append("\n");
         }
         if (t.isAdmin()) {
             string.append("***Admin Commands***").append("\n");
             for (Method m : a2.getDeclaredMethods()) {
-                string.append("    -> ").append(m.getName().toLowerCase()).append(" ").append(DiscordUtils.CustomTerminal.convert(m.getParameterTypes())).append("\n");
+                string.append("    -> ").append(m.getName()).append(" ").append(DiscordUtils.CustomTerminal.convert(m.getParameterTypes())).append("\n");
             }
         }
         return string;
