@@ -54,7 +54,7 @@ public class Wss extends WebSocketFactory {
                                             if (g.t.equals(webSocket_events.toString())) {
                                                 Class<?> cl = webSocket_events.getaClass();
                                                 Constructor constructor = cl.getConstructor(IPrivateBot.class, Json.class);
-                                                Object t = constructor.newInstance(bot, new Json((String) payload.get("d")));
+                                                Object t = constructor.newInstance(bot, new Json(String.valueOf(payload.get("d"))));
                                                 bot.getDispatcher().callEvent((Event) t);
                                             }
                                         }

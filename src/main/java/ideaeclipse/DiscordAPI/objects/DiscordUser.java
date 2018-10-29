@@ -86,9 +86,12 @@ class DiscordUser implements IDiscordUser {
         }
 
         UserP logicId() {
-            object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + bot.getGuildId() + MEMBER + "/" + id)));
-            Payloads.DUser u = ParserObjects.convertToPayload(new Json((String) object.get("user")), Payloads.DUser.class);
-            user = new DiscordUser(u.id, u.username, u.discriminator, bot);
+            String s = String.valueOf(rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + bot.getGuildId() + MEMBER + "/" + id)));
+            if (!s.equals("null")) {
+                object = new Json(s);
+                Payloads.DUser u = ParserObjects.convertToPayload(new Json((String) object.get("user")), Payloads.DUser.class);
+                user = new DiscordUser(u.id, u.username, u.discriminator, bot);
+            }
             return this;
         }
 
@@ -96,7 +99,7 @@ class DiscordUser implements IDiscordUser {
             if (id == null) {
                 IUser temp = null;
                 if (bot.getUsers() != null) {
-                    temp = DiscordUtils.Search.USER(Objects.requireNonNull(bot.getUsers()), Long.parseUnsignedLong((String) object.get("id")));
+                    temp = DiscordUtils.Search.USER(bot.getUsers(), Long.parseUnsignedLong(String.valueOf(object.get("id"))));
                 }
                 if (temp == null) {
                     Payloads.DUser u = ParserObjects.convertToPayload(object, Payloads.DUser.class);

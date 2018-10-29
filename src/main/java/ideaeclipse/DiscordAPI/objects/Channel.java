@@ -130,7 +130,7 @@ class Channel implements IChannel {
          */
         ChannelP logic() {
             if (object == null) {
-                object = new Json((String) rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id)));
+                object = new Json(String.valueOf(rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, CHANNEL + "/" + id))));
             }
             Payloads.DChannel c = ParserObjects.convertToPayload(object, Payloads.DChannel.class);
             channel = new Channel(c.id, c.name, c.position, c.nsfw, c.type);

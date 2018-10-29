@@ -85,38 +85,40 @@ class TerminalManager {
     public class terminalMessageListener implements Listener {
         @EventHandler
         public void onMessageEvent(Message_Create create) {
-            Async.blankThread(()->{
-                IMessage m = create.getMessage();
-                Terminal terminal = getCurrentTerminal(m.getUser());
-                if (m.getChannel().getId().equals(Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).getId())) {
-                    AsyncList<?> list = new ForEachList<>();
-                    list.add(x -> {
-                        if (terminal != null) {
-                            if (terminal.requiresMoreInput()) {
-                                terminal.getDispatcher().callEvent(new NeedsMoreInput(terminal, m));
-                            }
-                        }
-                        return Optional.empty();
-                    }).add(x -> {
-                        if (terminal == null) {
-                            if (m.getContent().startsWith("cm")) {
-                                if (m.getContent().equals("cm help")) {
-                                    invoke(new Terminal(m.getUser(), bot, new terminalListener(), commandList), m);
-                                } else {
-                                    terminalList.add(new Terminal(m.getUser(), bot, new terminalListener(), commandList));
-                                    if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
-                                        terminalList.remove(terminalList.size() - 1);
-                                    }
-
+            Async.blankThread(() -> {
+                if (create.getMessage() != null) {
+                    IMessage m = create.getMessage();
+                    Terminal terminal = getCurrentTerminal(m.getUser());
+                    if (m.getChannel().getId().equals(Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).getId())) {
+                        AsyncList<?> list = new ForEachList<>();
+                        list.add(x -> {
+                            if (terminal != null) {
+                                if (terminal.requiresMoreInput()) {
+                                    terminal.getDispatcher().callEvent(new NeedsMoreInput(terminal, m));
                                 }
                             }
-                        }
-                        return Optional.empty();
-                    });
-                    list.execute();
-                } else {
-                    if (m.getContent().equals("cm") || m.getContent().startsWith("cm"))
-                        m.getChannel().sendMessage("Use the bot channel to execute bot related commands");
+                            return Optional.empty();
+                        }).add(x -> {
+                            if (terminal == null) {
+                                if (m.getContent().startsWith("cm")) {
+                                    if (m.getContent().equals("cm help")) {
+                                        invoke(new Terminal(m.getUser(), bot, new terminalListener(), commandList), m);
+                                    } else {
+                                        terminalList.add(new Terminal(m.getUser(), bot, new terminalListener(), commandList));
+                                        if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
+                                            terminalList.remove(terminalList.size() - 1);
+                                        }
+
+                                    }
+                                }
+                            }
+                            return Optional.empty();
+                        });
+                        list.execute();
+                    } else {
+                        if (m.getContent().equals("cm") || m.getContent().startsWith("cm"))
+                            m.getChannel().sendMessage("Use the bot channel to execute bot related commands");
+                    }
                 }
             });
         }

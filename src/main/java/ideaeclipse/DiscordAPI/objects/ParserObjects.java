@@ -133,15 +133,23 @@ public class ParserObjects {
          */
         public MessageCreate(final IPrivateBot b, final Json payload) {
             this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
-            Json user = new Json(String.valueOf(payload.get("author")));
-            Payloads.DMessage m = ParserObjects.convertToPayload(payload, Payloads.DMessage.class);
-            DiscordUser.UserP pd = new DiscordUser.UserP(user, b).logic();
-            Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
-            message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, (m.content == null) ? "N/A" : m.content);
-            if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
-                logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
-            } else {
-                logger.info("Dm Sent: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n"));
+            if (payload.getMap() != null) {
+                Json user = null;
+                if (payload.get("author") != null)
+                    user = new Json(String.valueOf(payload.get("author")));
+                Payloads.DMessage m = ParserObjects.convertToPayload(payload, Payloads.DMessage.class);
+                DiscordUser.UserP pd;
+                if (user != null)
+                    pd = new DiscordUser.UserP(user, b).logic();
+                else
+                    pd = new DiscordUser.UserP(Long.parseUnsignedLong(String.valueOf(payload.get("id"))), b).logicId();
+                Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
+                message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, (m.content == null) ? "N/A" : m.content);
+                if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
+                    logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
+                } else {
+                    logger.info("Dm Sent: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n"));
+                }
             }
         }
 
