@@ -7,9 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.*;
 
-import static ideaeclipse.DiscordAPI.utils.DiscordUtils.HttpRequests.get;
-import static ideaeclipse.DiscordAPI.utils.DiscordUtils.HttpRequests.post;
-import static ideaeclipse.DiscordAPI.utils.DiscordUtils.HttpRequests.sendJson;
+import static ideaeclipse.DiscordAPI.utils.DiscordUtils.HttpRequests.*;
 import static ideaeclipse.DiscordAPI.utils.RateLimitRecorder.QueueHandler.*;
 
 public class RateLimitRecorder {
@@ -76,7 +74,8 @@ public class RateLimitRecorder {
         public enum RequestTypes {
             get,
             post,
-            sendJson
+            sendJson,
+            sendFile
         }
 
         public static class WebSocketEvent implements IQueueHandler {
@@ -99,17 +98,27 @@ public class RateLimitRecorder {
             private final RequestTypes type;
             private final String url;
             private final Json object;
+            private final String filePath;
+
+            public HttpEvent(final RequestTypes type, final String url, final String filePath) {
+                this.type = type;
+                this.url = url;
+                this.object = null;
+                this.filePath = filePath;
+            }
 
             public HttpEvent(final RequestTypes type, final String url, final Json object) {
                 this.type = type;
                 this.url = url;
                 this.object = object;
+                this.filePath = null;
             }
 
             public HttpEvent(final RequestTypes type, final String url) {
                 this.type = type;
                 this.url = url;
                 this.object = null;
+                this.filePath = null;
             }
 
             @Override
@@ -123,6 +132,9 @@ public class RateLimitRecorder {
                     case sendJson:
                         assert object != null;
                         return sendJson(url, object);
+                    case sendFile:
+                        assert filePath != null;
+                        return sendFile(url, filePath);
                 }
                 return null;
             }

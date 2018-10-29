@@ -1,4 +1,4 @@
-package DiscordBot.Data.Methods.proof;
+package DiscordBot.Data.Methods.math;
 
 import ideaeclipse.DiscordAPI.terminal.CustomTerminal;
 

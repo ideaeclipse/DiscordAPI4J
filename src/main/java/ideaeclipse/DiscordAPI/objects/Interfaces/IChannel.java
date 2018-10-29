@@ -14,5 +14,7 @@ public interface IChannel {
     Payloads.ChannelTypes getType();
 
     void sendMessage(final String messageContent);
+
+    void sendMessage(final String messageContent, String file);
 }
 

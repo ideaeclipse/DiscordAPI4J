@@ -1,5 +1,6 @@
 package ideaeclipse.DiscordAPI.objects;
 
+import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.AsyncUtility.AsyncList;
 import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IDiscordBot;
@@ -35,7 +36,7 @@ class TerminalManager {
     private final IDiscordBot bot;
     private final List<Terminal> terminalList;
     private final CommandList commandList;
-    final IChannel botChannel;
+    private final IChannel botChannel;
 
     /**
      * @param bot passes the bot to get properties
@@ -84,40 +85,41 @@ class TerminalManager {
     public class terminalMessageListener implements Listener {
         @EventHandler
         public void onMessageEvent(Message_Create create) {
-            IMessage m = create.getMessage();
-            Terminal terminal = getCurrentTerminal(m.getUser());
-            if (m.getChannel().getId().equals(Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).getId())) {
-                AsyncList<?> list = new ForEachList<>();
-                list.add(x -> {
-                    if (terminal != null) {
-                        if (terminal.requiresMoreInput()) {
-                            terminal.getDispatcher().callEvent(new NeedsMoreInput(terminal, m));
-                        }
-                    }
-                    return Optional.empty();
-                }).add(x -> {
-                    if (terminal == null) {
-                        if (m.getContent().startsWith("cm")) {
-                            if (m.getContent().equals("cm help")) {
-                                invoke(new Terminal(m.getUser(), bot, new terminalListener(), commandList), m);
-                            } else {
-                                terminalList.add(new Terminal(m.getUser(), bot, new terminalListener(), commandList));
-                                if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
-                                    terminalList.remove(terminalList.size() - 1);
-                                }
-
+            Async.blankThread(()->{
+                IMessage m = create.getMessage();
+                Terminal terminal = getCurrentTerminal(m.getUser());
+                if (m.getChannel().getId().equals(Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot")).getId())) {
+                    AsyncList<?> list = new ForEachList<>();
+                    list.add(x -> {
+                        if (terminal != null) {
+                            if (terminal.requiresMoreInput()) {
+                                terminal.getDispatcher().callEvent(new NeedsMoreInput(terminal, m));
                             }
                         }
-                    }
-                    return Optional.empty();
-                });
-                list.execute();
-            } else {
-                if (m.getContent().equals("cm") || m.getContent().startsWith("cm"))
-                    m.getChannel().sendMessage("Use the bot channel to execute bot related commands");
-            }
-        }
+                        return Optional.empty();
+                    }).add(x -> {
+                        if (terminal == null) {
+                            if (m.getContent().startsWith("cm")) {
+                                if (m.getContent().equals("cm help")) {
+                                    invoke(new Terminal(m.getUser(), bot, new terminalListener(), commandList), m);
+                                } else {
+                                    terminalList.add(new Terminal(m.getUser(), bot, new terminalListener(), commandList));
+                                    if (!invoke(terminalList.get(terminalList.size() - 1), m)) {
+                                        terminalList.remove(terminalList.size() - 1);
+                                    }
 
+                                }
+                            }
+                        }
+                        return Optional.empty();
+                    });
+                    list.execute();
+                } else {
+                    if (m.getContent().equals("cm") || m.getContent().startsWith("cm"))
+                        m.getChannel().sendMessage("Use the bot channel to execute bot related commands");
+                }
+            });
+        }
     }
 
     public class terminalListener implements Listener {

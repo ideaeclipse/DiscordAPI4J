@@ -70,6 +70,22 @@ class Channel implements IChannel {
         rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, "channels/" + id + "/messages", object));
     }
 
+    /**
+     * @param messageContent String containing the message you wish to send
+     */
+    public void sendMessage(String messageContent, String file) {
+        Json object = new Json();
+        messageContent = messageContent.replace("\n", "\\n");
+        object.put("content", messageContent);
+        object.put("file", "multipart/form-data");
+        Json url = new Json();
+        url.put("url", "attachment://" + file);
+        Json image = new Json();
+        image.put("image", url);
+        object.put("embed", image);
+        rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendFile, "channels/" + id + "/messages", file));
+    }
+
     @Override
     public String toString() {
         return "{Channel} Id: " + id + " Name: " + name + " Position: " + position + " Nsfw: " + nsfw + " ChannelType: " + type;

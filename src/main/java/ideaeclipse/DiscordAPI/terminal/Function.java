@@ -1,15 +1,13 @@
 package ideaeclipse.DiscordAPI.terminal;
 
+import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPI.terminal.listener.Commands.*;
 import ideaeclipse.DiscordAPI.terminal.listener.errors.WrongNumberOfArgs;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -107,17 +105,20 @@ class Function {
      * @param m      method you whish to envoke
      */
     private static void invoke(final Object object, final List<String> params, final Method m, final Terminal t) {
-        params.remove(0);
-        try {
-            Object[] convertedArgs = convertArgs(params, m.getParameterTypes(), t);
-            if (convertedArgs != null) {
-                Object r = m.invoke(object, convertArgs(params, m.getParameterTypes(), t));
-                if (r != null)
-                    t.getDispatcher().callEvent(new ProgramReturnValues(t, String.valueOf(r)));
+        Async.blankThread(() -> {
+            params.remove(0);
+            try {
+                Object[] convertedArgs = convertArgs(params, m.getParameterTypes(), t);
+                if (convertedArgs != null) {
+                    Object r = m.invoke(object, convertArgs(params, m.getParameterTypes(), t));
+                    if (r != null)
+                        t.getDispatcher().callEvent(new ProgramReturnValues(t, String.valueOf(r)));
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
             }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        });
+
     }
 
     /**
@@ -164,32 +165,34 @@ class Function {
          * @param d      default class
          */
         static void invoke(final Terminal t, final List<String> params, final Class<?> a, final Class<?> d) {
-            if (t.isAdmin()) {
-                List<Method> methods = Arrays
-                        .stream(a.getDeclaredMethods())
-                        .filter(o -> o.getName().toLowerCase().trim().equals(params.get(0).toLowerCase().trim()))
-                        .collect(Collectors.toList());
-                if (methods.size() > 0) {
-                    try {
-                        Function.invoke(a.getConstructors()[0].newInstance(t), params, methods.get(0), t);
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+            Async.blankThread(() -> {
+                if (t.isAdmin()) {
+                    List<Method> methods = Arrays
+                            .stream(a.getDeclaredMethods())
+                            .filter(o -> o.getName().toLowerCase().trim().equals(params.get(0).toLowerCase().trim()))
+                            .collect(Collectors.toList());
+                    if (methods.size() > 0) {
+                        try {
+                            Function.invoke(a.getConstructors()[0].newInstance(t), params, methods.get(0), t);
+                        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
-            if (params.size() >= 1) {
-                List<Method> methods = Arrays
-                        .stream(d.getDeclaredMethods())
-                        .filter(o -> o.getName().toLowerCase().trim().equals(params.get(0).toLowerCase().trim()))
-                        .collect(Collectors.toList());
-                if (methods.size() > 0) {
-                    try {
-                        Function.invoke(d.getConstructors()[0].newInstance(t), params, methods.get(0), t);
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
+                if (params.size() >= 1) {
+                    List<Method> methods = Arrays
+                            .stream(d.getDeclaredMethods())
+                            .filter(o -> o.getName().toLowerCase().trim().equals(params.get(0).toLowerCase().trim()))
+                            .collect(Collectors.toList());
+                    if (methods.size() > 0) {
+                        try {
+                            Function.invoke(d.getConstructors()[0].newInstance(t), params, methods.get(0), t);
+                        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
+            });
         }
 
         /**

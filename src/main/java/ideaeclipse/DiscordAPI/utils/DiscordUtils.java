@@ -6,15 +6,19 @@ import ideaeclipse.DiscordAPI.objects.Interfaces.IRole;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IUser;
 import ideaeclipse.DiscordAPI.objects.Payloads;
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.customLogger.CustomLogger;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.Collectors;
 
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.*;
 
@@ -31,7 +35,7 @@ public class DiscordUtils {
      * @author ideaeclipse
      */
 
-    public static class CustomTerminal{
+    public static class CustomTerminal {
         public static ArrayList<String> convert(Class<?>[] m) {
             ArrayList<String> data = new ArrayList<>();
             for (Class<?> c : m) {
@@ -40,6 +44,7 @@ public class DiscordUtils {
             return data;
         }
     }
+
     /**
      * This class is used to Handle all Http Api Requests
      *
@@ -120,13 +125,45 @@ public class DiscordUtils {
                 con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 con.setRequestProperty("Accept", "application/json");
                 OutputStream os = con.getOutputStream();
-                os.write(object.toString().getBytes("UTF-8"));
+                os.write(object.toString().getBytes(StandardCharsets.UTF_8));
                 os.close();
                 return printOutput(con.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+            return null;
+        }
+
+        static Object sendFile(final String url, final String fileName) {
+            File file = new File(fileName);
+            if (file.exists()) {
+                try {
+                    String attachmentName = fileName.substring(0, fileName.indexOf('.'));
+                    String attachmentFileName = file.getName();
+                    String crlf = "\r\n";
+                    String twoHyphens = "--";
+                    String boundary = "*****";
+                    HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                    con.setDoOutput(true);
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Connection", "Keep-Alive");
+                    con.setRequestProperty("Cache-Control", "no-cache");
+                    con.setRequestProperty("Content-type", "multipart/form-data;boundary=" + boundary);
+                    DataOutputStream request = new DataOutputStream(con.getOutputStream());
+                    request.writeBytes(twoHyphens + boundary + crlf);
+                    request.writeBytes("Content-Disposition: form-data; name=\"" + attachmentName + "\";filename=\"" + attachmentFileName + "\"" + crlf);
+                    request.writeBytes(crlf);
+                    request.write(Files.readAllBytes(file.toPath()));
+                    request.writeBytes(crlf);
+                    request.writeBytes(twoHyphens + boundary + twoHyphens + crlf);
+                    request.flush();
+                    request.close();
+                    return printOutput(con.getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             return null;
         }
 
@@ -162,16 +199,11 @@ public class DiscordUtils {
 
     public static class Search {
         public static IChannel CHANNEL(final List<IChannel> channels, final String channelName) {
-
-            for (IChannel channel : channels) {
-                if (channel.getType().equals(Payloads.ChannelTypes.textChannel)) {
-                    if (channel.getName().toLowerCase().equals(channelName.toLowerCase())) {
-                        return channel;
-                    }
-                }
-            }
-
-            return null;
+            List<IChannel> channelSet = channels.stream().filter(o -> o.getType().equals(Payloads.ChannelTypes.textChannel) && o.getName().toLowerCase().equals(channelName.toLowerCase())).collect(Collectors.toList());
+            if (!channelSet.isEmpty())
+                return channelSet.get(0);
+            else
+                return null;
         }
 
         public static IChannel VOICECHANNEL(final List<IChannel> channels, final String channelName) {
@@ -252,7 +284,7 @@ public class DiscordUtils {
         public static final String ROLE = "/roles";
         public static final String USERME = USER + "@me";
 
-        static final String httpErrorFormat = "Discord Http API Responsed with error code: %code";
+        static final String httpErrorFormat = "Discord Http API Responded with error code: %code";
     }
 
     static class Exceptions {

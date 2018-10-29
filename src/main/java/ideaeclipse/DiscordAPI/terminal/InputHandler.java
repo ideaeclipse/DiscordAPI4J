@@ -49,26 +49,26 @@ class InputHandler {
                 }
                 break;
             default:
-                if (words.size() == 2) {
-                    Optional<Class<?>> optionalClass = getRequestedClass(t.getCommandList().getCommandMap(), words.get(0), words.get(1));
-                    if (optionalClass.isPresent()) {
-                        this.function = new Function(optionalClass.get(), t);
-                        t.changeStatus(true);
-                        return true;
-                    }
-                    t.getDispatcher().callEvent(new InvalidCommand(t));
-                } else if (words.size() >= 2) {
-                    List<String> params = words;
-                    Objects.requireNonNull(getRequestedClass(t.getCommandList().getCommandMap(), words.get(0), words.get(1))).ifPresent(aClass -> {
-                        params.remove(0);
-                        params.remove(0);
-                        function = new Function(aClass, t, params);
-                        t.changeStatus(true);
-                    });
-                    return true;
+                if (Function.generic.isGenericCommand(words.get(0), a, d)) {
+                    Function.generic.invoke(t, words, a, d);
                 } else {
-                    if (Function.generic.isGenericCommand(words.get(0), a, d)) {
-                        Function.generic.invoke(t, words, a, d);
+                    if (words.size() == 2) {
+                        Optional<Class<?>> optionalClass = getRequestedClass(t.getCommandList().getCommandMap(), words.get(0), words.get(1));
+                        if (optionalClass.isPresent()) {
+                            this.function = new Function(optionalClass.get(), t);
+                            t.changeStatus(true);
+                            return true;
+                        }
+                        t.getDispatcher().callEvent(new InvalidCommand(t));
+                    } else if (words.size() >= 2) {
+                        List<String> params = words;
+                        Objects.requireNonNull(getRequestedClass(t.getCommandList().getCommandMap(), words.get(0), words.get(1))).ifPresent(aClass -> {
+                            params.remove(0);
+                            params.remove(0);
+                            function = new Function(aClass, t, params);
+                            t.changeStatus(true);
+                        });
+                        return true;
                     }
                 }
                 break;
