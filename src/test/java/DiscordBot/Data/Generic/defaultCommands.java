@@ -35,7 +35,7 @@ public class defaultCommands {
 
     public String equation(String eq) {
         if (!eq.equals("help")) {
-            LatexConverter converter = new LatexConverter("latexTemp", "C:\\Program Files\\MikTex 2.9\\miktex\\bin\\x64\\pdflatex.exe");
+            LatexConverter converter = new LatexConverter("latexTemp", System.getProperty("os.name").toLowerCase().contains("windows")?"C:\\Program Files\\MikTex 2.9\\miktex\\bin\\x64\\pdflatex.exe":"pdflatex");
             eq = eq.replaceAll("\\\\\\\\", "\\\\");
             try {
                 DiscordUtils.Search.CHANNEL(Main.bot.getChannels(), "bot").sendMessage("Test", converter.convert(eq));
