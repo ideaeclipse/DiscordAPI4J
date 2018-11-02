@@ -85,7 +85,11 @@ public class CommandList {
                     if (entry.getName().startsWith(directory) && entry.getName().endsWith(".class")) {
                         try {
                             String temp = entry.getName().substring(directory.length() + 1);
-                            String subCommand = temp.substring(0,temp.indexOf('/'));
+                            String subCommand;
+                            if (temp.indexOf('/') > 0)
+                                subCommand = temp.substring(0, temp.indexOf('/'));
+                            else
+                                subCommand = temp.substring(temp.indexOf('/') + 1).replace(".class", "");
                             Class<?> aClass = newClassLoader.loadClass(entry.getName().replace('/', '.').replace(".class", ""));
                             if (map.get(subCommand) != null)
                                 map.get(subCommand).add(aClass);
