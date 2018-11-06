@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
  * @see InputHandler
  */
 class Function {
-    private Class<?> c, a, d;
     private final Terminal t;
+    private Class<?> c, a, d;
     private Object object;
 
     /**

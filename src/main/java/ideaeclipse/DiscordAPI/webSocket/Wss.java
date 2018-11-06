@@ -33,10 +33,7 @@ public class Wss extends WebSocketFactory {
     private final WebSocket webSocket;
 
     public Wss(final IPrivateBot bot) throws IOException, WebSocketException {
-        this.logger = new CustomLogger(this.getClass(),bot.getLoggerManager());
-        if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(Level.DEBUG);
-        }
+        this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         wss = this;
         webSocket = this
                 .setConnectionTimeout(5000)
@@ -90,7 +87,7 @@ public class Wss extends WebSocketFactory {
                                 logger.info("Received initial Message");
                                 w = ParserObjects.convertToPayload(g.d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
-                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new TextHeartBeat(wss, w.heartbeat_interval,bot.getLoggerManager()));
+                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new TextHeartBeat(wss, w.heartbeat_interval, bot.getLoggerManager()));
                                 startTime = System.currentTimeMillis();
                                 heartbeat.start();
                                 sendText(bot.getIdentity());

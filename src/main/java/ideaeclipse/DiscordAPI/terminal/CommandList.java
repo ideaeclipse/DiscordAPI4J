@@ -57,14 +57,18 @@ public class CommandList {
                     if (file1.listFiles() != null) {
                         for (File file2 : Objects.requireNonNull(file1.listFiles())) {
                             try {
-                                classes.add(newClassLoader.loadClass(directory + "." + subDirectory + "." + file2.getName().replace(".class", "")));
+                                Class<?> command = newClassLoader.loadClass(directory + "." + subDirectory + "." + file2.getName().replace(".class", ""));
+                                if (command.getSuperclass().equals(CustomTerminal.class))
+                                    classes.add(command);
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
                             }
                         }
                     } else {
                         try {
-                            classes.add(newClassLoader.loadClass(directory + "." + file1.getName().replace(".class", "")));
+                            Class<?> command = newClassLoader.loadClass(directory + "." + file1.getName().replace(".class", ""));
+                            if (command.getSuperclass().equals(CustomTerminal.class))
+                                classes.add(command);
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -91,12 +95,15 @@ public class CommandList {
                             else
                                 subCommand = temp.substring(temp.indexOf('/') + 1).replace(".class", "");
                             Class<?> aClass = newClassLoader.loadClass(entry.getName().replace('/', '.').replace(".class", ""));
-                            if (map.get(subCommand) != null)
-                                map.get(subCommand).add(aClass);
-                            else {
-                                List<Class<?>> classes = new LinkedList<>();
-                                classes.add(aClass);
-                                map.put(subCommand, classes);
+                            if (map.get(subCommand) != null) {
+                                if (aClass.getSuperclass().equals(CustomTerminal.class))
+                                    map.get(subCommand).add(aClass);
+                            } else {
+                                if (aClass.getSuperclass().equals(CustomTerminal.class)) {
+                                    List<Class<?>> classes = new LinkedList<>();
+                                    classes.add(aClass);
+                                    map.put(subCommand, classes);
+                                }
                             }
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();

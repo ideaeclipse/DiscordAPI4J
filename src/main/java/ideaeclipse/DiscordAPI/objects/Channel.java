@@ -1,8 +1,12 @@
 package ideaeclipse.DiscordAPI.objects;
 
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
+import ideaeclipse.DiscordAPI.objects.Interfaces.IMessage;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.Parser;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.CHANNEL;
 import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRecorder;
@@ -21,6 +25,7 @@ class Channel implements IChannel {
     private final Integer position;
     private final Boolean nsfw;
     private final Payloads.ChannelTypes type;
+    private final List<IMessage> messageHistory;
 
     /**
      * Channel is only created using Payloads.DChannel {@link ideaeclipse.DiscordAPI.objects.Payloads.DChannel}
@@ -37,31 +42,44 @@ class Channel implements IChannel {
         this.position = position;
         this.nsfw = nsfw;
         this.type = type;
+        this.messageHistory = new LinkedList<>();
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public Integer getPosition() {
         return position;
     }
 
+    @Override
     public Boolean getNsfw() {
         return nsfw;
     }
 
+    @Override
     public Payloads.ChannelTypes getType() {
         return type;
     }
 
+    @Override
+    public List<IMessage> messageHistory() {
+        return this.messageHistory;
+    }
+
+
     /**
      * @param messageContent String containing the message you wish to send
      */
+    @Override
     public void sendMessage(String messageContent) {
         Json object = new Json();
         messageContent = messageContent.replace("\n", "\\n");
@@ -73,10 +91,10 @@ class Channel implements IChannel {
     /**
      * @param messageContent String containing the message you wish to send
      */
-    public void sendMessage(String messageContent, String file) {
+    @Override
+    public void sendMessage(final String messageContent, final String file) {
         Json object = new Json();
-        messageContent = messageContent.replace("\n", "\\n");
-        object.put("content", messageContent);
+        object.put("content", messageContent.replace("\n", "\\n"));
         object.put("file", "multipart/form-data");
         Json url = new Json();
         url.put("url", "attachment://" + file);

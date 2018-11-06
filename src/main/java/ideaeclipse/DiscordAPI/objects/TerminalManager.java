@@ -15,7 +15,6 @@ import ideaeclipse.DiscordAPI.terminal.listener.errors.*;
 import ideaeclipse.DiscordAPI.terminal.listener.terminal.NeedsMoreInput;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.customLogger.CustomLogger;
-import ideaeclipse.customLogger.Level;
 import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
 
@@ -45,9 +44,6 @@ class TerminalManager {
         this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         logger.info("Starting terminal Manager");
         this.commandList = new CommandList(bot);
-        if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(Level.DEBUG);
-        }
         this.bot = bot;
         terminalList = new LinkedList<>();
         this.botChannel = Objects.requireNonNull(DiscordUtils.Search.CHANNEL(bot.getChannels(), "bot"));

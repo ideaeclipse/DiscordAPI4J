@@ -62,13 +62,15 @@ class InputHandler {
                         t.getDispatcher().callEvent(new InvalidCommand(t));
                     } else if (words.size() >= 2) {
                         List<String> params = words;
-                        Objects.requireNonNull(getRequestedClass(t.getCommandList().getCommandMap(), words.get(0), words.get(1))).ifPresent(aClass -> {
+                        Optional<Class<?>> optionalClass = getRequestedClass(t.getCommandList().getCommandMap(), words.get(0), words.get(1));
+                        if (optionalClass.isPresent()) {
                             params.remove(0);
                             params.remove(0);
-                            function = new Function(aClass, t, params);
+                            function = new Function(optionalClass.get(), t, params);
                             t.changeStatus(true);
-                        });
-                        return true;
+                            return true;
+                        }
+                        return false;
                     }
                 }
                 break;

@@ -10,4 +10,6 @@ public interface IMessage {
     Long getGuildId();
 
     String getContent();
+
+    Long getMessageId();
 }

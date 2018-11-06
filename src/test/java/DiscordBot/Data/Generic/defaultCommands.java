@@ -1,13 +1,14 @@
 package DiscordBot.Data.Generic;
 
 import DiscordBot.Main;
+import ideaeclipse.DiscordAPI.terminal.CustomTerminal;
 import ideaeclipse.DiscordAPI.terminal.Terminal;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.latexConverter.LatexConverter;
 
 import java.io.IOException;
 
-public class defaultCommands {
+public class defaultCommands extends CustomTerminal {
     private Terminal t;
 
     public defaultCommands(Terminal t) {
@@ -107,5 +108,10 @@ public class defaultCommands {
             return info.toString();
         }
         return null;
+    }
+
+    @Override
+    public void done() {
+
     }
 }
