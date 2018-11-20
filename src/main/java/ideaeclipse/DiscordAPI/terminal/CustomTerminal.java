@@ -1,5 +1,5 @@
 package ideaeclipse.DiscordAPI.terminal;
 
-public interface CustomTerminal {
-    void done();
+public abstract class CustomTerminal {
+    public abstract void done();
 }

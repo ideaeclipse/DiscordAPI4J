@@ -5,6 +5,7 @@ import ideaeclipse.AsyncUtility.ForEachList;
 import ideaeclipse.DiscordAPI.IPrivateBot;
 import ideaeclipse.DiscordAPI.listener.discordApiListener.Channel_Create;
 import ideaeclipse.DiscordAPI.objects.Interfaces.IChannel;
+import ideaeclipse.DiscordAPI.objects.Interfaces.IReaction;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.customLogger.CustomLogger;
@@ -15,6 +16,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**
@@ -144,7 +146,8 @@ public class ParserObjects {
                 else
                     pd = new DiscordUser.UserP(Long.parseUnsignedLong(String.valueOf(payload.get("id"))), b).logicId();
                 Channel.ChannelP cd = new Channel.ChannelP(m.channel_id).logic();
-                message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, (m.content == null) ? "N/A" : m.content);
+                message = new Message(pd.getUser(), cd.getChannel(), m.guild_id, (m.content == null) ? "N/A" : m.content, m.id);
+                DiscordUtils.Search.CHANNEL(b.getChannels(), message.getChannel().getName()).messageHistory().add(message);
                 if (message.getChannel().getType().equals(Payloads.ChannelTypes.textChannel)) {
                     logger.info("Message Create: DiscordUser: " + message.getUser().getName() + " Content: " + message.getContent().replace("\n", "\\n") + " Channel: " + message.getChannel().getName());
                 } else {
@@ -184,6 +187,29 @@ public class ParserObjects {
 
         public User getUser() {
             return user;
+        }
+    }
+
+    /**
+     * Adds a reaction object to the designated message in the message history of the channel object
+     *
+     * @author Ideaeclipse
+     * @see Channel
+     * @see Message
+     * {@link Channel#messageHistory()}
+     */
+    public static class ReactionAdd {
+        private final CustomLogger logger;
+        private final IReaction reaction;
+
+        public ReactionAdd(final IPrivateBot b, final Json payload) {
+            this.logger = new CustomLogger(this.getClass(), b.getLoggerManager());
+            this.reaction = new Reaction.ReactionP(b, payload).logic().getReaction();
+            this.logger.info("Reaction Add: Channel: " + this.reaction.getChannel() + " Message: " + this.reaction.getMessage() + " Emoji: " + this.reaction.getEmoji() + " Emoji Text: " + this.reaction.getEmojiText());
+        }
+
+        public IReaction getReaction() {
+            return reaction;
         }
     }
 
@@ -288,14 +314,14 @@ public class ParserObjects {
                         list.add(convert(value.substring(0, indexes.get(i)).trim(), c));
                     } else if (i == indexes.size() - 1) {
                         list.add(convert(value.substring(indexes.get(i - 1), indexes.get(i)).trim(), c));
-                        list.add(convert(value.substring(indexes.get(i), value.length()).trim(), c));
+                        list.add(convert(value.substring(indexes.get(i)).trim(), c));
                     } else {
                         list.add(convert(value.substring(indexes.get(i - 1), indexes.get(i)).trim(), c));
                     }
                 }
             } else if (indexes.size() == 1) {
                 list.add(convert(value.substring(0, indexes.get(0)).trim(), c));
-                list.add(convert(value.substring(indexes.get(0) + 1, value.length()).trim(), c));
+                list.add(convert(value.substring(indexes.get(0) + 1).trim(), c));
             }
         } else {
             if (value.length() > 0) {

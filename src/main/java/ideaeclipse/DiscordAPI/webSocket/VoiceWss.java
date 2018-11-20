@@ -33,9 +33,6 @@ public class VoiceWss extends WebSocketFactory {
         this.bot = bot;
         this.initialServerUpdate = vServerUpdate;
         this.initialStateUpdate = vStateUpdate;
-        if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(Level.DEBUG);
-        }
         webSocket = this
                 .setConnectionTimeout(5000)
                 .createSocket("ws://" + endpoint + "?v=3")

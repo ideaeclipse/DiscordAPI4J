@@ -15,6 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * This is an individual terminal instance, every time a custom command gets entered an instance of this object is stored for the specific user that sent the command
+ *
+ *
+ * @author Ideaeclipse
+ */
 public class Terminal {
     private final IDiscordBot bot;
     private final EventManager dispatcher;

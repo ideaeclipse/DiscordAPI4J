@@ -1,8 +1,8 @@
-package DiscordBot.Data.Methods.proof;
+package DiscordBot.Data.Methods.included;
 
 import ideaeclipse.DiscordAPI.terminal.CustomTerminal;
 
-public class Dog implements CustomTerminal {
+public class Dog extends CustomTerminal {
     private String name;
     private int age;
     public Dog() {

@@ -1,10 +1,11 @@
-package DiscordBot.Data.Methods.search;
+package DiscordBot.Data.Methods.included;
 
+import ideaeclipse.DiscordAPI.terminal.CustomTerminal;
 import ideaeclipse.DuckDuckGoAPI4j.Search;
 
 import java.io.IOException;
 
-public class DuckDuckGo {
+public class DuckDuckGo extends CustomTerminal {
 
     public String search(String parameters) {
         try {
@@ -15,5 +16,10 @@ public class DuckDuckGo {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public void done() {
+
     }
 }

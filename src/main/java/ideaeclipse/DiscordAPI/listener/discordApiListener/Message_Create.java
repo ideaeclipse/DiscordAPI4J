@@ -23,7 +23,7 @@ public class Message_Create extends Event {
      * Initialized using Java reflection
      *
      * @param b       passed to super Used when user adds a listener event
-     * @param payload the 'd' param from the message from the webscoekt
+     * @param payload the 'd' param from the message from the websocket
      * @see Wss under case Dispatch
      */
     public Message_Create(final IPrivateBot b, final Json payload) {

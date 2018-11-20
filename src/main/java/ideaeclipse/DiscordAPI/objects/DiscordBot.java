@@ -61,18 +61,15 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
      * @param guildID Guild id (Right click server and hit copy id)
      */
     DiscordBot(final String token, final Listener listener, final long guildID) {
-        this.loggerManager = new LoggerManager(System.getProperty("user.dir") + "/logs/");
-        this.logger = new CustomLogger(this.getClass(), loggerManager);
         properties = new Properties(new String[]{"adminUser", "adminGroup", "commandsDirectory", "genericDirectory", "adminFileDir", "defaultFileDirectory", "useTerminal", "debug"});
         try {
             properties.start();
         } catch (IOException e) {
-            logger.error("Couldn't start properties manager therefor the bot can't start");
+            System.exit(-1);
         }
+        this.loggerManager = new LoggerManager(System.getProperty("user.dir") + "/logs/",  getProperties().getProperty("debug").equals("true") ? Level.DEBUG : Level.INFO);
+        this.logger = new CustomLogger(this.getClass(), loggerManager);
         DiscordUtils.DefaultLinks.bot = this;
-        if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(Level.DEBUG);
-        }
         DiscordUtils.DefaultLinks.token = token;
         this.identity = buildIdentity();
         logger.info("Starting Rate Limit Monitor");

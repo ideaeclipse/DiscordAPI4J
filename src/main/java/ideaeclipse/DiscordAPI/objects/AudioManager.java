@@ -36,9 +36,6 @@ public class AudioManager {
      */
     AudioManager(final DiscordBot bot) {
         this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
-        if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(Level.DEBUG);
-        }
         this.lock = new Object();
         this.bot = bot;
     }

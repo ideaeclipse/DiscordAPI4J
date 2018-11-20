@@ -9,7 +9,7 @@ import ideaeclipse.JsonUtilities.Json;
 import java.util.List;
 
 /**
- * This class is used for {@link ParserObjects.convertToPayload(Json, Class)}
+ * This class is used for {@link ParserObjects#convertToPayload(Json, Class)}
  * and will return the class you passed to the method
  *
  * @author Ideaeclipse
@@ -52,6 +52,24 @@ public class Payloads {
         public String content;
 
         public DMessage() {
+
+        }
+    }
+
+    public static class DReactionAdd {
+        public Long channel_id;
+        public Long message_id;
+        public Json emoji;
+
+        public DReactionAdd() {
+
+        }
+    }
+
+    public static class DEmoji {
+        public String name;
+
+        public DEmoji() {
 
         }
     }

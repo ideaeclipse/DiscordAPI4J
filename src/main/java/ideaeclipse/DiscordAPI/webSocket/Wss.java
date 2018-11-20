@@ -10,10 +10,9 @@ import ideaeclipse.DiscordAPI.objects.ParserObjects;
 import ideaeclipse.DiscordAPI.objects.Payloads;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.DiscordAPI.utils.RateLimitRecorder;
-import ideaeclipse.DiscordAPI.utils.TextHeartBeat;
+import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.customLogger.CustomLogger;
-import ideaeclipse.customLogger.Level;
 import ideaeclipse.reflectionListener.Event;
 
 import java.io.IOException;
@@ -26,18 +25,11 @@ import static ideaeclipse.DiscordAPI.utils.DiscordUtils.DefaultLinks.rateLimitRe
 public class Wss extends WebSocketFactory {
     private final CustomLogger logger;
     private final Object lock = new Object();
-    private Thread heartbeat;
     private Payloads.DWelcome w;
-    private Long startTime;
-    private Wss wss;
     private final WebSocket webSocket;
 
     public Wss(final IPrivateBot bot) throws IOException, WebSocketException {
-        this.logger = new CustomLogger(this.getClass(),bot.getLoggerManager());
-        if (bot.getProperties().getProperty("debug").equals("true")) {
-            logger.setLevel(Level.DEBUG);
-        }
-        wss = this;
+        this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         webSocket = this
                 .setConnectionTimeout(5000)
                 .createSocket(DiscordUtils.DefaultLinks.WEBSOCKET)
@@ -90,9 +82,11 @@ public class Wss extends WebSocketFactory {
                                 logger.info("Received initial Message");
                                 w = ParserObjects.convertToPayload(g.d, Payloads.DWelcome.class);
                                 logger.info("Sending HeartBeast task every: " + w.heartbeat_interval + " milliseconds");
-                                heartbeat = DiscordUtils.createDaemonThreadFactory("Heartbeat").newThread(new TextHeartBeat(wss, w.heartbeat_interval,bot.getLoggerManager()));
-                                startTime = System.currentTimeMillis();
-                                heartbeat.start();
+                                Async.addJob(o -> {
+                                    Json object = Builder.buildPayload(TextOpCodes.Heartbeat.ordinal(), 251);
+                                    sendText(object);
+                                    return Optional.empty();
+                                }, w.heartbeat_interval);
                                 sendText(bot.getIdentity());
                                 synchronized (lock) {
                                     lock.notify();
@@ -100,13 +94,6 @@ public class Wss extends WebSocketFactory {
                                 break;
                             case HeartBeat_ACK:
                                 logger.debug("Alive");
-                                if (heartbeat.isAlive()) {
-                                    if ((System.currentTimeMillis() - startTime > (w.heartbeat_interval + 5000)) && heartbeat.isAlive()) {
-                                        heartbeat.interrupt();
-                                        logger.error("Heartbeat return took to long");
-                                    }
-                                    startTime = System.currentTimeMillis();
-                                }
                                 break;
                         }
                     }

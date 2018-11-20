@@ -7,7 +7,7 @@ public class Main {
     public static IDiscordBot bot;
 
     private Main(String token, Long guildId) {
-        bot = new DiscordBotBuilder(token, null, guildId).login();
+        bot = new DiscordBotBuilder(token, new EventClass(), guildId).login();
     }
 
     public static void main(String[] args) {

@@ -14,6 +14,7 @@ class Message implements IMessage {
     private final IChannel channel;
     private final Long guildId;
     private final String content;
+    private final Long messageId;
 
     /**
      * @param user    DiscordUser who sent the message
@@ -21,26 +22,41 @@ class Message implements IMessage {
      * @param guildId guildId
      * @param content contents of the message
      */
-    Message(final IDiscordUser user, final IChannel channel, final Long guildId, final String content) {
+    Message(final IDiscordUser user, final IChannel channel, final Long guildId, final String content, final Long messageId) {
         this.user = user;
         this.channel = channel;
         this.guildId = guildId;
         this.content = content;
+        this.messageId = messageId;
     }
 
+    @Override
     public IChannel getChannel() {
         return channel;
     }
 
+    @Override
     public IDiscordUser getUser() {
         return user;
     }
 
+    @Override
     public Long getGuildId() {
         return guildId;
     }
 
+    @Override
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public Long getMessageId() {
+        return this.messageId;
+    }
+
+    @Override
+    public String toString() {
+        return "{Message} User: " + user.getName() + " id: " + getMessageId() + " content: " + getContent();
     }
 }
