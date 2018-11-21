@@ -7,7 +7,9 @@ import ideaeclipse.reflectionListener.Listener;
 
 public class EventClass implements Listener {
     @EventHandler
-    public void event2(Message_Update create) {
-        //System.out.println("This bitch is an updated content message: " + create.getMessage().getContent());
+    public void event2(Message_Create create) {
+        if(create.getMessage().getContent().equals("ping")){
+            create.getMessage().getChannel().sendMessage("pong");
+        }
     }
 }

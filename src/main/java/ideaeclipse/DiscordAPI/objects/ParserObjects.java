@@ -268,7 +268,7 @@ public class ParserObjects {
                     } catch (NoSuchFieldException ignored) {
                         Thread.currentThread().interrupt();
                     }
-                    String value = String.valueOf(object.get((String) s));
+                    String value = String.valueOf(object.get(String.valueOf(s)));
                     if (value.equals("null")) {
                         value = null;
                     }
@@ -281,7 +281,7 @@ public class ParserObjects {
                         } else if (f.getType().equals(Game.class)) {
                             f.set(o, value != null ? new Game.GameP(new Json(value)).logic().getGame() : null);
                         } else if (f.getType().equals(Json.class)) {
-                            f.set(o, value != null ? new Json(value) : null);
+                            f.set(o, value != null && value.startsWith("{") ? new Json(value) : null);
                         } else if (f.getType().isEnum()) {
                             f.set(o, value != null ? f.getType().getEnumConstants()[Integer.parseInt(value)] : null);
                         } else {
@@ -332,7 +332,12 @@ public class ParserObjects {
     }
 
     private static <T> T convert(Object value, Class<T> c) {
-        final String s = String.valueOf(value);
+        String s = String.valueOf(value);
+        if (s.length() > 1) {
+            if (s.charAt(0) == '\"') {
+                s = s.substring(1, s.length() - 2);
+            }
+        }
         Object convertedValue = null;
         if (c != null) {
             if (c.equals(String.class)) {

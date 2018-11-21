@@ -82,7 +82,7 @@ class Channel implements IChannel {
     @Override
     public void sendMessage(String messageContent) {
         Json object = new Json();
-        messageContent = messageContent.replace("\n", "\\n");
+        //messageContent = messageContent.replace("\n", "\\n");
         object.put("content", messageContent);
         object.put("file", "file");
         rateLimitRecorder.queue(new HttpEvent(RequestTypes.sendJson, "channels/" + id + "/messages", object));

@@ -89,7 +89,7 @@ class DiscordUser implements IDiscordUser {
             String s = String.valueOf(rateLimitRecorder.queue(new HttpEvent(RequestTypes.get, GUILD + bot.getGuildId() + MEMBER + "/" + id)));
             if (!s.equals("null")) {
                 object = new Json(s);
-                Payloads.DUser u = ParserObjects.convertToPayload(new Json((String) object.get("user")), Payloads.DUser.class);
+                Payloads.DUser u = ParserObjects.convertToPayload(new Json(String.valueOf(object.get("user"))), Payloads.DUser.class);
                 user = new DiscordUser(u.id, u.username, u.discriminator, bot);
             }
             return this;
