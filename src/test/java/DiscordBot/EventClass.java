@@ -1,9 +1,8 @@
 package DiscordBot;
 
 import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Create;
-import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Update;
-import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
+import ideaeclipse.reflectionListener.annotations.EventHandler;
 
 public class EventClass implements Listener {
     @EventHandler

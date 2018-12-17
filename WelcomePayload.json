@@ -1,0 +1,25 @@
+{
+  "op": 2,
+  "d": {
+    "shards": [
+      0,
+      1
+    ],
+    "compress": true,
+    "presence": {
+      "game": {
+        "name": "cm help for commands",
+        "type": 0
+      },
+      "afk": false,
+      "status": "online"
+    },
+    "large_threshold": 250,
+    "properties": {
+      "$device": "D4J",
+      "$os": "Windows 10",
+      "$browser": "D4J"
+    },
+    "token": "?token"
+  }
+}
