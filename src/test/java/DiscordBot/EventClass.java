@@ -1,13 +1,14 @@
 package DiscordBot;
 
 import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Create;
-import ideaeclipse.DiscordAPI.listener.discordApiListener.Message_Update;
-import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
+import ideaeclipse.reflectionListener.annotations.EventHandler;
 
 public class EventClass implements Listener {
     @EventHandler
-    public void event2(Message_Update create) {
-        //System.out.println("This bitch is an updated content message: " + create.getMessage().getContent());
+    public void event2(Message_Create create) {
+        if(create.getMessage().getContent().equals("ping")){
+            create.getMessage().getChannel().sendMessage("pong");
+        }
     }
 }

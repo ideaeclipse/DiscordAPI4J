@@ -1,0 +1,24 @@
+Projects: Discord, WebhookManager, videoStreamer, javahttpserver.
+
+Discord:
+	Rewrite entire util.
+	Make it more privatized. Don't allow any shit brother.
+	Make a system that allows for json validation before execution. If not return a valid "invalid" response apon request.
+	Start by writing a list of json inputs. write what is required for them to be valid. There is also a second route of requesting additional input if the input is shit.
+
+WebhookManager:
+	clean up code.
+	comment.
+	make sure it works. and isn't shit.
+	
+Video streamer.
+	Buy a raspberry pi.
+	Buy a usb camera.
+	Get the stream.
+	Write a socket that get accept video data.
+	Replay the stream over the network.
+	Make it playable in the web. EZ
+	
+JavaServer.
+	Work on cleanup.
+	ssl, cause thats important.

@@ -22,6 +22,7 @@ import ideaeclipse.customLogger.Level;
 import ideaeclipse.customLogger.LoggerManager;
 import ideaeclipse.reflectionListener.EventManager;
 import ideaeclipse.reflectionListener.Listener;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
         } catch (IOException e) {
             System.exit(-1);
         }
-        this.loggerManager = new LoggerManager(System.getProperty("user.dir") + "/logs/",  getProperties().getProperty("debug").equals("true") ? Level.DEBUG : Level.INFO);
+        this.loggerManager = new LoggerManager(System.getProperty("user.dir") + "/logs/", getProperties().getProperty("debug").equals("true") ? Level.DEBUG : Level.INFO);
         this.logger = new CustomLogger(this.getClass(), loggerManager);
         DiscordUtils.DefaultLinks.bot = this;
         DiscordUtils.DefaultLinks.token = token;
@@ -178,7 +179,10 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
 
     @Override
     public Json getIdentity() {
-        return Builder.buildPayload(TextOpCodes.Identify.ordinal(), this.identity);
+        Json json = new Json();
+        json.put("op",TextOpCodes.Identify.ordinal());
+        json.put("d",new JSONObject(this.identity.toString()));
+        return json;
     }
 
     @Override

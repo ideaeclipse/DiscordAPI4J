@@ -15,8 +15,8 @@ import ideaeclipse.DiscordAPI.terminal.listener.errors.*;
 import ideaeclipse.DiscordAPI.terminal.listener.terminal.NeedsMoreInput;
 import ideaeclipse.DiscordAPI.utils.DiscordUtils;
 import ideaeclipse.customLogger.CustomLogger;
-import ideaeclipse.reflectionListener.EventHandler;
 import ideaeclipse.reflectionListener.Listener;
+import ideaeclipse.reflectionListener.annotations.EventHandler;
 
 import java.util.LinkedList;
 import java.util.List;
