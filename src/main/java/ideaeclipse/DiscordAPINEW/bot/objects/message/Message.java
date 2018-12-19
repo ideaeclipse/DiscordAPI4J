@@ -12,6 +12,7 @@ public class Message implements IMessage {
         this.content = content;
         this.channel = channel;
         this.user = user;
+        System.out.println(toString());
     }
 
     @Override
@@ -27,5 +28,10 @@ public class Message implements IMessage {
     @Override
     public IDiscordUser getUser() {
         return this.user;
+    }
+
+    @Override
+    public String toString() {
+        return (this.user != null ? "{Message} User: " + this.user.getUsername() : "") + (this.channel != null ? " Channel: " + this.channel.getName() : "") + " Content: " + this.content;
     }
 }

@@ -17,23 +17,33 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * TODO: Tidy up check returns and check event handling
+ */
 public class Util {
     public static final RateLimitRecorder rateLimitRecorder = new RateLimitRecorder();
     public static IHttpRequests requests;
 
-    public static <T extends Event> boolean check(final EventManager manager, final T object, final String methodName, final Json json) {
-        if (check(object, methodName, json))
-            manager.callEvent(object);
-        return true;
+    public static <K, T extends Event> Optional<K> check(final EventManager manager, final T object, final Json json) {
+        return check(manager, object, "initialize", json);
     }
 
-    public static <T extends Event> boolean check(final T object, final Json json) {
+    public static <K, T extends Event> Optional<K> check(final EventManager manager, final T object, final String methodName, final Json json) {
+        Optional<Object> r = check(object, methodName, json);
+        boolean executed = Boolean.parseBoolean(String.valueOf(r.orElse(false)));
+        if (!executed)
+            manager.callEvent(object);
+        return (Optional<K>) r;
+    }
+
+    public static <K, T extends Event> Optional<K> check(final T object, final Json json) {
         return check(object, "initialize", json);
     }
 
-    public static <T extends Event> boolean check(final T object, final String methodName, final Json json) {
+    public static <K, T extends Event> Optional<K> check(final T object, final String methodName, final Json json) {
         try {
             Method initialize = object.getClass().getDeclaredMethod(methodName, Json.class);
             initialize.setAccessible(true);
@@ -41,16 +51,16 @@ public class Util {
                 List<Annotation> validityList = Arrays.stream(initialize.getParameterAnnotations()[0]).filter(o -> o.annotationType().equals(JsonValidity.class)).collect(Collectors.toList());
                 if (!validityList.isEmpty()) {
                     JsonValidity validity = (JsonValidity) validityList.get(0);
-                    boolean returnStatus = json.getMap().keySet().containsAll(Arrays.asList(validity.value()));
-                    if (returnStatus)
-                        initialize.invoke(object, json);
-                    return returnStatus;
+                    if (json.getMap().keySet().containsAll(Arrays.asList(validity.value())))
+                        return Optional.ofNullable((K) initialize.invoke(object, json));
+                    else
+                        return (Optional<K>) Optional.of(true);
                 }
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return false;
+        return Optional.empty();
     }
 
     @SuppressWarnings("ALL")

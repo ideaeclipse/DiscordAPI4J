@@ -2,13 +2,12 @@ package ideaeclipse.DiscordAPINEW.bot;
 
 import com.neovisionaries.ws.client.WebSocketException;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
-import ideaeclipse.DiscordAPINEW.bot.objects.channel.LoadChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.LoadChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.LoadRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.LoadUser;
-import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
-import ideaeclipse.DiscordAPINEW.utils.interfaces.IHttpRequests;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.webSocket.RateLimitRecorder;
 import ideaeclipse.DiscordAPINEW.webSocket.Wss;
@@ -25,21 +24,19 @@ import java.util.Map;
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
 /**
- * TODO: Channel object.
  * TODO: format loading.
  * TODO: comments;
  * TODO: allow for presence update.
  * TODO: make creating channel/role/user a listenable event
+ * TODO: all for adding groups on users.
  */
 public class DiscordBot implements IPrivateBot {
-    private final String serverId;
     private final EventManager manager;
     private final Map<Long, IRole> roles = new HashMap<>();
     private final Map<Long, IDiscordUser> users = new HashMap<>();
     private final Map<Long, IChannel> channels = new HashMap<>();
 
     public DiscordBot(final String token, final String serverId) {
-        this.serverId = serverId;
         Util.requests = new Util.HttpRequests(token);
         this.manager = new EventManager();
         this.manager.registerListener(new MemeListener());
@@ -50,7 +47,7 @@ public class DiscordBot implements IPrivateBot {
             System.out.println(role.getRole());
             roles.put(role.getRole().getId(), role.getRole());
         }
-        System.out.println("nibba they loaded");
+        System.out.println("Roles loaded");
         System.out.println("Loading users");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/members" + "?limit=1000")))) {
             LoadUser user = new LoadUser(roles);
@@ -58,7 +55,7 @@ public class DiscordBot implements IPrivateBot {
             System.out.println(user.getUser());
             users.put(user.getUser().getId(), user.getUser());
         }
-        System.out.println("They loaded");
+        System.out.println("Users loaded");
         System.out.println("Loading channels");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/channels")))) {
             LoadChannel channel = new LoadChannel();
@@ -66,7 +63,8 @@ public class DiscordBot implements IPrivateBot {
             System.out.println(channel.getChannel());
             channels.put(channel.getChannel().getId(), channel.getChannel());
         }
-        System.out.println("They loaded");
+        System.out.println("Channels loaded");
+
         try {
             new Wss(this, token);
         } catch (IOException | WebSocketException e) {
@@ -91,11 +89,8 @@ public class DiscordBot implements IPrivateBot {
 
     public static class MemeListener implements Listener {
         @EventHandler
-        public void dicks(MessageCreate create) {
+        public void messageTest(MessageCreate create) {
             if (!create.getMessage().getUser().getUsername().equals("Testing")) {
-                System.out.println("Yo nibba there be a message in a channel dog: " + create.getMessage().getContent());
-                System.out.println(create.getMessage().getChannel());
-                System.out.println(create.getMessage().getUser());
                 create.getMessage().getChannel().sendMessage("pong");
                 //create.getMessage().getChannel().uploadFile("C:\\Users\\myles\\Desktop\\memes.pdf");
             }

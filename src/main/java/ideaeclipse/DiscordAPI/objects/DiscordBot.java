@@ -22,7 +22,6 @@ import ideaeclipse.customLogger.Level;
 import ideaeclipse.customLogger.LoggerManager;
 import ideaeclipse.reflectionListener.EventManager;
 import ideaeclipse.reflectionListener.Listener;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -181,7 +180,7 @@ class DiscordBot implements IDiscordBot, IPrivateBot {
     public Json getIdentity() {
         Json json = new Json();
         json.put("op",TextOpCodes.Identify.ordinal());
-        json.put("d",new JSONObject(this.identity.toString()));
+        json.put("d",new Json(this.identity.toString()));
         return json;
     }
 

@@ -1,6 +1,5 @@
 package ideaeclipse.DiscordAPINEW.bot;
 
-import ideaeclipse.DiscordAPI.objects.Interfaces.IRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.reflectionListener.EventManager;

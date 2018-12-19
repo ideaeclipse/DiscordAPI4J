@@ -6,12 +6,18 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.LoadDMChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.LoadChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
+import ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Optional;
 
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
@@ -33,9 +39,17 @@ public class Wss extends WebSocketFactory {
                         final Json d = new Json(String.valueOf(message.get("d")));
                         switch (op) {
                             case Dispatch:
-                                System.out.println("OP: " + op + " S: " + s + " T: " + t + " D: " + d);
+                                //System.out.println("OP: " + op + " S: " + s + " T: " + t + " D: " + d);
                                 if (t.toLowerCase().equals("message_create")) {
-                                    Util.check(bot.getManager(), new MessageCreate(bot), "initialize", d);
+                                    Util.check(bot.getManager(), new MessageCreate(bot.getChannels(), bot.getUsers()), d);
+                                }
+                                if (t.toLowerCase().equals("presence_update")) {
+                                    Util.check(bot.getManager(), new PresenceUpdate(bot.getUsers()), d);
+                                }
+                                if (t.toLowerCase().equals("channel_create")) {
+                                    if (Boolean.parseBoolean(String.valueOf(Util.check(bot.getManager(), new LoadChannel(), d).orElse(false))))
+                                        Util.check(bot.getManager(), new LoadDMChannel(bot.getUsers(), bot.getChannels()), d);
+
                                 }
                                 break;
                             case Heartbeat:
