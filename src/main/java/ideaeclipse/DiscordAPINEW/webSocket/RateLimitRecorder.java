@@ -74,6 +74,8 @@ public class RateLimitRecorder {
         public enum RequestTypes {
             get,
             post,
+            put,
+            delete,
             sendJson,
             sendFile
         }
@@ -129,6 +131,9 @@ public class RateLimitRecorder {
                         return Util.requests.get(url);
                     case post:
                         Util.requests.post(url);
+                        break;
+                    case put:
+                        Util.requests.put(url);
                         break;
                     case sendJson:
                         assert object != null;

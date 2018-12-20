@@ -1,6 +1,7 @@
 package ideaeclipse.DiscordAPINEW.bot;
 
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.reflectionListener.EventManager;
 
@@ -12,4 +13,6 @@ public interface IPrivateBot {
     Map<Long, IDiscordUser> getUsers();
 
     Map<Long, IChannel> getChannels();
+
+    Map<Long, IRole> getRoles();
 }

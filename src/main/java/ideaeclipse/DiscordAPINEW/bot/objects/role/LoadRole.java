@@ -1,6 +1,7 @@
 package ideaeclipse.DiscordAPINEW.bot.objects.role;
 
 import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
+import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
@@ -18,6 +19,10 @@ public class LoadRole extends Event implements IDiscordAction {
                 , Integer.parseInt(String.valueOf(json.get("position")))
                 , Long.parseUnsignedLong(String.valueOf(json.get("id")))
                 , Boolean.parseBoolean(String.valueOf(json.get("hoist"))));
+    }
+
+    public void guildRoleUpdate(@JsonValidity(value = {"role"}) Json json) {
+        Util.check(this, new Json(String.valueOf(json.get("role"))));
     }
 
     public IRole getRole() {

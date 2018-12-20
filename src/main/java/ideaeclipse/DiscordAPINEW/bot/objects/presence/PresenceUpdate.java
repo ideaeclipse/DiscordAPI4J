@@ -26,8 +26,8 @@ public class PresenceUpdate extends Event implements IDiscordAction {
     public void initialize(@JsonValidity(value = {"game", "status", "user"}) Json json) {
         List<StatusTypes> filtered = Arrays.stream(StatusTypes.values()).filter(o -> o.name().toLowerCase().equals(String.valueOf(json.get("status")).toLowerCase())).collect(Collectors.toList());
         this.presence = new Presence(!filtered.isEmpty() ? filtered.get(0) : StatusTypes.invisible
-                , (IDiscordUser) Util.check(this, "loadUsers", new Json(String.valueOf(json.get("user")))).orElse(null)
-                , !String.valueOf(json.get("game")).equals("null") ? IGame.parse(Util.check(new LoadGame(), new Json(String.valueOf(json.get("game")))).orElse(null)) : null);
+                , IDiscordUser.parse(Util.check(this, "loadUsers", new Json(String.valueOf(json.get("user")))).getObject())
+                , !String.valueOf(json.get("game")).equals("null") ? IGame.parse(Util.check(new LoadGame(), new Json(String.valueOf(json.get("game")))).getObject()) : null);
     }
 
     public IDiscordUser loadUsers(@JsonValidity(value = {"id"}) Json json) {

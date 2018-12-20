@@ -26,7 +26,7 @@ public class MessageCreate extends Event implements IDiscordAction {
     public void initialize(@JsonValidity(value = {"author", "content", "id", "pinned", "channel_id"}) Json json) {
         this.message = new Message((String) json.get("content")
                 , channels.get(Long.parseUnsignedLong(String.valueOf(json.get("channel_id"))))
-                , IDiscordUser.parse(Util.check(this, "getUser", new Json(String.valueOf(json.get("author")))).orElse(null)));
+                , IDiscordUser.parse(Util.check(this, "getUser", new Json(String.valueOf(json.get("author")))).getObject()));
     }
 
     private IDiscordUser getUser(@JsonValidity(value = {"id"}) Json json) {

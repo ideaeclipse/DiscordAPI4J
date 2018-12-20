@@ -7,9 +7,15 @@ import com.neovisionaries.ws.client.WebSocketFactory;
 import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.LoadDMChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.DeleteChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.LoadChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
 import ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.LoadRole;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.LoadUser;
+import ideaeclipse.DiscordAPINEW.utils.CheckResponeType;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
@@ -18,7 +24,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
@@ -33,23 +42,53 @@ public class Wss extends WebSocketFactory {
                     @Override
                     public void onTextMessage(WebSocket websocket, String text) {
                         Json message = new Json(text);
-                        final TextOpCodes op = TextOpCodes.values()[(int) message.get("op")];
+                        final TextOpCodes op = TextOpCodes.values()[Integer.parseInt(String.valueOf(message.get("op")))];
                         final String s = String.valueOf(message.get("s"));
                         final String t = String.valueOf(message.get("t"));
-                        final Json d = new Json(String.valueOf(message.get("d")));
+                        final Json d = new Json(!String.valueOf(message.get("d")).equals("null") ? String.valueOf(message.get("d")) : "{}");
                         switch (op) {
                             case Dispatch:
-                                //System.out.println("OP: " + op + " S: " + s + " T: " + t + " D: " + d);
-                                if (t.toLowerCase().equals("message_create")) {
-                                    Util.check(bot.getManager(), new MessageCreate(bot.getChannels(), bot.getUsers()), d);
-                                }
-                                if (t.toLowerCase().equals("presence_update")) {
-                                    Util.check(bot.getManager(), new PresenceUpdate(bot.getUsers()), d);
-                                }
-                                if (t.toLowerCase().equals("channel_create")) {
-                                    if (Boolean.parseBoolean(String.valueOf(Util.check(bot.getManager(), new LoadChannel(), d).orElse(false))))
-                                        Util.check(bot.getManager(), new LoadDMChannel(bot.getUsers(), bot.getChannels()), d);
-
+                                // System.out.println("OP: " + op + " S: " + s + " T: " + t + " D: " + d);
+                                List<DispatchType> filtered = Arrays.stream(DispatchType.values()).filter(o -> o.name().equals(t.toUpperCase())).collect(Collectors.toList());
+                                if (!filtered.isEmpty()) {
+                                    switch (filtered.get(0)) {
+                                        case MESSAGE_CREATE:
+                                            Util.check(bot.getManager(), new MessageCreate(bot.getChannels(), bot.getUsers()), d);
+                                            break;
+                                        case PRESENCE_UPDATE:
+                                            Util.check(bot.getManager(), new PresenceUpdate(bot.getUsers()), d);
+                                            break;
+                                        case CHANNEL_CREATE:
+                                            if (!Util.check(bot.getManager(), new LoadChannel(), d).getType().equals(CheckResponeType.EXECUTED))
+                                                Util.check(bot.getManager(), new LoadDMChannel(bot.getUsers(), bot.getChannels()), d);
+                                            break;
+                                        case CHANNEL_UPDATE:
+                                            LoadChannel channel = new LoadChannel();
+                                            if (Util.check(bot.getManager(), channel, d).getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getChannels().put(channel.getChannel().getId(), channel.getChannel());
+                                            break;
+                                        case CHANNEL_DELETE:
+                                            Util.check(bot.getManager(), new DeleteChannel(bot.getChannels()), d);
+                                            break;
+                                        case GUILD_ROLE_CREATE:
+                                            loadRole(bot, d);
+                                            break;
+                                        case GUILD_ROLE_UPDATE:
+                                            loadRole(bot, d);
+                                            break;
+                                        case GUILD_ROLE_DELETE:
+                                            Util.check(bot.getManager(), new DeleteRole(bot.getRoles()), d);
+                                            break;
+                                        case GUILD_MEMBER_ADD:
+                                            loadUser(bot, d);
+                                            break;
+                                        case GUILD_MEMBER_UPDATE:
+                                            loadUser(bot, d);
+                                            break;
+                                        case GUILD_MEMBER_REMOVE:
+                                            Util.check(bot.getManager(), new DeleteDiscordUser(bot.getUsers()), d);
+                                            break;
+                                    }
                                 }
                                 break;
                             case Heartbeat:
@@ -108,5 +147,17 @@ public class Wss extends WebSocketFactory {
 
     private void sendText(final Json json) {
         rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.WebSocketEvent(socket, json));
+    }
+
+    private void loadRole(final IPrivateBot bot, final Json d) {
+        LoadRole role = new LoadRole();
+        if (Util.check(bot.getManager(), role, "guildRoleUpdate", d).getType().equals(CheckResponeType.EXECUTED))
+            bot.getRoles().put(role.getRole().getId(), role.getRole());
+    }
+
+    private void loadUser(final IPrivateBot bot, final Json d) {
+        LoadUser user = new LoadUser(bot.getRoles());
+        if (Util.check(bot.getManager(), user, d).getType().equals(CheckResponeType.EXECUTED))
+            bot.getUsers().put(user.getUser().getId(), user.getUser());
     }
 }

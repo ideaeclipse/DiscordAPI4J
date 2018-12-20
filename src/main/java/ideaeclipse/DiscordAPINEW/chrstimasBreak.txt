@@ -22,3 +22,153 @@ Video streamer.
 JavaServer.
 	Work on cleanup.
 	ssl, cause thats important.
+
+GUILD_ROLE_CREATE
+{
+  "role": {
+    "color": 0,
+    "permissions": 104324161,
+    "managed": false,
+    "name": "new role",
+    "mentionable": false,
+    "position": 1,
+    "id": "525059526345490442",
+    "hoist": false
+  },
+  "guild_id": "471104815192211458"
+}
+
+GUILD_ROLE_UPDATE
+
+{
+  "role": {
+    "color": 15158332,
+    "permissions": 104324161,
+    "managed": false,
+    "name": "memes",
+    "mentionable": false,
+    "position": 1,
+    "id": "525059526345490442",
+    "hoist": true
+  },
+  "guild_id": "471104815192211458"
+}
+
+GUILD_ROLE_DELETE
+
+{
+  "role_id": "525117763044507648",
+  "guild_id": "471104815192211458"
+}
+
+CHANNEL_CREATE
+
+{
+  "permission_overwrites": [
+
+  ],
+  "last_message_id": null,
+  "nsfw": false,
+  "rate_limit_per_user": 0,
+  "parent_id": "495015318138388530",
+  "name": "test",
+  "guild_id": "471104815192211458",
+  "topic": null,
+  "position": 3,
+  "id": "525121830827196438",
+  "type": 0
+}
+
+CHANNEL_UPDATE
+
+{
+  "permission_overwrites": [
+    {
+      "allow": 0,
+      "deny": 1,
+      "id": "471104815192211458",
+      "type": "role"
+    }
+  ],
+  "last_message_id": null,
+  "nsfw": false,
+  "rate_limit_per_user": 0,
+  "parent_id": "495015318138388530",
+  "name": "test",
+  "guild_id": "471104815192211458",
+  "topic": null,
+  "position": 3,
+  "id": "525121830827196438",
+  "type": 0
+}
+
+CHANNEL_DELETE
+
+{
+  "permission_overwrites": [
+    {
+      "allow": 0,
+      "deny": 1,
+      "id": "471104815192211458",
+      "type": "role"
+    }
+  ],
+  "last_message_id": null,
+  "nsfw": false,
+  "rate_limit_per_user": 0,
+  "parent_id": "495015318138388530",
+  "name": "test",
+  "guild_id": "471104815192211458",
+  "topic": null,
+  "position": 3,
+  "id": "525121830827196438",
+  "type": 0
+}
+
+GUILD_MEMBER_ADD
+
+{
+  "nick": null,
+  "joined_at": "2018-12-20T02:04:55.063206+00:00",
+  "roles": [
+
+  ],
+  "guild_id": "471104815192211458",
+  "deaf": false,
+  "mute": false,
+  "user": {
+    "id": "525130696008663041",
+    "avatar": null,
+    "username": "bigMemes2k18",
+    "discriminator": "4013"
+  }
+}
+
+GUILD_MEMBER_UPDATE
+
+{
+  "nick": "Mayo",
+  "roles": [
+    "472235368863760384",
+    "525059526345490442"
+  ],
+  "guild_id": "471104815192211458",
+  "user": {
+    "id": "304408618986504195",
+    "avatar": "a_d4a797f21eaa2c13a96a26bd83858af3",
+    "username": "luminol",
+    "discriminator": "6666"
+  }
+}
+
+GUILD_MEMBER_REMOVE
+
+{
+  "guild_id": "471104815192211458",
+  "user": {
+    "id": "525130696008663041",
+    "avatar": null,
+    "username": "bigMemes2k18",
+    "discriminator": "4013"
+  }
+}

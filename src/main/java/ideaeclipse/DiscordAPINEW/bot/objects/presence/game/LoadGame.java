@@ -16,7 +16,7 @@ public class LoadGame extends Event {
         return new Game(String.valueOf(json.get("name"))
                 , String.valueOf(json.get("state"))
                 , String.valueOf(json.get("details"))
-                , String.valueOf(Util.check(this,"additionalText",new Json(String.valueOf(json.get("assets")))).orElse(null))
+                , String.valueOf(Util.check(this,"additionalText",new Json(String.valueOf(json.get("assets")))).getObject())
                 , Integer.parseInt(String.valueOf(json.get("type"))));
     }
 

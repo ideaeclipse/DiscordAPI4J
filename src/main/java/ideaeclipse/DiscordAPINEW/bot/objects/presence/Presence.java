@@ -38,6 +38,6 @@ public class Presence implements IPresence {
 
     @Override
     public String toString() {
-        return "{Presence} Status: " + this.status + " User: " + this.user.getUsername() + (this.game != null ? " Game: " + this.game : "");
+        return "{Presence} Status: " + this.status + (this.user != null ? " User: " + this.user.getUsername() : "") + (this.game != null ? " Game: " + this.game : "");
     }
 }

@@ -7,7 +7,9 @@ public interface IHttpRequests {
 
     void post(final String url);
 
+    void put(final String url);
+
     Object sendJson(final String url, final Json object);
 
-    Object sendFile(final String url,final String filename);
+    Object sendFile(final String url, final String filename);
 }
