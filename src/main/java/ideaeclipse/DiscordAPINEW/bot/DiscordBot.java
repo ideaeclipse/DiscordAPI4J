@@ -2,12 +2,13 @@ package ideaeclipse.DiscordAPINEW.bot;
 
 import com.neovisionaries.ws.client.WebSocketException;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.CreateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.DeleteChannel;
-import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.LoadChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
-import ideaeclipse.DiscordAPINEW.bot.objects.role.LoadRole;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.LoadUser;
@@ -27,13 +28,14 @@ import java.util.Map;
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
 /**
+ * TODO: allow for deletions to pass the IRole object before deleting it from the list.
+ * TODO: Allow for presence change for bot.
+ * TODO: Updated event names. Make updated role/user/channel a seperate event. Make it so that each is in a more standard format, consider a generic interface
+ * TODO: format loading.
+ * TODO: comments
  * TODO: add json examples for each type of dispatch event in their interface class.
  * TODO: implement custom terminal
  * TODO: add custom logger
- * TODO: format loading.
- * TODO: comments
- * TODO: make creating channel/role/user a listenable event
- * TODO: all for adding groups on users.
  */
 public class DiscordBot implements IPrivateBot {
     private final EventManager manager;
@@ -48,7 +50,7 @@ public class DiscordBot implements IPrivateBot {
         this.manager.registerListener(new MemeListener(this));
         System.out.println("Loading roles");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/roles")))) {
-            LoadRole role = new LoadRole();
+            CreateRole role = new CreateRole();
             Util.check(role, json);
             System.out.println(role.getRole());
             roles.put(role.getRole().getId(), role.getRole());
@@ -64,7 +66,7 @@ public class DiscordBot implements IPrivateBot {
         System.out.println("Users loaded");
         System.out.println("Loading channels");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/channels")))) {
-            LoadChannel channel = new LoadChannel();
+            CreateChannel channel = new CreateChannel();
             Util.check(channel, json);
             System.out.println(channel.getChannel());
             channels.put(channel.getChannel().getId(), channel.getChannel());
@@ -113,10 +115,13 @@ public class DiscordBot implements IPrivateBot {
                 //create.getMessage().getChannel().uploadFile("C:\\Users\\myles\\Desktop\\memes.pdf");
             }
         }
-
         @EventHandler
-        public void onRoleCreate(LoadRole role) {
-            System.out.println("Role Loaded: " + role.getRole().getName());
+        public void onRoleCreate(CreateRole role){
+            System.out.println("Role Create: " + role.getRole().getName());
+        }
+        @EventHandler
+        public void onRoleUpdate(UpdateRole role) {
+            System.out.println("Role Updated: " + role.getRole().getName());
         }
 
         @EventHandler
@@ -125,7 +130,7 @@ public class DiscordBot implements IPrivateBot {
         }
 
         @EventHandler
-        public void onChannelCreate(LoadChannel channel) {
+        public void onChannelCreate(CreateChannel channel) {
             System.out.println("Channel loaded: " + channel.getChannel().getName());
         }
 
@@ -133,12 +138,14 @@ public class DiscordBot implements IPrivateBot {
         public void deleteChannel(DeleteChannel channel) {
             System.out.println("Channel deleted");
         }
+
         @EventHandler
-        public void onUserJoin(LoadUser user){
+        public void onUserJoin(LoadUser user) {
             System.out.println("User added/updated: " + user.getUser());
         }
+
         @EventHandler
-        public void deleteUser(DeleteDiscordUser user){
+        public void deleteUser(DeleteDiscordUser user) {
             System.out.println("User deleted");
         }
     }

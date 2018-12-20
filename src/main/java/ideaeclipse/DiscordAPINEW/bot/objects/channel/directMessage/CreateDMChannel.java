@@ -13,11 +13,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class LoadDMChannel extends Event implements IDiscordAction {
+public class CreateDMChannel extends Event implements IDiscordAction {
     private final Map<Long, IDiscordUser> users;
     private final Map<Long, IChannel> channels;
 
-    public LoadDMChannel(final Map<Long, IDiscordUser> users, final Map<Long, IChannel> channels) {
+    public CreateDMChannel(final Map<Long, IDiscordUser> users, final Map<Long, IChannel> channels) {
         this.users = users;
         this.channels = channels;
     }

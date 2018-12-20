@@ -6,15 +6,18 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.LoadDMChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.CreateDMChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.CreateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.DeleteChannel;
-import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.LoadChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.UpdateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
 import ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
-import ideaeclipse.DiscordAPINEW.bot.objects.role.LoadRole;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.LoadUser;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.UpdateDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.CheckResponeType;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.JsonUtilities.Builder;
@@ -31,6 +34,10 @@ import java.util.stream.Collectors;
 
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
+/**
+ * TODO: Remove dependency on json file. make a static string
+ * TODO: Update the way each dispath gets handled
+ */
 public class Wss extends WebSocketFactory {
     private final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
     private final WebSocket socket;
@@ -59,34 +66,54 @@ public class Wss extends WebSocketFactory {
                                             Util.check(bot.getManager(), new PresenceUpdate(bot.getUsers()), d);
                                             break;
                                         case CHANNEL_CREATE:
-                                            if (!Util.check(bot.getManager(), new LoadChannel(), d).getType().equals(CheckResponeType.EXECUTED))
-                                                Util.check(bot.getManager(), new LoadDMChannel(bot.getUsers(), bot.getChannels()), d);
+                                            CreateChannel channel = new CreateChannel();
+                                            if (!Util.check(bot.getManager(), channel, d).getType().equals(CheckResponeType.EXECUTED))
+                                                Util.check(bot.getManager(), new CreateDMChannel(bot.getUsers(), bot.getChannels()), d);
+                                            else
+                                                bot.getChannels().put(channel.getChannel().getId(), channel.getChannel());
+                                            System.out.println(bot.getChannels());
                                             break;
                                         case CHANNEL_UPDATE:
-                                            LoadChannel channel = new LoadChannel();
-                                            if (Util.check(bot.getManager(), channel, d).getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getChannels().put(channel.getChannel().getId(), channel.getChannel());
+                                            UpdateChannel Updatechannel = new UpdateChannel();
+                                            if (Util.check(bot.getManager(), Updatechannel, d).getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getChannels().put(Updatechannel.getChannel().getId(), Updatechannel.getChannel());
+                                            System.out.println(bot.getChannels());
                                             break;
                                         case CHANNEL_DELETE:
                                             Util.check(bot.getManager(), new DeleteChannel(bot.getChannels()), d);
+                                            System.out.println(bot.getChannels());
                                             break;
                                         case GUILD_ROLE_CREATE:
-                                            loadRole(bot, d);
+                                            CreateRole role = new CreateRole();
+                                            if (Util.check(bot.getManager(), role, new Json(String.valueOf(d.get("role")))).getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getRoles().put(role.getRole().getId(), role.getRole());
+                                            System.out.println(bot.getRoles());
                                             break;
                                         case GUILD_ROLE_UPDATE:
-                                            loadRole(bot, d);
+                                            UpdateRole Updaterole = new UpdateRole();
+                                            if (Util.check(bot.getManager(), Updaterole, d).getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getRoles().put(Updaterole.getRole().getId(), Updaterole.getRole());
+                                            System.out.println(bot.getRoles());
                                             break;
                                         case GUILD_ROLE_DELETE:
                                             Util.check(bot.getManager(), new DeleteRole(bot.getRoles()), d);
+                                            System.out.println(bot.getRoles());
                                             break;
                                         case GUILD_MEMBER_ADD:
-                                            loadUser(bot, d);
+                                            LoadUser user = new LoadUser(bot.getRoles());
+                                            if (Util.check(bot.getManager(), user, d).getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getUsers().put(user.getUser().getId(), user.getUser());
+                                            System.out.println(bot.getUsers());
                                             break;
                                         case GUILD_MEMBER_UPDATE:
-                                            loadUser(bot, d);
+                                            UpdateDiscordUser Updateuser = new UpdateDiscordUser(bot.getRoles());
+                                            if (Util.check(bot.getManager(), Updateuser, d).getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getUsers().put(Updateuser.getUser().getId(), Updateuser.getUser());
+                                            System.out.println(bot.getUsers());
                                             break;
                                         case GUILD_MEMBER_REMOVE:
                                             Util.check(bot.getManager(), new DeleteDiscordUser(bot.getUsers()), d);
+                                            System.out.println(bot.getUsers());
                                             break;
                                     }
                                 }
@@ -102,8 +129,12 @@ public class Wss extends WebSocketFactory {
                             case Voice_Server_Ping:
                                 break;
                             case Resume:
+                                System.out.println("Resume: " + d);
+                                System.exit(-1);
                                 break;
                             case Reconnect:
+                                System.out.println("Reconnect: " + d);
+                                System.exit(-1);
                                 break;
                             case Request_Guild_Members:
                                 break;
@@ -147,17 +178,5 @@ public class Wss extends WebSocketFactory {
 
     private void sendText(final Json json) {
         rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.WebSocketEvent(socket, json));
-    }
-
-    private void loadRole(final IPrivateBot bot, final Json d) {
-        LoadRole role = new LoadRole();
-        if (Util.check(bot.getManager(), role, "guildRoleUpdate", d).getType().equals(CheckResponeType.EXECUTED))
-            bot.getRoles().put(role.getRole().getId(), role.getRole());
-    }
-
-    private void loadUser(final IPrivateBot bot, final Json d) {
-        LoadUser user = new LoadUser(bot.getRoles());
-        if (Util.check(bot.getManager(), user, d).getType().equals(CheckResponeType.EXECUTED))
-            bot.getUsers().put(user.getUser().getId(), user.getUser());
     }
 }

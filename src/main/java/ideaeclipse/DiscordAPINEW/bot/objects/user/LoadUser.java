@@ -24,7 +24,7 @@ public class LoadUser extends Event implements IDiscordAction {
     }
 
     @Override
-    public void initialize(@JsonValidity(value = {"nick", "user", "roles"}) Json json) {
+    public void initialize(@JsonValidity({"nick", "user", "roles"}) Json json) {
         String str = String.valueOf(json.get("roles"));
         List<String> strings = Arrays.asList(str.substring(1, str.length() - 1).trim().split("\\s*,\\s*"));
         strings = strings.stream().filter(o -> o.length() > 0).collect(Collectors.toList());

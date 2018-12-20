@@ -6,7 +6,7 @@ import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
 
-public class LoadChannel extends Event implements IDiscordAction {
+public class CreateChannel extends Event implements IDiscordAction {
     private IChannel channel;
 
     @Override
