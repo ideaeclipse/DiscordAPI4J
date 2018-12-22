@@ -1,4 +1,5 @@
 # DiscordAPI4J
+* This is for the older version of the utility a new one will be posted after development of the refreshed utility is finished
 * Custom discordapi interpreter
 
 * Example of Creating the bot

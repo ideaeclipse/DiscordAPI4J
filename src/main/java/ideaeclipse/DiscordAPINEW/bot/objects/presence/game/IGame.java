@@ -1,57 +1,26 @@
 package ideaeclipse.DiscordAPINEW.bot.objects.presence.game;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-@JsonFormat
 /**
+ * Object is used to store game information
  *
- *
- * Example json string for game.
- *
- * Name is the program
- * State is the action of the program
- * Details is the main info
- * additionalDetails is image text inside assets
- * type is the type, 0 is game, 2 is music
- *{
- *   "assets": {
- *     "large_image": "spotify:444e1a72c2893bfdb30516f523309d1a1eaf384f",
- *     "large_text": "I Want To Die In New Orleans"
- *   },
- *   "timestamps": {
- *     "start": 1545188757894,
- *     "end": 1545188899865
- *   },
- *   "name": "Spotify",
- *   "flags": 48,
- *   "session_id": "b656fcb82955a8bcb99927699004c28c",
- *   "created_at": 1545188769694,
- *   "details": "Phantom Menace",
- *   "state": "$uicideBoy$",
- *   "id": "spotify:1",
- *   "type": 2,
- *   "sync_id": "6oyeeA0sHwHM1pPpZaIsrD",
- *   "party": {
- *     "id": "spotify:304408618986504195"
- *   }
- * }
+ * @author ideaeclipse
  * @see Game
  * @see LoadGame
- * @author ideaeclipse
+ * @see ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate
  */
 public interface IGame {
     /**
-     * @return name of program
+     * @return name of game
      */
     String getName();
 
     /**
-     * @return what the program is doing
+     * @return what is happening in the game
      */
     String getState();
 
     /**
-     * @return details on the program
+     * @return details on the game
      */
     String getDetails();
 
@@ -65,7 +34,14 @@ public interface IGame {
      */
     int getType();
 
-    static IGame parse(Object o) {
+    /**
+     * checks to see if the object you think is a game object can be casted to one.
+     * This is to avoid casting issues in {@link LoadGame}
+     *
+     * @param o theoretical {@link IGame} object
+     * @return either a casted instance of object or null
+     */
+    static IGame parse(final Object o) {
         if (o instanceof IGame) {
             return (IGame) o;
         }

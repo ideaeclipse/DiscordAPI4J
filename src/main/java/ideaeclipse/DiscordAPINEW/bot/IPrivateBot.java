@@ -7,6 +7,11 @@ import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.Map;
 
+/**
+ * Allows for access to specific resources only for internal classes. Not user controled Ones
+ * @author Ideaeclipse
+ * @see DiscordBot
+ */
 public interface IPrivateBot {
     EventManager getManager();
 

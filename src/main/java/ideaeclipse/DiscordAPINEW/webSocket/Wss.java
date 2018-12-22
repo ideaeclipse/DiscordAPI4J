@@ -16,7 +16,7 @@ import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
-import ideaeclipse.DiscordAPINEW.bot.objects.user.LoadUser;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.CreateDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.UpdateDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.CheckResponeType;
 import ideaeclipse.DiscordAPINEW.utils.Util;
@@ -100,7 +100,7 @@ public class Wss extends WebSocketFactory {
                                             System.out.println(bot.getRoles());
                                             break;
                                         case GUILD_MEMBER_ADD:
-                                            LoadUser user = new LoadUser(bot.getRoles());
+                                            CreateDiscordUser user = new CreateDiscordUser(bot.getRoles());
                                             if (Util.check(bot.getManager(), user, d).getType().equals(CheckResponeType.EXECUTED))
                                                 bot.getUsers().put(user.getUser().getId(), user.getUser());
                                             System.out.println(bot.getUsers());

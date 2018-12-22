@@ -1,5 +1,14 @@
 package ideaeclipse.DiscordAPINEW.bot.objects.presence.game;
 
+/**
+ * A users game status. parsed from a sub json string from a presence update payload
+ *
+ * @author Ideaeclipse
+ * @see IGame
+ * @see ideaeclipse.DiscordAPINEW.bot.objects.presence.IPresence
+ * @see LoadGame
+ * @see ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate
+ */
 public class Game implements IGame {
     private final String name;
     private final String state;
@@ -7,6 +16,13 @@ public class Game implements IGame {
     private final String additionDetails;
     private final int type;
 
+    /**
+     * @param name name of the game
+     * @param state state of the game
+     * @param details details of the game
+     * @param additionalDetails additional details about the game, gathered from the image
+     * @param type type of game, 0 is playing, 1 is streaming, 2 is listening
+     */
     public Game(final String name, final String state, final String details, final String additionalDetails, final int type) {
         this.name = name;
         this.state = state;

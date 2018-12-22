@@ -11,7 +11,7 @@ import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
-import ideaeclipse.DiscordAPINEW.bot.objects.user.LoadUser;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.CreateDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.webSocket.RateLimitRecorder;
 import ideaeclipse.DiscordAPINEW.webSocket.Wss;
@@ -28,12 +28,14 @@ import java.util.Map;
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
 /**
+ * TODO: update util so it doesn't use {@link ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction} and passes the json in a constructor. also make {@link ideaeclipse.DiscordAPINEW.utils.CheckResponse} return the new instance of the object
+ * TODO: Leaving a running copy on the server and wait for disconnection. Make sure the things get printed out before compilation
  * TODO: allow for deletions to pass the IRole object before deleting it from the list.
  * TODO: Allow for presence change for bot.
  * TODO: Updated event names. Make updated role/user/channel a seperate event. Make it so that each is in a more standard format, consider a generic interface
  * TODO: format loading.
- * TODO: comments
- * TODO: add json examples for each type of dispatch event in their interface class.
+ * TODO: IPublicBot
+ * TODO: Voice channels
  * TODO: implement custom terminal
  * TODO: add custom logger
  */
@@ -47,7 +49,7 @@ public class DiscordBot implements IPrivateBot {
         Util.requests = new Util.HttpRequests(token);
         Util.guildId = Long.parseUnsignedLong(String.valueOf(serverId));
         this.manager = new EventManager();
-        this.manager.registerListener(new MemeListener(this));
+        this.manager.registerListener(new TestListener(this));
         System.out.println("Loading roles");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/roles")))) {
             CreateRole role = new CreateRole();
@@ -58,7 +60,7 @@ public class DiscordBot implements IPrivateBot {
         System.out.println("Roles loaded");
         System.out.println("Loading users");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/members" + "?limit=1000")))) {
-            LoadUser user = new LoadUser(roles);
+            CreateDiscordUser user = new CreateDiscordUser(roles);
             Util.check(user, json);
             System.out.println(user.getUser());
             users.put(user.getUser().getId(), user.getUser());
@@ -100,10 +102,13 @@ public class DiscordBot implements IPrivateBot {
         return this.roles;
     }
 
-    public static class MemeListener implements Listener {
+    /**
+     * Used to test that the events get called when they happen.
+     */
+    public static class TestListener implements Listener {
         private final IPrivateBot bot;
 
-        public MemeListener(final IPrivateBot bot) {
+        public TestListener(final IPrivateBot bot) {
             this.bot = bot;
         }
 
@@ -140,7 +145,7 @@ public class DiscordBot implements IPrivateBot {
         }
 
         @EventHandler
-        public void onUserJoin(LoadUser user) {
+        public void onUserJoin(CreateDiscordUser user) {
             System.out.println("User added/updated: " + user.getUser());
         }
 

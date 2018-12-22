@@ -5,15 +5,29 @@ import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 
 import java.util.List;
 
+/**
+ * Parsed direct message channel into a class object
+ *
+ * @author Ideaeclipse
+ * @see CreateDMChannel
+ * @see IChannel
+ */
 public class DMChannel extends IChannel {
     private final long id;
     private final int type;
-    private final List<IDiscordUser> reciepients;
-    DMChannel(final long id, final int type, final List<IDiscordUser> reciepient){
+    private final List<IDiscordUser> recipients;
+
+    /**
+     * @param id channel id
+     * @param type channel type {1}
+     * @param recipients list of users that are apart of the direct message channel
+     */
+    DMChannel(final long id, final int type, final List<IDiscordUser> recipients) {
         this.id = id;
         this.type = type;
-        this.reciepients = reciepient;
+        this.recipients = recipients;
     }
+
     @Override
     public boolean isNsfw() {
         return false;
@@ -35,7 +49,7 @@ public class DMChannel extends IChannel {
     }
 
     @Override
-    public List<IDiscordUser> getReciepient() {
-        return this.reciepients;
+    public List<IDiscordUser> getReciepients() {
+        return this.recipients;
     }
 }

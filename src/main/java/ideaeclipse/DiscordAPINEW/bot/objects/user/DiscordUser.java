@@ -9,6 +9,15 @@ import java.util.List;
 
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
+/**
+ * The class is created from parsing a user's json data
+ *
+ * @author Ideaeclipse
+ * @see CreateDiscordUser
+ * @see UpdateDiscordUser
+ * @see DeleteDiscordUser
+ * @see IDiscordUser
+ */
 public class DiscordUser implements IDiscordUser {
     private final String nickname;
     private final String username;
@@ -16,7 +25,14 @@ public class DiscordUser implements IDiscordUser {
     private final long id;
     private final List<IRole> roles;
 
-    DiscordUser(final String nickname,final String username, final int discriminator, final long id, final List<IRole> roles) {
+    /**
+     * @param nickname users nickname
+     * @param username username
+     * @param discriminator discriminator
+     * @param id unique identifier
+     * @param roles list of roles the user has
+     */
+    DiscordUser(final String nickname, final String username, final int discriminator, final long id, final List<IRole> roles) {
         this.nickname = nickname;
         this.username = username;
         this.discriminator = discriminator;

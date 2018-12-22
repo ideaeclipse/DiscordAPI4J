@@ -5,12 +5,26 @@ import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 
 import java.util.List;
 
+/**
+ * Channel data mapped to an object from {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
+ *
+ * @author Ideaeclipse
+ * @see CreateChannel
+ * @see UpdateChannel
+ * @see IChannel
+ */
 public class Channel extends IChannel {
     private final boolean nsfw;
     private final String name;
     private final long id;
     private final int type;
 
+    /**
+     * @param nsfw boolean on channels nsfw status
+     * @param name name of channel
+     * @param id channel unique identifier
+     * @param type channel type 0: text 2: voice 4: group
+     */
     public Channel(final boolean nsfw, final String name, final long id, final int type) {
         this.nsfw = nsfw;
         this.name = name;
@@ -39,7 +53,7 @@ public class Channel extends IChannel {
     }
 
     @Override
-    public List<IDiscordUser> getReciepient() {
+    public List<IDiscordUser> getReciepients() {
         return null;
     }
 
