@@ -1,10 +1,19 @@
 package ideaeclipse.DiscordAPINEW.bot;
 
+import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.CreateDMChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.CreateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.DeleteChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.UpdateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
+import ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate;
+import ideaeclipse.DiscordAPINEW.bot.objects.presence.UserStatus;
+import ideaeclipse.DiscordAPINEW.bot.objects.presence.game.GameType;
+import ideaeclipse.DiscordAPINEW.bot.objects.reaction.AddReaction;
+import ideaeclipse.DiscordAPINEW.bot.objects.reaction.IReaction;
+import ideaeclipse.DiscordAPINEW.bot.objects.reaction.RemoveReaction;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
@@ -12,8 +21,10 @@ import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.CreateDiscordUser;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.UpdateDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.webSocket.RateLimitRecorder;
+import ideaeclipse.DiscordAPINEW.webSocket.TextOpCodes;
 import ideaeclipse.DiscordAPINEW.webSocket.Wss;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
@@ -28,11 +39,10 @@ import java.util.Map;
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
 /**
- * TODO: update util so it doesn't use {@link ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction} and passes the json in a constructor. also make {@link ideaeclipse.DiscordAPINEW.utils.CheckResponse} return the new instance of the object
+ * TODO: finish message history, then do reactions
  * TODO: Leaving a running copy on the server and wait for disconnection. Make sure the things get printed out before compilation
- * TODO: allow for deletions to pass the IRole object before deleting it from the list.
- * TODO: Allow for presence change for bot.
- * TODO: Updated event names. Make updated role/user/channel a seperate event. Make it so that each is in a more standard format, consider a generic interface
+ * TODO: Allow for querying of dm channels
+ * TODO: reactions
  * TODO: format loading.
  * TODO: IPublicBot
  * TODO: Voice channels
@@ -44,6 +54,8 @@ public class DiscordBot implements IPrivateBot {
     private final Map<Long, IRole> roles = new HashMap<>();
     private final Map<Long, IDiscordUser> users = new HashMap<>();
     private final Map<Long, IChannel> channels = new HashMap<>();
+    private final Map<String, IReaction> reactions = new HashMap<>();
+    private WebSocket socket;
 
     public DiscordBot(final String token, final String serverId) {
         Util.requests = new Util.HttpRequests(token);
@@ -52,31 +64,28 @@ public class DiscordBot implements IPrivateBot {
         this.manager.registerListener(new TestListener(this));
         System.out.println("Loading roles");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/roles")))) {
-            CreateRole role = new CreateRole();
-            Util.check(role, json);
+            CreateRole role = Util.checkConstructor(CreateRole.class, json, this).getObject();
             System.out.println(role.getRole());
             roles.put(role.getRole().getId(), role.getRole());
         }
         System.out.println("Roles loaded");
         System.out.println("Loading users");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/members" + "?limit=1000")))) {
-            CreateDiscordUser user = new CreateDiscordUser(roles);
-            Util.check(user, json);
+            CreateDiscordUser user = Util.checkConstructor(CreateDiscordUser.class, json, this).getObject();
             System.out.println(user.getUser());
             users.put(user.getUser().getId(), user.getUser());
         }
         System.out.println("Users loaded");
         System.out.println("Loading channels");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/channels")))) {
-            CreateChannel channel = new CreateChannel();
-            Util.check(channel, json);
+            CreateChannel channel = Util.checkConstructor(CreateChannel.class, json, this).getObject();
             System.out.println(channel.getChannel());
             channels.put(channel.getChannel().getId(), channel.getChannel());
         }
         System.out.println("Channels loaded");
 
         try {
-            new Wss(this, token);
+            this.socket = new Wss(this, token).getSocket();
         } catch (IOException | WebSocketException e) {
             e.printStackTrace();
         }
@@ -102,6 +111,28 @@ public class DiscordBot implements IPrivateBot {
         return this.roles;
     }
 
+    @Override
+    public Map<String, IReaction> getReactions() {
+        return this.reactions;
+    }
+
+    @Override
+    public void setStatus(final GameType type, final String message, final UserStatus status) {
+        String payload = "{\"op\":3,\"d\":{\"since\":0,\"game\":{\"name\":\"?name\",\"type\":?type},\"afk\":false,\"status\":\"?status\"}}";
+        payload = payload.replace("?name", message).replace("?type", String.valueOf(type.ordinal())).replace("?status", status.name());
+        System.out.println(new Json(payload) + " " + TextOpCodes.Status_Update.ordinal());
+        rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.WebSocketEvent(this.socket, new Json(payload)));
+    }
+
+    @Override
+    public IChannel createDmChannel(final IDiscordUser user) {
+        String info = "{\"recipient_id\":?id}";
+        info = info.replace("?id", String.valueOf(user.getId()));
+        CreateDMChannel channel = Util.checkConstructor(CreateDMChannel.class, new Json(String.valueOf(rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.sendJson, "/users/@me/channels", new Json(info))))), this).getObject();
+        this.getChannels().put(channel.getChannel().getId(), channel.getChannel());
+        return channel.getChannel();
+    }
+
     /**
      * Used to test that the events get called when they happen.
      */
@@ -114,16 +145,26 @@ public class DiscordBot implements IPrivateBot {
 
         @EventHandler
         public void messageTest(MessageCreate create) {
+            System.out.println(create.getMessage());
             if (!create.getMessage().getUser().getUsername().equals("Testing")) {
                 create.getMessage().getChannel().sendMessage("pong");
+                //this.bot.createDmChannel(create.getMessage().getUser()).sendMessage("Why you messaging in my channel");
+                //this.bot.setStatus(GameType.playing, "with numbers", UserStatus.online);
                 // create.getMessage().getUser().addRole(bot.getRoles().get(Long.parseUnsignedLong("525059526345490442")));
                 //create.getMessage().getChannel().uploadFile("C:\\Users\\myles\\Desktop\\memes.pdf");
             }
         }
+
         @EventHandler
-        public void onRoleCreate(CreateRole role){
-            System.out.println("Role Create: " + role.getRole().getName());
+        public void presence(PresenceUpdate update) {
+            System.out.println(update.getPresence());
         }
+
+        @EventHandler
+        public void onRoleCreate(CreateRole role) {
+            System.out.println("Role added: " + role.getRole().getName());
+        }
+
         @EventHandler
         public void onRoleUpdate(UpdateRole role) {
             System.out.println("Role Updated: " + role.getRole().getName());
@@ -131,27 +172,47 @@ public class DiscordBot implements IPrivateBot {
 
         @EventHandler
         public void deleteRole(DeleteRole role) {
-            System.out.println("Role delete");
+            System.out.println("Role delete: " + role.getRole().getName());
         }
 
         @EventHandler
         public void onChannelCreate(CreateChannel channel) {
-            System.out.println("Channel loaded: " + channel.getChannel().getName());
+            System.out.println("Channel added: " + channel.getChannel().getName());
+        }
+
+        @EventHandler
+        public void onChannelUpdate(UpdateChannel channel) {
+            System.out.println("Channel updated: " + channel.getChannel().getName());
         }
 
         @EventHandler
         public void deleteChannel(DeleteChannel channel) {
-            System.out.println("Channel deleted");
+            System.out.println("Channel deleted: " + channel.getChannel().getName());
         }
 
         @EventHandler
         public void onUserJoin(CreateDiscordUser user) {
-            System.out.println("User added/updated: " + user.getUser());
+            System.out.println("User added: " + user.getUser());
+        }
+
+        @EventHandler
+        public void onUserUpdate(UpdateDiscordUser user) {
+            System.out.println("User updated: " + user.getUser());
         }
 
         @EventHandler
         public void deleteUser(DeleteDiscordUser user) {
-            System.out.println("User deleted");
+            System.out.println("User deleted: " + user.getUser().getUsername());
+        }
+
+        @EventHandler
+        public void addReaction(AddReaction add) {
+            System.out.println("Reaction added: " + add.getReaction());
+        }
+
+        @EventHandler
+        public void removeReaction(RemoveReaction remove) {
+            System.out.println("Reaction removed: " + remove.getReaction());
         }
     }
 }

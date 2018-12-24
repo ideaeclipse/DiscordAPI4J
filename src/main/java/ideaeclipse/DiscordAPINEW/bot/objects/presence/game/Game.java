@@ -14,7 +14,7 @@ public class Game implements IGame {
     private final String state;
     private final String details;
     private final String additionDetails;
-    private final int type;
+    private final GameType type;
 
     /**
      * @param name name of the game
@@ -23,7 +23,7 @@ public class Game implements IGame {
      * @param additionalDetails additional details about the game, gathered from the image
      * @param type type of game, 0 is playing, 1 is streaming, 2 is listening
      */
-    public Game(final String name, final String state, final String details, final String additionalDetails, final int type) {
+    public Game(final String name, final String state, final String details, final String additionalDetails, final GameType type) {
         this.name = name;
         this.state = state;
         this.details = details;
@@ -52,7 +52,7 @@ public class Game implements IGame {
     }
 
     @Override
-    public int getType() {
+    public GameType getType() {
         return this.type;
     }
 

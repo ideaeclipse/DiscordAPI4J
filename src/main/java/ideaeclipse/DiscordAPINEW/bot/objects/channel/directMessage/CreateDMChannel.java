@@ -2,7 +2,6 @@ package ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.Util;
@@ -44,34 +43,23 @@ import java.util.Map;
  * @see DMChannel
  * @see ideaeclipse.DiscordAPINEW.webSocket.Wss#Wss(IPrivateBot, String)
  */
-public class CreateDMChannel extends Event implements IDiscordAction {
-    private final Map<Long, IDiscordUser> users;
-    private final Map<Long, IChannel> channels;
-
-    /**
-     * @param users    map of users of server
-     * @param channels map of channels of server
-     * @see ideaeclipse.DiscordAPINEW.bot.IPrivateBot
-     */
-    public CreateDMChannel(final Map<Long, IDiscordUser> users, final Map<Long, IChannel> channels) {
-        this.users = users;
-        this.channels = channels;
-    }
+public class CreateDMChannel extends Event {
+    private final IPrivateBot bot;
+    private final IChannel channel;
 
     /**
      * @param json json string from {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
      */
-    @Override
-    public void initialize(@JsonValidity( {"recipients", "id", "type"}) Json json) {
+    private CreateDMChannel(@JsonValidity({"recipients", "id", "type"}) final Json json, final IPrivateBot bot) {
+        this.bot = bot;
         List<IDiscordUser> recipients = new LinkedList<>();
         for (Json json1 : new JsonArray(String.valueOf(json.get("recipients")))) {
             Util.check(this, "getId", json1).ifPresent(o -> recipients.add(IDiscordUser.parse(o)));
         }
-        this.channels.put(Long.parseUnsignedLong(String.valueOf(json.get("id")))
-                , new DMChannel(Long.parseUnsignedLong(String.valueOf(json.get("id")))
-                        , Integer.parseInt(String.valueOf(json.get("type")))
-                        , recipients
-                ));
+        this.channel = new DMChannel(Long.parseUnsignedLong(String.valueOf(json.get("id")))
+                , Integer.parseInt(String.valueOf(json.get("type")))
+                , recipients
+        );
     }
 
     /**
@@ -80,7 +68,14 @@ public class CreateDMChannel extends Event implements IDiscordAction {
      * @param json recipients json object
      * @return Searched user from user map with the valid id key
      */
-    public IDiscordUser getId(@JsonValidity( "id") Json json) {
-        return this.users.get(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+    public IDiscordUser getId(@JsonValidity("id") Json json) {
+        return this.bot.getUsers().get(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+    }
+
+    /**
+     * @return return object from parsed data
+     */
+    public IChannel getChannel() {
+        return channel;
     }
 }

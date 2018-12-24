@@ -2,7 +2,6 @@ package ideaeclipse.DiscordAPINEW.bot.objects.presence;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
 import ideaeclipse.DiscordAPINEW.bot.objects.presence.game.IGame;
 import ideaeclipse.DiscordAPINEW.bot.objects.presence.game.LoadGame;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
@@ -10,11 +9,9 @@ import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
-import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @JsonFormat
@@ -79,33 +76,27 @@ import java.util.stream.Collectors;
  * @see IGame
  * @see Presence
  * @see LoadGame
- * @see StatusTypes
+ * @see UserStatus
  * @see ideaeclipse.DiscordAPINEW.webSocket.Wss#Wss(IPrivateBot, String)
  */
-public class PresenceUpdate extends Event implements IDiscordAction {
-    private final Map<Long, IDiscordUser> users;
-    private IPresence presence;
+public class PresenceUpdate extends Event {
+    private final IPrivateBot bot;
+    private final IPresence presence;
 
     /**
-     * @param users users map from {@link IPrivateBot}
-     */
-    public PresenceUpdate(final Map<Long, IDiscordUser> users) {
-        this.users = users;
-    }
-
-    /**
-     * {@link Util#check(EventManager, Event, Json)} validates json object has right keys
-     * Filters {@link StatusTypes} to get a enum value instead of a string
+     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json object has right keys
+     * Filters {@link UserStatus} to get a enum value instead of a string
      *
      * @param json json from {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
-     * @see StatusTypes
+     * @see UserStatus
      */
-    @Override
-    public void initialize(@JsonValidity( {"game", "status", "user"}) Json json) {
-        List<StatusTypes> filtered = Arrays.stream(StatusTypes.values()).filter(o -> o.name().toLowerCase().equals(String.valueOf(json.get("status")).toLowerCase())).collect(Collectors.toList());
-        this.presence = new Presence(!filtered.isEmpty() ? filtered.get(0) : StatusTypes.invisible
+    private PresenceUpdate(@JsonValidity({"game", "status", "user"}) final Json json, final IPrivateBot bot) {
+        this.bot = bot;
+        List<UserStatus> filtered = Arrays.stream(UserStatus.values()).filter(o -> o.name().toLowerCase().equals(String.valueOf(json.get("status")).toLowerCase())).collect(Collectors.toList());
+        LoadGame game = !String.valueOf(json.get("game")).equals("null") ? Util.checkConstructor(LoadGame.class, new Json(String.valueOf(json.get("game"))), bot).getObject() : null;
+        this.presence = new Presence(!filtered.isEmpty() ? filtered.get(0) : UserStatus.invisible
                 , IDiscordUser.parse(Util.check(this, "loadUsers", new Json(String.valueOf(json.get("user")))).getObject())
-                , !String.valueOf(json.get("game")).equals("null") ? IGame.parse(Util.check(new LoadGame(), new Json(String.valueOf(json.get("game")))).getObject()) : null);
+                , game != null ? game.getGame() : null);
     }
 
     /**
@@ -115,8 +106,8 @@ public class PresenceUpdate extends Event implements IDiscordAction {
      * @param json sub json user
      * @return user object from users using the found id
      */
-    public IDiscordUser loadUsers(@JsonValidity( {"id"}) Json json) {
-        return this.users.get(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+    public IDiscordUser loadUsers(@JsonValidity({"id"}) Json json) {
+        return this.bot.getUsers().get(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
     }
 
     /**

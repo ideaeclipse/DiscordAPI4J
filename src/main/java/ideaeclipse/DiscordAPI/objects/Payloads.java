@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class Payloads {
     /**
-     * GameTypes use {@link GameTypes#ordinal()} to get integer value
+     * GameType use {@link GameTypes#ordinal()} to get integer value
      *
      * @see Game
      */

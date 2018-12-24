@@ -2,7 +2,6 @@ package ideaeclipse.DiscordAPINEW.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -38,31 +37,35 @@ import java.util.Map;
  * @see IDiscordUser
  * @see ideaeclipse.DiscordAPINEW.webSocket.Wss#Wss(IPrivateBot, String)
  */
-public class DeleteDiscordUser extends Event implements IDiscordAction {
-    private final Map<Long, IDiscordUser> users;
+public class DeleteDiscordUser extends Event {
+    private final IPrivateBot bot;
+    private final IDiscordUser user;
 
     /**
-     * @param users users map
-     */
-    public DeleteDiscordUser(final Map<Long, IDiscordUser> users) {
-        this.users = users;
-    }
-
-    /**
-     * {@link Util#check(EventManager, Event, Json)} validates json string for components
+     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json string for components
      * calls {@link #parse(Json)} to get id and then remove the key value pair from users with that id
      *
      * @param json json string from {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
      */
-    @Override
-    public void initialize(@JsonValidity( "user") Json json) {
-        Util.check(this, "parse", new Json(String.valueOf(json.get("user"))));
+    private DeleteDiscordUser(@JsonValidity("user") final Json json, final IPrivateBot bot) {
+        this.bot = bot;
+        this.user = IDiscordUser.parse(Util.check(this, "parse", new Json(String.valueOf(json.get("user")))));
     }
 
     /**
      * @param json parses 'id' from sub json 'user' and removes it from the users map
      */
-    public void parse(@JsonValidity( "id") Json json) {
-        users.remove(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+    public IDiscordUser parse(@JsonValidity("id") Json json) {
+        long id = Long.parseUnsignedLong(String.valueOf(json.get("id")));
+        IDiscordUser user = this.bot.getUsers().get(id);
+        this.bot.getUsers().remove(id);
+        return user;
+    }
+
+    /**
+     * @return object of deleted user
+     */
+    public IDiscordUser getUser() {
+        return user;
     }
 }

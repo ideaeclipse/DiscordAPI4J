@@ -16,7 +16,7 @@ public interface IPresence {
     /**
      * @return user's status
      */
-    StatusTypes getStatus();
+    UserStatus getStatus();
 
     /**
      * @return user object

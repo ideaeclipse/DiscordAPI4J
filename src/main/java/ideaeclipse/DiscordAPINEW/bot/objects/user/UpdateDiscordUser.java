@@ -2,7 +2,6 @@ package ideaeclipse.DiscordAPINEW.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
@@ -42,27 +41,19 @@ import java.util.Map;
  * @see IDiscordUser
  * @see ideaeclipse.DiscordAPINEW.webSocket.Wss#Wss(IPrivateBot, String)
  */
-public class UpdateDiscordUser extends Event implements IDiscordAction {
-    private final Map<Long, IRole> roles;
-    private IDiscordUser user;
+public class UpdateDiscordUser extends Event {
+    private final IPrivateBot bot;
+    private final IDiscordUser user;
 
     /**
-     * @param roles map of roles
-     */
-    public UpdateDiscordUser(final Map<Long, IRole> roles) {
-        this.roles = roles;
-    }
-
-    /**
-     * {@link Util#check(EventManager, Event, Json)} validates that the json object has proper components
+     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates that the json object has proper components
      * Uses {@link CreateDiscordUser} to parse the json string
      *
      * @param json json from {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
      */
-    @Override
-    public void initialize(@JsonValidity({"nick", "user", "roles"}) Json json) {
-        CreateDiscordUser user = new CreateDiscordUser(this.roles);
-        Util.check(user, json);
+    private UpdateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IPrivateBot bot) {
+        this.bot = bot;
+        CreateDiscordUser user = Util.checkConstructor(CreateDiscordUser.class, json, bot).getObject();
         this.user = user.getUser();
     }
 

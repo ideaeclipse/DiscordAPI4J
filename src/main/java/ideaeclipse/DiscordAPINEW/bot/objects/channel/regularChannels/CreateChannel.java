@@ -2,12 +2,19 @@ package ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.message.IMessage;
+import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
+import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
+import ideaeclipse.DiscordAPINEW.webSocket.RateLimitRecorder;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.JsonArray;
 import ideaeclipse.reflectionListener.Event;
 import ideaeclipse.reflectionListener.EventManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @JsonFormat
 /**
@@ -37,26 +44,35 @@ import ideaeclipse.reflectionListener.EventManager;
  * @see IChannel
  * @see ideaeclipse.DiscordAPINEW.webSocket.Wss#Wss(IPrivateBot, String)
  */
-public class CreateChannel extends Event implements IDiscordAction {
-    private IChannel channel;
+public class CreateChannel extends Event {
+    private final IPrivateBot bot;
+    private final IChannel channel;
 
     /**
-     * Does a validity check {@link ideaeclipse.DiscordAPINEW.utils.Util#check(EventManager, Event, Json)}
+     * Does a validity check {@link ideaeclipse.DiscordAPINEW.utils.Util#checkConstructor(Class, Json, IPrivateBot)}
      * and parses that data into a channel object
      *
      * @param json json object received from the websocket
+     * @param bot  bot from util
      * @see ideaeclipse.DiscordAPINEW.utils.Util
      */
-    @Override
-    public void initialize(@JsonValidity( {"nsfw", "name", "id", "type"}) Json json) {
+    private CreateChannel(@JsonValidity({"nsfw", "name", "id", "type"}) Json json, final IPrivateBot bot) {
+        this.bot = bot;
+        Map<Long, IMessage> messageHistory = new HashMap<>();
+        long id = Long.parseUnsignedLong(String.valueOf(json.get("id")));
+        for (Json json1 : new JsonArray(String.valueOf(Util.rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "channels/" + id + "/messages?limit=100"))))) {
+            MessageCreate message = Util.checkConstructor(MessageCreate.class,json1,bot).getObject();
+            messageHistory.put(message.getMessage().getId(),message.getMessage());
+        }
         this.channel = new Channel(Boolean.parseBoolean(String.valueOf(json.get("nsfw")))
                 , String.valueOf(json.get("name"))
-                , Long.parseUnsignedLong(String.valueOf(json.get("id")))
-                , Integer.parseInt(String.valueOf(json.get("type"))));
+                , id
+                , Integer.parseInt(String.valueOf(json.get("type")))
+                , messageHistory);
     }
 
     /**
-     * @return created channel object from {@link #initialize(Json)}
+     * @return created channel object from {@link #CreateChannel(Json, IPrivateBot)} )}
      */
     public IChannel getChannel() {
         return channel;

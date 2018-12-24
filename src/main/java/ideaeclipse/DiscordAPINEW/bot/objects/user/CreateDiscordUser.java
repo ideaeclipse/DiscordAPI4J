@@ -2,7 +2,6 @@ package ideaeclipse.DiscordAPINEW.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 
 @JsonFormat
 /**
- * TODO: remove user and nickname. Make methods that parse them and return them.
+ * TODO: remove user and nickname variables. Make methods that parse them and return them.
  * This class is called when a guild member add payload is sent to {@link ideaeclipse.DiscordAPI.webSocket.Wss}
  *
  * Json Example
@@ -48,33 +47,26 @@ import java.util.stream.Collectors;
  * @see IDiscordUser
  * @see ideaeclipse.DiscordAPINEW.webSocket.Wss#Wss(IPrivateBot, String)
  */
-public class CreateDiscordUser extends Event implements IDiscordAction {
+public class CreateDiscordUser extends Event {
+    private final IPrivateBot bot;
     private final List<IRole> userRoles = new LinkedList<>();
-    private final Map<Long, IRole> roles;
     private IDiscordUser user;
     private String nickname;
 
     /**
-     * @param roles map of roles
-     */
-    public CreateDiscordUser(final Map<Long, IRole> roles) {
-        this.roles = roles;
-    }
-
-    /**
-     * {@link Util#check(EventManager, Event, Json)} validates json components
+     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json components
      * parses roles from the map of roles, and parses nickname
      *
      * @param json json from {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
      */
-    @Override
-    public void initialize(@JsonValidity({"nick", "user", "roles"}) Json json) {
+    private CreateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IPrivateBot bot) {
+        this.bot = bot;
         String str = String.valueOf(json.get("roles"));
         List<String> strings = Arrays.asList(str.substring(1, str.length() - 1).trim().split("\\s*,\\s*"));
         strings = strings.stream().filter(o -> o.length() > 0).collect(Collectors.toList());
         for (String string : strings) {
             Long l = Long.parseUnsignedLong(string.replace("\"", ""));
-            userRoles.add(roles.get(l));
+            userRoles.add(this.bot.getRoles().get(l));
         }
         this.nickname = String.valueOf(json.get("nick"));
         Util.check(this, "load", new Json(String.valueOf(json.get("user"))));

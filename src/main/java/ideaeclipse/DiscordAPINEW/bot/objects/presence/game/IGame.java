@@ -32,7 +32,7 @@ public interface IGame {
     /**
      * @return type of program
      */
-    int getType();
+    GameType getType();
 
     /**
      * checks to see if the object you think is a game object can be casted to one.

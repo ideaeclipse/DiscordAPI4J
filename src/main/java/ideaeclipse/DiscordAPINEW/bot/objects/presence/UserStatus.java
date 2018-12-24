@@ -8,7 +8,7 @@ package ideaeclipse.DiscordAPINEW.bot.objects.presence;
  * @see IPresence
  * @see Presence
  */
-public enum StatusTypes {
+public enum UserStatus {
     online,
     dnd,
     idle,

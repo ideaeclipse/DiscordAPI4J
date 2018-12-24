@@ -1,6 +1,7 @@
 package ideaeclipse.DiscordAPINEW.bot.objects.presence.game;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -49,19 +50,22 @@ import ideaeclipse.reflectionListener.EventManager;
  * @see ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate
  */
 public class LoadGame extends Event {
+    private final IPrivateBot bot;
+    private final IGame game;
+
     /**
-     * {@link Util#check(EventManager, Event, Json)} validates json components
+     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json components
      * parses information into an {@link IGame} object
      *
      * @param json json from websocket {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
-     * @return game object
      */
-    public IGame initialize(@JsonValidity( {"assets", "state", "details", "type"}) Json json) {
-        return new Game(String.valueOf(json.get("name"))
+    private LoadGame(@JsonValidity({"assets", "state", "details", "type"}) final Json json, final IPrivateBot bot) {
+        this.bot = bot;
+        this.game = new Game(String.valueOf(json.get("name"))
                 , String.valueOf(json.get("state"))
                 , String.valueOf(json.get("details"))
                 , String.valueOf(Util.check(this, "additionalText", new Json(String.valueOf(json.get("assets")))).getObject())
-                , Integer.parseInt(String.valueOf(json.get("type"))));
+                , GameType.values()[Integer.parseInt(String.valueOf(json.get("type")))]);
     }
 
     /**
@@ -70,7 +74,14 @@ public class LoadGame extends Event {
      * @param json sub json 'assets'
      * @return addition details
      */
-    public String additionalText(@JsonValidity( "large_text") Json json) {
+    public String additionalText(@JsonValidity("large_text") Json json) {
         return String.valueOf(json.get("large_text"));
+    }
+
+    /**
+     * @return returns game object
+     */
+    public IGame getGame() {
+        return game;
     }
 }

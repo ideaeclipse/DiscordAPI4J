@@ -2,7 +2,6 @@ package ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.IDiscordAction;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -46,24 +45,28 @@ import java.util.Map;
  * @see IChannel
  * @see ideaeclipse.DiscordAPINEW.webSocket.Wss#Wss(IPrivateBot, String)
  */
-public class DeleteChannel extends Event implements IDiscordAction {
-    private final Map<Long, IChannel> channels;
-
-    /**
-     * @param channels passes map of channels from {@link ideaeclipse.DiscordAPINEW.bot.IPrivateBot}
-     */
-    public DeleteChannel(final Map<Long, IChannel> channels) {
-        this.channels = channels;
-    }
+public class DeleteChannel extends Event {
+    private final IPrivateBot bot;
+    private final IChannel channel;
 
     /**
      * Ensures key value id is present and removes based on id.
      * Id will always be a valid long.
      *
      * @param json json string sent from {@link ideaeclipse.DiscordAPINEW.webSocket.Wss}
+     * @param bot  bot from util
      */
-    @Override
-    public void initialize(@JsonValidity( "id") Json json) {
-        channels.remove(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+    private DeleteChannel(@JsonValidity("id") Json json, final IPrivateBot bot) {
+        this.bot = bot;
+        long id = Long.parseUnsignedLong(String.valueOf(json.get("id")));
+        this.channel = this.bot.getChannels().get(id);
+        this.bot.getChannels().remove(id);
+    }
+
+    /**
+     * @return deleted channel object
+     */
+    public IChannel getChannel() {
+        return channel;
     }
 }

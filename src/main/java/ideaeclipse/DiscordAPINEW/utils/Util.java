@@ -1,5 +1,6 @@
 package ideaeclipse.DiscordAPINEW.utils;
 
+import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.DiscordAPINEW.utils.interfaces.IHttpRequests;
 import ideaeclipse.DiscordAPINEW.webSocket.RateLimitRecorder;
@@ -10,6 +11,7 @@ import ideaeclipse.reflectionListener.EventManager;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -19,25 +21,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * TODO: improve check
+ */
 public class Util {
     public static final RateLimitRecorder rateLimitRecorder = new RateLimitRecorder();
     public static Long guildId;
     public static IHttpRequests requests;
-
-    public static <K, T extends Event> CheckResponse<K> check(final EventManager manager, final T object, final Json json) {
-        return check(manager, object, "initialize", json);
-    }
-
-    public static <K, T extends Event> CheckResponse<K> check(final EventManager manager, final T object, final String methodName, final Json json) {
-        CheckResponse<K> r = check(object, methodName, json);
-        if (r.getType().equals(CheckResponeType.EXECUTED))
-            manager.callEvent(object);
-        return r;
-    }
-
-    public static <K, T extends Event> CheckResponse<K> check(final T object, final Json json) {
-        return check(object, "initialize", json);
-    }
 
     public static <K, T extends Event> CheckResponse<K> check(final T object, final String methodName, final Json json) {
         try {
@@ -48,12 +38,40 @@ public class Util {
                 if (!validityList.isEmpty()) {
                     JsonValidity validity = (JsonValidity) validityList.get(0);
                     if (json.getMap().keySet().containsAll(Arrays.asList(validity.value()))) {
+                        Object o = initialize.invoke(object,json);
                         return new CheckResponse<>(CheckResponeType.EXECUTED, (K) initialize.invoke(object, json));
                     }
                     return new CheckResponse<>(CheckResponeType.NOTEXECUTED, null);
                 }
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return new CheckResponse<>(CheckResponeType.NOTFOUND, null);
+    }
+
+    public static <T extends Event> CheckResponse<T> checkConstructor(final EventManager manager, final Class<T> object, final Json json, final IPrivateBot bot) {
+        CheckResponse<T> r = checkConstructor(object, json, bot);
+        if (r.getType().equals(CheckResponeType.EXECUTED))
+            manager.callEvent(r.getObject());
+        return r;
+    }
+
+    public static <T extends Event> CheckResponse<T> checkConstructor(final Class<T> object, final Json json, final IPrivateBot bot) {
+        try {
+            Constructor<T> constructor = object.getDeclaredConstructor(Json.class, IPrivateBot.class);
+            if (constructor != null) {
+                constructor.setAccessible(true);
+                List<Annotation> validityList = Arrays.stream(constructor.getParameterAnnotations()[0]).filter(o -> o.annotationType().equals(JsonValidity.class)).collect(Collectors.toList());
+                if (!validityList.isEmpty()) {
+                    JsonValidity validity = (JsonValidity) validityList.get(0);
+                    if (json.getMap().keySet().containsAll(Arrays.asList(validity.value()))) {
+                        return new CheckResponse<>(CheckResponeType.EXECUTED, constructor.newInstance(json, bot));
+                    }
+                    return new CheckResponse<>(CheckResponeType.NOTEXECUTED, null);
+                }
+            }
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return new CheckResponse<>(CheckResponeType.NOTFOUND, null);
@@ -120,6 +138,7 @@ public class Util {
                 e.printStackTrace();
             }
         }
+
         /**
          * If you need to use the Post Method for a web url
          *

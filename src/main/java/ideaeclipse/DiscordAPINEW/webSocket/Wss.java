@@ -12,6 +12,9 @@ import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.DeleteChann
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.UpdateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
 import ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate;
+import ideaeclipse.DiscordAPINEW.bot.objects.reaction.AddReaction;
+import ideaeclipse.DiscordAPINEW.bot.objects.reaction.IReaction;
+import ideaeclipse.DiscordAPINEW.bot.objects.reaction.RemoveReaction;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
@@ -19,6 +22,7 @@ import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.CreateDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.UpdateDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.CheckResponeType;
+import ideaeclipse.DiscordAPINEW.utils.CheckResponse;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
@@ -60,60 +64,61 @@ public class Wss extends WebSocketFactory {
                                 if (!filtered.isEmpty()) {
                                     switch (filtered.get(0)) {
                                         case MESSAGE_CREATE:
-                                            Util.check(bot.getManager(), new MessageCreate(bot.getChannels(), bot.getUsers()), d);
+                                            Util.checkConstructor(bot.getManager(), MessageCreate.class, d, bot);
                                             break;
                                         case PRESENCE_UPDATE:
-                                            Util.check(bot.getManager(), new PresenceUpdate(bot.getUsers()), d);
+                                            Util.checkConstructor(bot.getManager(), PresenceUpdate.class, d, bot);
                                             break;
                                         case CHANNEL_CREATE:
-                                            CreateChannel channel = new CreateChannel();
-                                            if (!Util.check(bot.getManager(), channel, d).getType().equals(CheckResponeType.EXECUTED))
-                                                Util.check(bot.getManager(), new CreateDMChannel(bot.getUsers(), bot.getChannels()), d);
-                                            else
+                                            CheckResponse<CreateChannel> channelCheckResponse = Util.checkConstructor(bot.getManager(), CreateChannel.class, d, bot);
+                                            if (!channelCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
+                                                CreateDMChannel channel = Util.checkConstructor(bot.getManager(), CreateDMChannel.class, d, bot).getObject();
                                                 bot.getChannels().put(channel.getChannel().getId(), channel.getChannel());
-                                            System.out.println(bot.getChannels());
+                                            } else {
+                                                bot.getChannels().put(channelCheckResponse.getObject().getChannel().getId(), channelCheckResponse.getObject().getChannel());
+                                            }
                                             break;
                                         case CHANNEL_UPDATE:
-                                            UpdateChannel Updatechannel = new UpdateChannel();
-                                            if (Util.check(bot.getManager(), Updatechannel, d).getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getChannels().put(Updatechannel.getChannel().getId(), Updatechannel.getChannel());
-                                            System.out.println(bot.getChannels());
+                                            CheckResponse<UpdateChannel> updateChannelCheckResponse = Util.checkConstructor(bot.getManager(), UpdateChannel.class, d, bot);
+                                            if (updateChannelCheckResponse.getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getChannels().put(updateChannelCheckResponse.getObject().getChannel().getId(), updateChannelCheckResponse.getObject().getChannel());
                                             break;
                                         case CHANNEL_DELETE:
-                                            Util.check(bot.getManager(), new DeleteChannel(bot.getChannels()), d);
-                                            System.out.println(bot.getChannels());
+                                            Util.checkConstructor(bot.getManager(), DeleteChannel.class, d, bot);
                                             break;
                                         case GUILD_ROLE_CREATE:
-                                            CreateRole role = new CreateRole();
-                                            if (Util.check(bot.getManager(), role, new Json(String.valueOf(d.get("role")))).getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getRoles().put(role.getRole().getId(), role.getRole());
-                                            System.out.println(bot.getRoles());
+                                            CheckResponse<CreateRole> createRoleCheckResponse = Util.checkConstructor(bot.getManager(), CreateRole.class, d, bot);
+                                            if (createRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getRoles().put(createRoleCheckResponse.getObject().getRole().getId(), createRoleCheckResponse.getObject().getRole());
                                             break;
                                         case GUILD_ROLE_UPDATE:
-                                            UpdateRole Updaterole = new UpdateRole();
-                                            if (Util.check(bot.getManager(), Updaterole, d).getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getRoles().put(Updaterole.getRole().getId(), Updaterole.getRole());
-                                            System.out.println(bot.getRoles());
+                                            CheckResponse<UpdateRole> updateRoleCheckResponse = Util.checkConstructor(bot.getManager(), UpdateRole.class, d, bot);
+                                            if (updateRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getRoles().put(updateRoleCheckResponse.getObject().getRole().getId(), updateRoleCheckResponse.getObject().getRole());
                                             break;
                                         case GUILD_ROLE_DELETE:
-                                            Util.check(bot.getManager(), new DeleteRole(bot.getRoles()), d);
-                                            System.out.println(bot.getRoles());
+                                            Util.checkConstructor(bot.getManager(), DeleteRole.class, d, bot);
                                             break;
                                         case GUILD_MEMBER_ADD:
-                                            CreateDiscordUser user = new CreateDiscordUser(bot.getRoles());
-                                            if (Util.check(bot.getManager(), user, d).getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getUsers().put(user.getUser().getId(), user.getUser());
-                                            System.out.println(bot.getUsers());
+                                            CheckResponse<CreateDiscordUser> createDiscordUserCheckResponse = Util.checkConstructor(bot.getManager(), CreateDiscordUser.class, d, bot);
+                                            if (createDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getUsers().put(createDiscordUserCheckResponse.getObject().getUser().getId(), createDiscordUserCheckResponse.getObject().getUser());
                                             break;
                                         case GUILD_MEMBER_UPDATE:
-                                            UpdateDiscordUser Updateuser = new UpdateDiscordUser(bot.getRoles());
-                                            if (Util.check(bot.getManager(), Updateuser, d).getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getUsers().put(Updateuser.getUser().getId(), Updateuser.getUser());
-                                            System.out.println(bot.getUsers());
+                                            CheckResponse<UpdateDiscordUser> updateDiscordUserCheckResponse = Util.checkConstructor(bot.getManager(), UpdateDiscordUser.class, d, bot);
+                                            if (updateDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED))
+                                                bot.getUsers().put(updateDiscordUserCheckResponse.getObject().getUser().getId(), updateDiscordUserCheckResponse.getObject().getUser());
                                             break;
                                         case GUILD_MEMBER_REMOVE:
-                                            Util.check(bot.getManager(), new DeleteDiscordUser(bot.getUsers()), d);
-                                            System.out.println(bot.getUsers());
+                                            Util.checkConstructor(bot.getManager(), DeleteDiscordUser.class, d, bot);
+                                            break;
+                                        case MESSAGE_REACTION_ADD:
+                                            AddReaction addReaction = Util.checkConstructor(bot.getManager(), AddReaction.class, d, bot).getObject();
+                                            IReaction reaction = addReaction.getReaction();
+                                            reaction.getChannel().getMessageHistory().get(reaction.getMessage().getId()).addReaction(reaction.getCode());
+                                            break;
+                                        case MESSAGE_REACTION_REMOVE:
+                                            Util.checkConstructor(bot.getManager(), RemoveReaction.class, d, bot);
                                             break;
                                     }
                                 }
@@ -178,5 +183,9 @@ public class Wss extends WebSocketFactory {
 
     private void sendText(final Json json) {
         rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.WebSocketEvent(socket, json));
+    }
+
+    public WebSocket getSocket() {
+        return socket;
     }
 }

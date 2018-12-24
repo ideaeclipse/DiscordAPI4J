@@ -1,10 +1,12 @@
 package ideaeclipse.DiscordAPINEW.bot.objects.channel;
 
+import ideaeclipse.DiscordAPINEW.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPINEW.webSocket.RateLimitRecorder;
 import ideaeclipse.JsonUtilities.Json;
 
 import java.util.List;
+import java.util.Map;
 
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
@@ -85,6 +87,7 @@ public abstract class IChannel {
 
     /**
      * Valid for all channel types
+     *
      * @return type of channel 0,1,2,4
      */
     public abstract int getType();
@@ -92,8 +95,19 @@ public abstract class IChannel {
     /**
      * TODO: voice channels @see
      * Only valid for voice channels and direct message channels
+     *
      * @return list of participants in the channel
      * @see ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.DMChannel
      */
     public abstract List<IDiscordUser> getReciepients();
+
+    /**
+     * @return last 100 messages
+     */
+    public abstract Map<Long, IMessage> getMessageHistory();
+
+    /**
+     * @param message message to add to history
+     */
+    public abstract void addMessage(final IMessage message);
 }

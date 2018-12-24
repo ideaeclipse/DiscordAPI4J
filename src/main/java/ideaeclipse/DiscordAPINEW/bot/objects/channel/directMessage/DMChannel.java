@@ -1,9 +1,11 @@
 package ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage;
 
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Parsed direct message channel into a class object
@@ -51,5 +53,14 @@ public class DMChannel extends IChannel {
     @Override
     public List<IDiscordUser> getReciepients() {
         return this.recipients;
+    }
+
+    @Override
+    public Map<Long, IMessage> getMessageHistory() {
+        return null;
+    }
+
+    @Override
+    public void addMessage(IMessage message) {
     }
 }
