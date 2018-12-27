@@ -6,6 +6,7 @@ import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
+import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.CreateDMChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.CreateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.DeleteChannel;
@@ -17,9 +18,11 @@ import ideaeclipse.DiscordAPINEW.bot.objects.reaction.IReaction;
 import ideaeclipse.DiscordAPINEW.bot.objects.reaction.RemoveReaction;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.CreateDiscordUser;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.UpdateDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.CheckResponeType;
 import ideaeclipse.DiscordAPINEW.utils.CheckResponse;
@@ -39,7 +42,6 @@ import java.util.stream.Collectors;
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
 /**
- *
  * TODO: Remove dependency on json file. make a static string
  * TODO: Update the way each dispatch gets handled
  */
@@ -74,41 +76,53 @@ public class Wss extends WebSocketFactory {
                                             CheckResponse<CreateChannel> channelCheckResponse = Util.checkConstructor(bot.getManager(), CreateChannel.class, d, bot);
                                             if (!channelCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
                                                 CreateDMChannel channel = Util.checkConstructor(bot.getManager(), CreateDMChannel.class, d, bot).getObject();
-                                                bot.getChannels().put(channel.getChannel().getId(), channel.getChannel());
+                                                IChannel channel1 = channel.getChannel();
+                                                bot.getChannels().put(channel1.getId(), channel1.getName(), channel1);
                                             } else {
-                                                bot.getChannels().put(channelCheckResponse.getObject().getChannel().getId(), channelCheckResponse.getObject().getChannel());
+                                                IChannel channel = channelCheckResponse.getObject().getChannel();
+                                                bot.getChannels().put(channel.getId(), channel.getName(), channel);
                                             }
                                             break;
                                         case CHANNEL_UPDATE:
                                             CheckResponse<UpdateChannel> updateChannelCheckResponse = Util.checkConstructor(bot.getManager(), UpdateChannel.class, d, bot);
-                                            if (updateChannelCheckResponse.getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getChannels().put(updateChannelCheckResponse.getObject().getChannel().getId(), updateChannelCheckResponse.getObject().getChannel());
+                                            if (updateChannelCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
+                                                IChannel channel = updateChannelCheckResponse.getObject().getChannel();
+                                                bot.getChannels().put(channel.getId(),channel.getName(), channel);
+                                            }
                                             break;
                                         case CHANNEL_DELETE:
                                             Util.checkConstructor(bot.getManager(), DeleteChannel.class, d, bot);
                                             break;
                                         case GUILD_ROLE_CREATE:
                                             CheckResponse<CreateRole> createRoleCheckResponse = Util.checkConstructor(bot.getManager(), CreateRole.class, d, bot);
-                                            if (createRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getRoles().put(createRoleCheckResponse.getObject().getRole().getId(), createRoleCheckResponse.getObject().getRole());
+                                            if (createRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
+                                                IRole role = createRoleCheckResponse.getObject().getRole();
+                                                bot.getRoles().put(role.getId(),role.getName(), role);
+                                            }
                                             break;
                                         case GUILD_ROLE_UPDATE:
                                             CheckResponse<UpdateRole> updateRoleCheckResponse = Util.checkConstructor(bot.getManager(), UpdateRole.class, d, bot);
-                                            if (updateRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getRoles().put(updateRoleCheckResponse.getObject().getRole().getId(), updateRoleCheckResponse.getObject().getRole());
+                                            if (updateRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
+                                                IRole role = updateRoleCheckResponse.getObject().getRole();
+                                                bot.getRoles().put(role.getId(),role.getName(), role);
+                                            }
                                             break;
                                         case GUILD_ROLE_DELETE:
                                             Util.checkConstructor(bot.getManager(), DeleteRole.class, d, bot);
                                             break;
                                         case GUILD_MEMBER_ADD:
                                             CheckResponse<CreateDiscordUser> createDiscordUserCheckResponse = Util.checkConstructor(bot.getManager(), CreateDiscordUser.class, d, bot);
-                                            if (createDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getUsers().put(createDiscordUserCheckResponse.getObject().getUser().getId(), createDiscordUserCheckResponse.getObject().getUser());
+                                            if (createDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
+                                                IDiscordUser user = createDiscordUserCheckResponse.getObject().getUser();
+                                                bot.getUsers().put(user.getId(),user.getUsername(), user);
+                                            }
                                             break;
                                         case GUILD_MEMBER_UPDATE:
                                             CheckResponse<UpdateDiscordUser> updateDiscordUserCheckResponse = Util.checkConstructor(bot.getManager(), UpdateDiscordUser.class, d, bot);
-                                            if (updateDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED))
-                                                bot.getUsers().put(updateDiscordUserCheckResponse.getObject().getUser().getId(), updateDiscordUserCheckResponse.getObject().getUser());
+                                            if (updateDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
+                                                IDiscordUser user = updateDiscordUserCheckResponse.getObject().getUser();
+                                                bot.getUsers().put(user.getId(),user.getUsername(), user);
+                                            }
                                             break;
                                         case GUILD_MEMBER_REMOVE:
                                             Util.checkConstructor(bot.getManager(), DeleteDiscordUser.class, d, bot);

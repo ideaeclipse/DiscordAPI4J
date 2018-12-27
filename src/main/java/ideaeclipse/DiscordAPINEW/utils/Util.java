@@ -156,6 +156,18 @@ public class Util {
             }
         }
 
+        public void delete(final String url){
+            try {
+                HttpsURLConnection con = initialize(new URL(APIBASE + url));
+                con.setDoOutput(true);
+                con.setRequestMethod("DELETE");
+                con.setFixedLengthStreamingMode(0);
+                printOutput(con.getInputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         /**
          * This method will send Post method with a json String
          *

@@ -7,6 +7,7 @@ import ideaeclipse.DiscordAPINEW.bot.objects.channel.directMessage.CreateDMChann
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.CreateChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.DeleteChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.channel.regularChannels.UpdateChannel;
+import ideaeclipse.DiscordAPINEW.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPINEW.bot.objects.message.MessageCreate;
 import ideaeclipse.DiscordAPINEW.bot.objects.presence.PresenceUpdate;
 import ideaeclipse.DiscordAPINEW.bot.objects.presence.UserStatus;
@@ -14,14 +15,15 @@ import ideaeclipse.DiscordAPINEW.bot.objects.presence.game.GameType;
 import ideaeclipse.DiscordAPINEW.bot.objects.reaction.AddReaction;
 import ideaeclipse.DiscordAPINEW.bot.objects.reaction.IReaction;
 import ideaeclipse.DiscordAPINEW.bot.objects.reaction.RemoveReaction;
+import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.DeleteRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
-import ideaeclipse.DiscordAPINEW.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.UpdateRole;
+import ideaeclipse.DiscordAPINEW.bot.objects.user.CreateDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
-import ideaeclipse.DiscordAPINEW.bot.objects.user.CreateDiscordUser;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.UpdateDiscordUser;
+import ideaeclipse.DiscordAPINEW.utils.MultiKeyMap;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.webSocket.RateLimitRecorder;
 import ideaeclipse.DiscordAPINEW.webSocket.TextOpCodes;
@@ -39,7 +41,7 @@ import java.util.Map;
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
 /**
- * TODO: finish message history, then do reactions
+ * TODO: Multi Key maps
  * TODO: Leaving a running copy on the server and wait for disconnection. Make sure the things get printed out before compilation
  * TODO: Allow for querying of dm channels
  * TODO: reactions
@@ -51,9 +53,9 @@ import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
  */
 public class DiscordBot implements IPrivateBot {
     private final EventManager manager;
-    private final Map<Long, IRole> roles = new HashMap<>();
-    private final Map<Long, IDiscordUser> users = new HashMap<>();
-    private final Map<Long, IChannel> channels = new HashMap<>();
+    private final MultiKeyMap<Long, String, IRole> roles = new MultiKeyMap<>();
+    private final MultiKeyMap<Long, String, IDiscordUser> users = new MultiKeyMap<>();
+    private final MultiKeyMap<Long, String, IChannel> channels = new MultiKeyMap<>();
     private final Map<String, IReaction> reactions = new HashMap<>();
     private WebSocket socket;
 
@@ -66,21 +68,21 @@ public class DiscordBot implements IPrivateBot {
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/roles")))) {
             CreateRole role = Util.checkConstructor(CreateRole.class, json, this).getObject();
             System.out.println(role.getRole());
-            roles.put(role.getRole().getId(), role.getRole());
+            roles.put(role.getRole().getId(), role.getRole().getName(), role.getRole());
         }
         System.out.println("Roles loaded");
         System.out.println("Loading users");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/members" + "?limit=1000")))) {
             CreateDiscordUser user = Util.checkConstructor(CreateDiscordUser.class, json, this).getObject();
             System.out.println(user.getUser());
-            users.put(user.getUser().getId(), user.getUser());
+            users.put(user.getUser().getId(), user.getUser().getUsername(), user.getUser());
         }
         System.out.println("Users loaded");
         System.out.println("Loading channels");
         for (Json json : new JsonArray((String) rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.get, "guilds/" + serverId + "/channels")))) {
             CreateChannel channel = Util.checkConstructor(CreateChannel.class, json, this).getObject();
             System.out.println(channel.getChannel());
-            channels.put(channel.getChannel().getId(), channel.getChannel());
+            channels.put(channel.getChannel().getId(), channel.getChannel().getName(), channel.getChannel());
         }
         System.out.println("Channels loaded");
 
@@ -97,17 +99,17 @@ public class DiscordBot implements IPrivateBot {
     }
 
     @Override
-    public Map<Long, IDiscordUser> getUsers() {
+    public MultiKeyMap<Long, String, IDiscordUser> getUsers() {
         return this.users;
     }
 
     @Override
-    public Map<Long, IChannel> getChannels() {
+    public MultiKeyMap<Long, String, IChannel> getChannels() {
         return this.channels;
     }
 
     @Override
-    public Map<Long, IRole> getRoles() {
+    public MultiKeyMap<Long, String, IRole> getRoles() {
         return this.roles;
     }
 
@@ -129,7 +131,7 @@ public class DiscordBot implements IPrivateBot {
         String info = "{\"recipient_id\":?id}";
         info = info.replace("?id", String.valueOf(user.getId()));
         CreateDMChannel channel = Util.checkConstructor(CreateDMChannel.class, new Json(String.valueOf(rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.sendJson, "/users/@me/channels", new Json(info))))), this).getObject();
-        this.getChannels().put(channel.getChannel().getId(), channel.getChannel());
+        this.getChannels().put(channel.getChannel().getId(), channel.getChannel().getName(), channel.getChannel());
         return channel.getChannel();
     }
 
@@ -147,7 +149,8 @@ public class DiscordBot implements IPrivateBot {
         public void messageTest(MessageCreate create) {
             System.out.println(create.getMessage());
             if (!create.getMessage().getUser().getUsername().equals("Testing")) {
-                create.getMessage().getChannel().sendMessage("pong");
+                IMessage message = create.getMessage();
+                //create.getMessage().getChannel().sendMessage("pong");
                 //this.bot.createDmChannel(create.getMessage().getUser()).sendMessage("Why you messaging in my channel");
                 //this.bot.setStatus(GameType.playing, "with numbers", UserStatus.online);
                 // create.getMessage().getUser().addRole(bot.getRoles().get(Long.parseUnsignedLong("525059526345490442")));

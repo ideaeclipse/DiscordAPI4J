@@ -12,7 +12,6 @@ import ideaeclipse.reflectionListener.Event;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @JsonFormat
 /**
@@ -69,7 +68,7 @@ public class CreateDMChannel extends Event {
      * @return Searched user from user map with the valid id key
      */
     public IDiscordUser getId(@JsonValidity("id") Json json) {
-        return this.bot.getUsers().get(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+        return this.bot.getUsers().getByK1(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
     }
 
     /**

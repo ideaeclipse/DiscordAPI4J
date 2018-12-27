@@ -7,8 +7,6 @@ import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
 
-import java.util.Map;
-
 @JsonFormat
 /**
  * Remove's a channel based on it's id
@@ -59,8 +57,8 @@ public class DeleteChannel extends Event {
     private DeleteChannel(@JsonValidity("id") Json json, final IPrivateBot bot) {
         this.bot = bot;
         long id = Long.parseUnsignedLong(String.valueOf(json.get("id")));
-        this.channel = this.bot.getChannels().get(id);
-        this.bot.getChannels().remove(id);
+        this.channel = this.bot.getChannels().getByK1(id);
+        this.bot.getChannels().removeByK1(id);
     }
 
     /**

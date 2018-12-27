@@ -1,4 +1,4 @@
-package ideaeclipse.DiscordAPINEW;
+package DiscordBotNew;
 
 import ideaeclipse.DiscordAPINEW.bot.DiscordBot;
 

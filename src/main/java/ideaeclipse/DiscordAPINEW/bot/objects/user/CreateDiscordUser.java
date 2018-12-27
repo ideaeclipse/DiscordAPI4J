@@ -7,12 +7,10 @@ import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
-import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @JsonFormat
@@ -66,7 +64,7 @@ public class CreateDiscordUser extends Event {
         strings = strings.stream().filter(o -> o.length() > 0).collect(Collectors.toList());
         for (String string : strings) {
             Long l = Long.parseUnsignedLong(string.replace("\"", ""));
-            userRoles.add(this.bot.getRoles().get(l));
+            userRoles.add(this.bot.getRoles().getByK1(l));
         }
         this.nickname = String.valueOf(json.get("nick"));
         Util.check(this, "load", new Json(String.valueOf(json.get("user"))));

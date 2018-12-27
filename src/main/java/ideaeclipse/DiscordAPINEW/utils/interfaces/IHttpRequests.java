@@ -30,6 +30,12 @@ public interface IHttpRequests {
     void put(final String url);
 
     /**
+     * Delete command
+     * @param url connection url
+     */
+    void delete(final String url);
+
+    /**
      * Send a json string as a post connection
      * @param url connection url
      * @param object json object

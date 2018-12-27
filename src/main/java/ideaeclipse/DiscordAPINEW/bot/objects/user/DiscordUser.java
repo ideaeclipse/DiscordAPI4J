@@ -26,11 +26,11 @@ public class DiscordUser implements IDiscordUser {
     private final List<IRole> roles;
 
     /**
-     * @param nickname users nickname
-     * @param username username
+     * @param nickname      users nickname
+     * @param username      username
      * @param discriminator discriminator
-     * @param id unique identifier
-     * @param roles list of roles the user has
+     * @param id            unique identifier
+     * @param roles         list of roles the user has
      */
     DiscordUser(final String nickname, final String username, final int discriminator, final long id, final List<IRole> roles) {
         this.nickname = nickname;
@@ -67,7 +67,15 @@ public class DiscordUser implements IDiscordUser {
 
     @Override
     public void addRole(final IRole role) {
-        rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.put, "guilds/" + Util.guildId + "/members/" + this.id + "/roles/" + role.getId()));
+        if (!this.getRoles().contains(role))
+            rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.put, "guilds/" + Util.guildId + "/members/" + this.id + "/roles/" + role.getId()));
+    }
+
+    @Override
+    public void removeRole(final IRole role) {
+        if(this.getRoles().contains(role)){
+            rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.delete,"guilds/" + Util.guildId + "/members/" + this.id + "/roles/" + role.getId()));
+        }
     }
 
     @Override

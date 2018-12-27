@@ -47,6 +47,13 @@ public interface IDiscordUser {
     void addRole(final IRole role);
 
     /**
+     * Removes a role from this user
+     *
+     * @param role role you wish to remove from user
+     */
+    void removeRole(final IRole role);
+
+    /**
      * Ensures that there is no cast exception when trying to cast a return object to a Discord User
      * if it is not a valid IDiscordUser return null
      *

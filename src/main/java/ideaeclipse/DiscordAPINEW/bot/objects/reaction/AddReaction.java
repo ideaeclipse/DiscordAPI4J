@@ -13,7 +13,7 @@ public class AddReaction extends Event {
 
     public AddReaction(@JsonValidity({"emoji", "channel_id", "message_id"}) final Json json, final IPrivateBot bot) {
         String s = String.valueOf(Util.check(this, "getEmojiName", new Json(String.valueOf(json.get("emoji")))).getObject());
-        IChannel channel = bot.getChannels().get(Long.parseUnsignedLong(String.valueOf(json.get("channel_id"))));
+        IChannel channel = bot.getChannels().getByK1(Long.parseUnsignedLong(String.valueOf(json.get("channel_id"))));
         this.reaction = new Reaction(EmojiUtils.shortCodify(s), s
                 , channel
                 , channel.getMessageHistory().get(Long.parseUnsignedLong(String.valueOf(json.get("message_id")))));

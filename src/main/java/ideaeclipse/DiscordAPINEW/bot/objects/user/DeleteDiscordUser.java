@@ -6,9 +6,6 @@ import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
-import ideaeclipse.reflectionListener.EventManager;
-
-import java.util.Map;
 
 @JsonFormat
 /**
@@ -57,8 +54,8 @@ public class DeleteDiscordUser extends Event {
      */
     public IDiscordUser parse(@JsonValidity("id") Json json) {
         long id = Long.parseUnsignedLong(String.valueOf(json.get("id")));
-        IDiscordUser user = this.bot.getUsers().get(id);
-        this.bot.getUsers().remove(id);
+        IDiscordUser user = this.bot.getUsers().getByK1(id);
+        this.bot.getUsers().removeByK1(id);
         return user;
     }
 

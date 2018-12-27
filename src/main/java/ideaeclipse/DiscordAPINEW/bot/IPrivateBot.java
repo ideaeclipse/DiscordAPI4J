@@ -6,6 +6,7 @@ import ideaeclipse.DiscordAPINEW.bot.objects.presence.game.GameType;
 import ideaeclipse.DiscordAPINEW.bot.objects.reaction.IReaction;
 import ideaeclipse.DiscordAPINEW.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
+import ideaeclipse.DiscordAPINEW.utils.MultiKeyMap;
 import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.Map;
@@ -19,11 +20,11 @@ import java.util.Map;
 public interface IPrivateBot {
     EventManager getManager();
 
-    Map<Long, IDiscordUser> getUsers();
+    MultiKeyMap<Long, String, IDiscordUser> getUsers();
 
-    Map<Long, IChannel> getChannels();
+    MultiKeyMap<Long, String, IChannel> getChannels();
 
-    Map<Long, IRole> getRoles();
+    MultiKeyMap<Long, String, IRole> getRoles();
 
     Map<String, IReaction> getReactions();
 

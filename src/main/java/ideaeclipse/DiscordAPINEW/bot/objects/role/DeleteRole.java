@@ -5,9 +5,6 @@ import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
-import ideaeclipse.reflectionListener.EventManager;
-
-import java.util.Map;
 
 @JsonFormat
 /**
@@ -39,8 +36,8 @@ public class DeleteRole extends Event {
     private DeleteRole(@JsonValidity("role_id") final Json json, final IPrivateBot bot) {
         this.bot = bot;
         long id = Long.parseUnsignedLong(String.valueOf(json.get("role_id")));
-        this.role = this.bot.getRoles().get(id);
-        this.bot.getRoles().remove(id);
+        this.role = this.bot.getRoles().getByK1(id);
+        this.bot.getRoles().removeByK1(id);
     }
 
     /**

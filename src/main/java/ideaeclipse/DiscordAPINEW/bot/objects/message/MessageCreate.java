@@ -4,14 +4,12 @@ package ideaeclipse.DiscordAPINEW.bot.objects.message;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import emoji4j.EmojiUtils;
 import ideaeclipse.DiscordAPINEW.bot.IPrivateBot;
-import ideaeclipse.DiscordAPINEW.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPINEW.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPINEW.utils.Util;
 import ideaeclipse.DiscordAPINEW.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
 import ideaeclipse.reflectionListener.Event;
-import ideaeclipse.reflectionListener.EventManager;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -77,7 +75,7 @@ public class MessageCreate extends Event {
             reactionMap = new HashMap<>();
         this.message = new Message(Long.parseUnsignedLong(String.valueOf(json.get("id")))
                 , String.valueOf(json.get("content"))
-                , this.bot.getChannels().get(Long.parseUnsignedLong(String.valueOf(json.get("channel_id"))))
+                , this.bot.getChannels().getByK1(Long.parseUnsignedLong(String.valueOf(json.get("channel_id"))))
                 , IDiscordUser.parse(Util.check(this, "getUser", new Json(String.valueOf(json.get("author")))).getObject())
                 , reactionMap);
         if (this.message.getChannel() != null)
@@ -91,7 +89,7 @@ public class MessageCreate extends Event {
      * @return Author's id value from user map
      */
     private IDiscordUser getUser(@JsonValidity({"id"}) Json json) {
-        return this.bot.getUsers().get(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+        return this.bot.getUsers().getByK1(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
     }
 
     /**

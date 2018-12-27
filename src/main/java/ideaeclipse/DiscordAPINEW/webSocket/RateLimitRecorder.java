@@ -135,6 +135,9 @@ public class RateLimitRecorder {
                     case put:
                         Util.requests.put(url);
                         break;
+                    case delete:
+                        Util.requests.delete(url);
+                        break;
                     case sendJson:
                         assert object != null;
                         return Util.requests.sendJson(url, object);

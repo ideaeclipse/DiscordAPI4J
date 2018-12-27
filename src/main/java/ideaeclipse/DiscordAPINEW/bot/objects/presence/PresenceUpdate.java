@@ -107,7 +107,7 @@ public class PresenceUpdate extends Event {
      * @return user object from users using the found id
      */
     public IDiscordUser loadUsers(@JsonValidity({"id"}) Json json) {
-        return this.bot.getUsers().get(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
+        return this.bot.getUsers().getByK1(Long.parseUnsignedLong(String.valueOf(json.get("id"))));
     }
 
     /**
