@@ -39,8 +39,9 @@ import java.util.stream.Collectors;
 import static ideaeclipse.DiscordAPINEW.utils.Util.rateLimitRecorder;
 
 /**
+ *
  * TODO: Remove dependency on json file. make a static string
- * TODO: Update the way each dispath gets handled
+ * TODO: Update the way each dispatch gets handled
  */
 public class Wss extends WebSocketFactory {
     private final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
@@ -134,11 +135,11 @@ public class Wss extends WebSocketFactory {
                             case Voice_Server_Ping:
                                 break;
                             case Resume:
-                                System.out.println("Resume: " + d);
+                                System.out.println("Resume: " + message);
                                 System.exit(-1);
                                 break;
                             case Reconnect:
-                                System.out.println("Reconnect: " + d);
+                                System.out.println("Reconnect: " + message);
                                 System.exit(-1);
                                 break;
                             case Request_Guild_Members:
