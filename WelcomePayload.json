@@ -8,7 +8,7 @@
     "compress": true,
     "presence": {
       "game": {
-        "name": "cm help for commands",
+        "name": "!help for commands",
         "type": 0
       },
       "afk": false,

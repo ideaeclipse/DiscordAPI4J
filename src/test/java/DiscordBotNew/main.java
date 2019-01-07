@@ -1,9 +1,10 @@
 package DiscordBotNew;
 
-import ideaeclipse.DiscordAPINEW.bot.DiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 
 public class main {
+    public static DiscordBot bot;
     public static void main(String[] ars) {
-        new DiscordBot(ars[0], ars[1]);
+        bot = new DiscordBot(ars[0], ars[1]);
     }
 }
