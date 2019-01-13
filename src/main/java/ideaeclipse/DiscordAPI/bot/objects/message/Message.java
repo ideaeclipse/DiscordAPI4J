@@ -14,7 +14,7 @@ import java.util.Map;
  * @see IChannel
  * @see IDiscordUser
  */
-public class Message implements IMessage {
+public final class Message implements IMessage {
     private final long id;
     private final String content;
     private final IChannel channel;
@@ -60,12 +60,12 @@ public class Message implements IMessage {
     }
 
     @Override
-    public void addReaction(String emoji) {
+    public void addReaction(final String emoji) {
         this.reactionMap.merge(emoji, 1, (a, b) -> a + b);
     }
 
     @Override
-    public void removeReaction(String emoji) {
+    public void removeReaction(final String emoji) {
         if (this.reactionMap.get(emoji) > 1)
             this.reactionMap.put(emoji, this.reactionMap.get(emoji) - 1);
         else

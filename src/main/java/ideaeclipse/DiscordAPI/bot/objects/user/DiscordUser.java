@@ -1,12 +1,11 @@
 package ideaeclipse.DiscordAPI.bot.objects.user;
 
 
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPI.utils.MultiKeyMap;
-import ideaeclipse.DiscordAPI.utils.Util;
-import ideaeclipse.DiscordAPI.webSocket.RateLimitRecorder;
-
-import static ideaeclipse.DiscordAPI.utils.Util.rateLimitRecorder;
+import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
+import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
 
 /**
  * The class is created from parsing a user's json data
@@ -17,12 +16,13 @@ import static ideaeclipse.DiscordAPI.utils.Util.rateLimitRecorder;
  * @see DeleteDiscordUser
  * @see IDiscordUser
  */
-public class DiscordUser implements IDiscordUser {
+public final class DiscordUser implements IDiscordUser {
+    private final IDiscordBot bot;
     private final String nickname;
     private final String username;
     private final int discriminator;
     private final long id;
-    private final MultiKeyMap<Long,String,IRole> roles;
+    private final MultiKeyMap<Long, String, IRole> roles;
 
     /**
      * @param nickname      users nickname
@@ -31,7 +31,8 @@ public class DiscordUser implements IDiscordUser {
      * @param id            unique identifier
      * @param roles         list of roles the user has
      */
-    DiscordUser(final String nickname, final String username, final int discriminator, final long id, final MultiKeyMap<Long,String,IRole> roles) {
+    DiscordUser(final IDiscordBot bot, final String nickname, final String username, final int discriminator, final long id, final MultiKeyMap<Long, String, IRole> roles) {
+        this.bot = bot;
         this.nickname = nickname;
         this.username = username;
         this.discriminator = discriminator;
@@ -72,7 +73,7 @@ public class DiscordUser implements IDiscordUser {
     @Override
     public void addRole(final IRole role) {
         if (!this.getRoles().containsValue(role)) {
-            rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.put, "guilds/" + Util.guildId + "/members/" + this.id + "/roles/" + role.getId()));
+            this.bot.getRateLimitRecorder().queue(new HttpEvent(this.bot, RequestTypes.PUT, "guilds/" + this.bot.getGuildId() + "/members/" + this.id + "/roles/" + role.getId()));
         } else {
             System.err.println("Role not found");
         }
@@ -81,7 +82,7 @@ public class DiscordUser implements IDiscordUser {
     @Override
     public void removeRole(final IRole role) {
         if (this.getRoles().containsValue(role)) {
-            rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.delete, "guilds/" + Util.guildId + "/members/" + this.id + "/roles/" + role.getId()));
+            this.bot.getRateLimitRecorder().queue(new HttpEvent(this.bot, RequestTypes.DELETE, "guilds/" + this.bot.getGuildId() + "/members/" + this.id + "/roles/" + role.getId()));
         }
     }
 

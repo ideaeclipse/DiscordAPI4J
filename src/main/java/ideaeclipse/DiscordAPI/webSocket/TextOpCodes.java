@@ -1,5 +1,10 @@
 package ideaeclipse.DiscordAPI.webSocket;
 
+/**
+ * Payload types
+ *
+ * @author Ideaeclipse
+ */
 public enum TextOpCodes {
     Dispatch,
     Heartbeat,

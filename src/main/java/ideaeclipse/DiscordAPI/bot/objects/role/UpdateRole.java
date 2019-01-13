@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.role;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -36,19 +36,19 @@ import ideaeclipse.reflectionListener.Event;
  * @see IRole
  * @see CreateRole
  * @see DeleteRole
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IPrivateBot, String)
+ * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
  */
-public class UpdateRole extends Event {
-    private final IPrivateBot bot;
+public final class UpdateRole extends Event {
+    private final IDiscordBot bot;
     private final IRole role;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IPrivateBot)}  validates inputted json string
+     * {@link Util#checkConstructor(Class, Json, IDiscordBot)}  validates inputted json string
      * uses {@link CreateRole} to parse json
      *
      * @param json json inputted from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      */
-    private UpdateRole(@JsonValidity({"role"}) final Json json, final IPrivateBot bot) {
+    private UpdateRole(@JsonValidity({"role"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         CreateRole role = Util.checkConstructor(CreateRole.class, new Json(String.valueOf(json.get("role"))), bot).getObject();
         this.role = role.getRole();

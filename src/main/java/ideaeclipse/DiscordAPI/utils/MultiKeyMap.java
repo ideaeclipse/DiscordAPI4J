@@ -83,9 +83,22 @@ public final class MultiKeyMap<K1, K2, V> {
         return this.k1VMap.containsValue(value) && this.k2VMap.containsValue(value);
     }
 
+    /**
+     * Does the map contains a key
+     *
+     * @param key key to see if exists
+     * @return boolean
+     */
     public boolean containsKey1(final K1 key) {
         return this.k1VMap.containsKey(key) && containsValue(this.k1VMap.get(key));
     }
+
+    /**
+     * Does the map contains a key
+     *
+     * @param key key to see if exists
+     * @return boolean
+     */
     public boolean containsKey2(final K2 key) {
         return this.k2VMap.containsKey(key) && containsValue(this.k2VMap.get(key));
     }
@@ -106,6 +119,6 @@ public final class MultiKeyMap<K1, K2, V> {
 
     @Override
     public String toString() {
-        return this.k1VMap + " : " + this.k2VMap;
+        return this.k1VMap.keySet() + " : " + this.k2VMap.keySet();
     }
 }

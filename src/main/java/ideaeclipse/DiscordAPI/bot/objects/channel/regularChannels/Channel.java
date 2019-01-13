@@ -1,5 +1,6 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels;
 
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
@@ -15,7 +16,7 @@ import java.util.Map;
  * @see UpdateChannel
  * @see IChannel
  */
-public class Channel extends IChannel {
+public final class Channel extends IChannel {
     private final boolean nsfw;
     private final String name;
     private final long id;
@@ -28,7 +29,8 @@ public class Channel extends IChannel {
      * @param id   channel unique identifier
      * @param type channel type 0: text 2: voice 4: group
      */
-    public Channel(final boolean nsfw, final String name, final long id, final int type, final Map<Long, IMessage> messageHistory) {
+    Channel(final IDiscordBot bot, final boolean nsfw, final String name, final long id, final int type, final Map<Long, IMessage> messageHistory) {
+        super(bot);
         this.nsfw = nsfw;
         this.name = name;
         this.id = id;

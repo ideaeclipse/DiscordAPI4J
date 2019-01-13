@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -35,19 +35,19 @@ import ideaeclipse.reflectionListener.Event;
  * @see CreateDiscordUser
  * @see DeleteDiscordUser
  * @see IDiscordUser
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IPrivateBot, String)
+ * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
  */
-public class UpdateDiscordUser extends Event {
-    private final IPrivateBot bot;
+public final class UpdateDiscordUser extends Event {
+    private final IDiscordBot bot;
     private final IDiscordUser user;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates that the json object has proper components
+     * {@link Util#checkConstructor(Class, Json, IDiscordBot)} validates that the json object has proper components
      * Uses {@link CreateDiscordUser} to parse the json string
      *
      * @param json json from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      */
-    private UpdateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IPrivateBot bot) {
+    private UpdateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         CreateDiscordUser user = Util.checkConstructor(CreateDiscordUser.class, json, bot).getObject();
         this.user = user.getUser();

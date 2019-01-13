@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel.directMessage;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPI.utils.Util;
@@ -40,22 +40,22 @@ import java.util.List;
  * @author Ideaeclipse
  * @see IChannel
  * @see DMChannel
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IPrivateBot, String)
+ * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
  */
-public class CreateDMChannel extends Event {
-    private final IPrivateBot bot;
+public final class CreateDMChannel extends Event {
+    private final IDiscordBot bot;
     private final IChannel channel;
 
     /**
      * @param json json string from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      */
-    private CreateDMChannel(@JsonValidity({"recipients", "id", "type"}) final Json json, final IPrivateBot bot) {
+    private CreateDMChannel(@JsonValidity({"recipients", "id", "type"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         List<IDiscordUser> recipients = new LinkedList<>();
         for (Json json1 : new JsonArray(String.valueOf(json.get("recipients")))) {
             Util.check(this, "getId", json1).ifPresent(o -> recipients.add(IDiscordUser.parse(o)));
         }
-        this.channel = new DMChannel(Long.parseUnsignedLong(String.valueOf(json.get("id")))
+        this.channel = new DMChannel(bot, Long.parseUnsignedLong(String.valueOf(json.get("id")))
                 , Integer.parseInt(String.valueOf(json.get("type")))
                 , recipients
         );

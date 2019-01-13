@@ -1,14 +1,14 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel;
 
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
-import ideaeclipse.DiscordAPI.webSocket.RateLimitRecorder;
+import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
+import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
 import ideaeclipse.JsonUtilities.Json;
 
 import java.util.List;
 import java.util.Map;
-
-import static ideaeclipse.DiscordAPI.utils.Util.rateLimitRecorder;
 
 /**
  * Abstract class that is the super class for all channel objects
@@ -26,6 +26,12 @@ import static ideaeclipse.DiscordAPI.utils.Util.rateLimitRecorder;
  * @see ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels.UpdateChannel
  */
 public abstract class IChannel {
+    private final IDiscordBot bot;
+
+    public IChannel(final IDiscordBot bot) {
+        this.bot = bot;
+    }
+
     /**
      * Allows for sending string based messages in text or direct message channels
      *
@@ -38,7 +44,7 @@ public abstract class IChannel {
             Json object = new Json();
             object.put("content", message);
             object.put("file", "file");
-            rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.sendJson, "channels/" + this.getId() + "/messages", object));
+            this.bot.getRateLimitRecorder().queue(new HttpEvent(this.bot, RequestTypes.SENDJSON, "channels/" + this.getId() + "/messages", object));
         }
     }
 
@@ -59,7 +65,7 @@ public abstract class IChannel {
             Json image = new Json();
             image.put("image", url);
             object.put("embed", image);
-            rateLimitRecorder.queue(new RateLimitRecorder.QueueHandler.HttpEvent(RateLimitRecorder.QueueHandler.RequestTypes.sendFile, "channels/" + this.getId() + "/messages", file));
+            this.bot.getRateLimitRecorder().queue(new HttpEvent(this.bot, RequestTypes.SENDFILE, "channels/" + this.getId() + "/messages", file));
         }
     }
 

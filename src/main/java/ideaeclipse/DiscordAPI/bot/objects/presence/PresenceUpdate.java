@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.presence;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.presence.game.IGame;
 import ideaeclipse.DiscordAPI.bot.objects.presence.game.LoadGame;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * Example json string
  *
  * Game is parsed by {@link ideaeclipse.DiscordAPI.bot.objects.presence.game.LoadGame}
- * user is parsed for the id and grabbed from {@link IPrivateBot#getUsers()}
+ * user is parsed for the id and grabbed from {@link IDiscordBot#getUsers()}
  * status is the users status
  * {
  *   "game": {
@@ -77,20 +77,20 @@ import java.util.stream.Collectors;
  * @see Presence
  * @see LoadGame
  * @see UserStatus
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IPrivateBot, String)
+ * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
  */
-public class PresenceUpdate extends Event {
-    private final IPrivateBot bot;
+public final class PresenceUpdate extends Event {
+    private final IDiscordBot bot;
     private final IPresence presence;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json object has right keys
+     * {@link Util#checkConstructor(Class, Json, IDiscordBot)} validates json object has right keys
      * Filters {@link UserStatus} to get a enum value instead of a string
      *
      * @param json json from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      * @see UserStatus
      */
-    private PresenceUpdate(@JsonValidity({"game", "status", "user"}) final Json json, final IPrivateBot bot) {
+    private PresenceUpdate(@JsonValidity({"game", "status", "user"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         List<UserStatus> filtered = Arrays.stream(UserStatus.values()).filter(o -> o.name().toLowerCase().equals(String.valueOf(json.get("status")).toLowerCase())).collect(Collectors.toList());
         LoadGame game = !String.valueOf(json.get("game")).equals("null") ? Util.checkConstructor(LoadGame.class, new Json(String.valueOf(json.get("game"))), bot).getObject() : null;

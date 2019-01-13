@@ -44,10 +44,15 @@
     <distributionManagement>
         <repository>
             <id>nexusServer</id>
-            <url>http://107.190.67.142:8081/repository/maven-releases/</url>
+            <url>http://192.168.2.199:8081/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
     <dependencies>
+        <dependency>
+            <groupId>com.ideaeclipse</groupId>
+            <artifactId>customTerminal</artifactId>
+            <version>LATEST</version>
+        </dependency>
         <dependency>
             <groupId>com.ideaeclipse</groupId>
             <artifactId>JsonUtilities</artifactId>
@@ -66,12 +71,6 @@
         </dependency>
         <dependency>
             <groupId>com.ideaeclipse</groupId>
-            <artifactId>DuckDuckGoAPI4J</artifactId>
-            <version>1.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.ideaeclipse</groupId>
             <artifactId>reflectionListener</artifactId>
             <version>RELEASE</version>
         </dependency>
@@ -79,16 +78,6 @@
             <groupId>com.ideaeclipse</groupId>
             <artifactId>CustomLogger</artifactId>
             <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ideaeclipse</groupId>
-            <artifactId>LatexConverter</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
         </dependency>
         <dependency>
             <groupId>com.kcthota</groupId>

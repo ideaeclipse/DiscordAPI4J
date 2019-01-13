@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -32,19 +32,19 @@ import ideaeclipse.reflectionListener.Event;
  * @see CreateDiscordUser
  * @see UpdateDiscordUser
  * @see IDiscordUser
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IPrivateBot, String)
+ * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
  */
-public class DeleteDiscordUser extends Event {
-    private final IPrivateBot bot;
+public final class DeleteDiscordUser extends Event {
+    private final IDiscordBot bot;
     private final IDiscordUser user;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json string for components
+     * {@link Util#checkConstructor(Class, Json, IDiscordBot)} validates json string for components
      * calls {@link #parse(Json)} to get id and then remove the key value pair from users with that id
      *
      * @param json json string from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      */
-    private DeleteDiscordUser(@JsonValidity("user") final Json json, final IPrivateBot bot) {
+    private DeleteDiscordUser(@JsonValidity("user") final Json json, final IDiscordBot bot) {
         this.bot = bot;
         this.user = IDiscordUser.parse(Util.check(this, "parse", new Json(String.valueOf(json.get("user")))).getObject());
     }

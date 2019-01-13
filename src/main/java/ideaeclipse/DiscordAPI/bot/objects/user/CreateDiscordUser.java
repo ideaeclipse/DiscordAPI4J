@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPI.utils.MultiKeyMap;
 import ideaeclipse.DiscordAPI.utils.Util;
@@ -43,21 +43,21 @@ import java.util.stream.Collectors;
  * @see UpdateDiscordUser
  * @see DeleteDiscordUser
  * @see IDiscordUser
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IPrivateBot, String)
+ * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
  */
-public class CreateDiscordUser extends Event {
-    private final IPrivateBot bot;
+public final class CreateDiscordUser extends Event {
+    private final IDiscordBot bot;
     private final MultiKeyMap<Long, String, IRole> userRoles = new MultiKeyMap<>();
     private IDiscordUser user;
     private String nickname;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json components
+     * {@link Util#checkConstructor(Class, Json, IDiscordBot)} validates json components
      * parses roles from the map of roles, and parses nickname
      *
      * @param json json from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      */
-    private CreateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IPrivateBot bot) {
+    private CreateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         String str = String.valueOf(json.get("roles"));
         List<String> strings = Arrays.asList(str.substring(1, str.length() - 1).trim().split("\\s*,\\s*"));
@@ -77,7 +77,7 @@ public class CreateDiscordUser extends Event {
      * @param json sub json 'user'
      */
     private void load(@JsonValidity({"username", "discriminator", "id"}) Json json) {
-        this.user = new DiscordUser(this.nickname,
+        this.user = new DiscordUser(this.bot, this.nickname,
                 String.valueOf(json.get("username")),
                 Integer.parseInt(String.valueOf(json.get("discriminator"))),
                 Long.parseUnsignedLong(String.valueOf(json.get("id"))),

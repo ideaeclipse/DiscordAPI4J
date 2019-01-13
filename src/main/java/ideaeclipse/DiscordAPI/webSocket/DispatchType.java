@@ -1,5 +1,10 @@
 package ideaeclipse.DiscordAPI.webSocket;
 
+/**
+ * Different dispatch types
+ *
+ * @author Ideaeclipse
+ */
 public enum DispatchType {
     MESSAGE_CREATE, PRESENCE_UPDATE,
     CHANNEL_CREATE, CHANNEL_UPDATE, CHANNEL_DELETE,

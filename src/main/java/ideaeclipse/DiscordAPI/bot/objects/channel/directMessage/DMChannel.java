@@ -1,5 +1,6 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel.directMessage;
 
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
@@ -14,17 +15,18 @@ import java.util.Map;
  * @see CreateDMChannel
  * @see IChannel
  */
-public class DMChannel extends IChannel {
+public final class DMChannel extends IChannel {
     private final long id;
     private final int type;
     private final List<IDiscordUser> recipients;
 
     /**
-     * @param id channel id
-     * @param type channel type {1}
+     * @param id         channel id
+     * @param type       channel type {1}
      * @param recipients list of users that are apart of the direct message channel
      */
-    DMChannel(final long id, final int type, final List<IDiscordUser> recipients) {
+    DMChannel(final IDiscordBot bot, final long id, final int type, final List<IDiscordUser> recipients) {
+        super(bot);
         this.id = id;
         this.type = type;
         this.recipients = recipients;

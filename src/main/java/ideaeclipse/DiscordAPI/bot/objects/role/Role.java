@@ -9,7 +9,7 @@ package ideaeclipse.DiscordAPI.bot.objects.role;
  * @see UpdateRole
  * @see DeleteRole
  */
-public class Role implements IRole {
+public final class Role implements IRole {
     private final int colour;
     private final boolean managed;
     private final int permission;

@@ -9,7 +9,7 @@ package ideaeclipse.DiscordAPI.bot.objects.presence.game;
  * @see LoadGame
  * @see ideaeclipse.DiscordAPI.bot.objects.presence.PresenceUpdate
  */
-public class Game implements IGame {
+public final class Game implements IGame {
     private final String name;
     private final String state;
     private final String details;
@@ -17,13 +17,13 @@ public class Game implements IGame {
     private final GameType type;
 
     /**
-     * @param name name of the game
-     * @param state state of the game
-     * @param details details of the game
+     * @param name              name of the game
+     * @param state             state of the game
+     * @param details           details of the game
      * @param additionalDetails additional details about the game, gathered from the image
-     * @param type type of game, 0 is playing, 1 is streaming, 2 is listening
+     * @param type              type of game, 0 is playing, 1 is streaming, 2 is listening
      */
-    public Game(final String name, final String state, final String details, final String additionalDetails, final GameType type) {
+    Game(final String name, final String state, final String details, final String additionalDetails, final GameType type) {
         this.name = name;
         this.state = state;
         this.details = details;

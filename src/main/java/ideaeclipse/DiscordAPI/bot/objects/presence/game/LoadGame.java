@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.presence.game;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -48,17 +48,17 @@ import ideaeclipse.reflectionListener.Event;
  * @see Game
  * @see ideaeclipse.DiscordAPI.bot.objects.presence.PresenceUpdate
  */
-public class LoadGame extends Event {
-    private final IPrivateBot bot;
+public final class LoadGame extends Event {
+    private final IDiscordBot bot;
     private final IGame game;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IPrivateBot)} validates json components
+     * {@link Util#checkConstructor(Class, Json, IDiscordBot)} validates json components
      * parses information into an {@link IGame} object
      *
      * @param json json from websocket {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      */
-    private LoadGame(@JsonValidity({"assets", "state", "details", "type"}) final Json json, final IPrivateBot bot) {
+    private LoadGame(@JsonValidity({"assets", "state", "details", "type"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         this.game = new Game(String.valueOf(json.get("name"))
                 , String.valueOf(json.get("state"))

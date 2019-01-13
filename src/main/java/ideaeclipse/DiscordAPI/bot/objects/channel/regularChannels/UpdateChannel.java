@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
@@ -43,10 +43,10 @@ import ideaeclipse.reflectionListener.Event;
  * @see CreateChannel
  * @see DeleteChannel
  * @see IChannel
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IPrivateBot, String)
+ * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
  */
-public class UpdateChannel extends Event {
-    private final IPrivateBot bot;
+public final class UpdateChannel extends Event {
+    private final IDiscordBot bot;
     private final IChannel channel;
 
     /**
@@ -55,7 +55,7 @@ public class UpdateChannel extends Event {
      * @param json json string received from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      * @param bot  passed from Util
      */
-    private UpdateChannel(@JsonValidity({"nsfw", "name", "id", "type"}) final Json json, final IPrivateBot bot) {
+    private UpdateChannel(@JsonValidity({"nsfw", "name", "id", "type"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         CreateChannel channel = Util.checkConstructor(CreateChannel.class, json, this.bot).getObject();
         this.channel = channel.getChannel();

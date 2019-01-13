@@ -13,7 +13,7 @@ import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
  * @see UserStatus
  * @see IGame
  */
-public class Presence implements IPresence {
+public final class Presence implements IPresence {
     private final UserStatus status;
     private final IDiscordUser user;
     private final IGame game;

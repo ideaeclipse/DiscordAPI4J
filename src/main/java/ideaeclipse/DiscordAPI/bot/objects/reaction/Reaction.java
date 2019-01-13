@@ -3,12 +3,26 @@ package ideaeclipse.DiscordAPI.bot.objects.reaction;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 
-class Reaction implements IReaction {
+/**
+ * Used to store reaction data
+ *
+ * @author Ideaeclipse
+ * @see IReaction
+ * @see AddReaction
+ * @see RemoveReaction
+ */
+final class Reaction implements IReaction {
     private final String code;
     private final String emoji;
     private final IChannel channel;
     private final IMessage message;
 
+    /**
+     * @param code emoji code
+     * @param emoji literal emoji
+     * @param channel channel object
+     * @param message message object
+     */
     Reaction(final String code, final String emoji, final IChannel channel, final IMessage message) {
         this.code = code;
         this.emoji = emoji;

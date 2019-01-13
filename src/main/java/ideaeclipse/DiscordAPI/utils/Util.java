@@ -1,9 +1,8 @@
 package ideaeclipse.DiscordAPI.utils;
 
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.DiscordAPI.utils.interfaces.IHttpRequests;
-import ideaeclipse.DiscordAPI.webSocket.RateLimitRecorder;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.Event;
 import ideaeclipse.reflectionListener.EventManager;
@@ -22,14 +21,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * TODO: improve check
+ * Util for discord bot library
+ *
+ * @author Ideaeclipse
  */
 public final class Util {
-    public static final RateLimitRecorder rateLimitRecorder = new RateLimitRecorder();
-    public static Long guildId;
-    public static IHttpRequests requests;
-    public static boolean QueryMessages = false;
-
+    /**
+     * TODO: fix return type
+     * <p>
+     * Executes a method and returns a checkResponse
+     *
+     * @param object     instance of a class from {@link Constructor#newInstance(Object...)}
+     * @param methodName method name
+     * @param json       json string to pass
+     * @param <T>        instance type
+     * @return checkResponse
+     */
     public static <T extends Event> CheckResponse<?> check(final T object, final String methodName, final Json json) {
         try {
             Method initialize = object.getClass().getDeclaredMethod(methodName, Json.class);
@@ -50,7 +57,17 @@ public final class Util {
         return new CheckResponse<>(CheckResponeType.NOTFOUND, null);
     }
 
-    public static <T extends Event> CheckResponse<T> checkConstructor(final EventManager manager, final Class<T> object, final Json json, final IPrivateBot bot) {
+    /**
+     * Executes a constructor and callEvent with the return object {@link CheckResponse#getObject()}
+     *
+     * @param manager event manager {@link IDiscordBot#getEventManager()}
+     * @param object  class to execute
+     * @param json    json to pass
+     * @param bot     discord bot instance
+     * @param <T>     class type ensures it extends event
+     * @return new checkResponse
+     */
+    public static <T extends Event> CheckResponse<T> checkConstructor(final EventManager manager, final Class<T> object, final Json json, final IDiscordBot bot) {
         CheckResponse<T> r = checkConstructor(object, json, bot);
         if (r.getType().equals(CheckResponeType.EXECUTED))
             manager.callEvent(r.getObject());
@@ -58,9 +75,18 @@ public final class Util {
         return r;
     }
 
-    public static <T extends Event> CheckResponse<T> checkConstructor(final Class<T> object, final Json json, final IPrivateBot bot) {
+    /**
+     * Executes a constructor if the params are valid in the json string
+     *
+     * @param object class to execute constructor
+     * @param json   json to pass
+     * @param bot    discord bot instance
+     * @param <T>    class type ensures it extends event
+     * @return new checkResponse
+     */
+    public static <T extends Event> CheckResponse<T> checkConstructor(final Class<T> object, final Json json, final IDiscordBot bot) {
         try {
-            Constructor<T> constructor = object.getDeclaredConstructor(Json.class, IPrivateBot.class);
+            Constructor<T> constructor = object.getDeclaredConstructor(Json.class, IDiscordBot.class);
             if (constructor != null) {
                 constructor.setAccessible(true);
                 List<Annotation> validityList = Arrays.stream(constructor.getParameterAnnotations()[0]).filter(o -> o.annotationType().equals(JsonValidity.class)).collect(Collectors.toList());
@@ -78,7 +104,12 @@ public final class Util {
         return new CheckResponse<>(CheckResponeType.NOTFOUND, null);
     }
 
-    @SuppressWarnings("ALL")
+    /**
+     * Where all http requests go through
+     *
+     * @author Ideaeclipse
+     * @see ideaeclipse.DiscordAPI.webSocket.rateLimit.RateLimitRecorder
+     */
     public static class HttpRequests implements IHttpRequests {
         private final String APIBASE = "https://discordapp.com/api/v6/", token;
 
@@ -102,8 +133,7 @@ public final class Util {
          */
         private HttpsURLConnection initialize(final URL url) throws IOException {
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con = authenticate(con);
-            return con;
+            return authenticate(con);
         }
 
         /**
@@ -113,8 +143,7 @@ public final class Util {
          * @return Json String from the web api
          */
         public Object get(final String url) throws IOException {
-            HttpsURLConnection con = null;
-            con = initialize(new URL(APIBASE + url));
+            HttpsURLConnection con = initialize(new URL(APIBASE + url));
             return printOutput(con.getInputStream());
         }
 

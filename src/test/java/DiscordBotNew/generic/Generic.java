@@ -1,20 +1,20 @@
 package DiscordBotNew.generic;
 
 import DiscordBotNew.main;
-import ideaeclipse.DiscordAPI.bot.IPrivateBot;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
-import ideaeclipse.DiscordAPI.customTerminal.Executable;
+import ideaeclipse.customTerminal.Executable;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Generic {
-    private final IPrivateBot bot;
+    private final IDiscordBot bot;
     private final List<String> cantAdd = Arrays.asList("Admin", "Moderator", "Bot", "@everyone");
 
-    public Generic(final IPrivateBot bot) {
+    public Generic(final IDiscordBot bot) {
         this.bot = bot;
     }
 
@@ -22,7 +22,7 @@ public class Generic {
     public String listRoles() {
         StringBuilder builder = new StringBuilder();
         builder.append("**Available Roles**").append("\n");
-        for (String string : main.bot.getRoles().getK2VMap().keySet()) {
+        for (String string : bot.getRoles().getK2VMap().keySet()) {
             if (!cantAdd.contains(string))
                 builder.append("    ").append(string).append("\n");
         }
