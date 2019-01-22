@@ -1,6 +1,5 @@
 package DiscordBotNew.generic;
 
-import DiscordBotNew.main;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;

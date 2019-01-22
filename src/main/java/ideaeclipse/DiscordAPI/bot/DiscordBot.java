@@ -278,14 +278,16 @@ public final class DiscordBot implements IDiscordBot {
         @EventHandler
         private void commandLogic(final MessageCreate create) {
             IMessage message = create.getMessage();
-            if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername()) && (message.getChannel().equals(bot.getChannels().getByK2(this.bot.getProperties().getProperty("CommandChannel"))) || message.getChannel().getType() == 1)) {
-                try {
-                    message.getChannel().sendMessage(String.valueOf(this.input.handleInput(message.getContent(), message.getUser(), message)));
-                } catch (ImproperCommandFormat e) {
-                    message.getChannel().sendMessage(e.getMessage());
+            if(message.getContent().startsWith(this.input.getPrefix())) {
+                if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername()) && (message.getChannel().equals(bot.getChannels().getByK2(this.bot.getProperties().getProperty("CommandChannel"))) || message.getChannel().getType() == 1)) {
+                    try {
+                        message.getChannel().sendMessage(String.valueOf(this.input.handleInput(message.getContent(), message.getUser(), message)));
+                    } catch (ImproperCommandFormat e) {
+                        message.getChannel().sendMessage(e.getMessage());
+                    }
+                } else if (message.getContent().startsWith(this.input.getPrefix())) {
+                    message.getChannel().sendMessage("Use the bot channel for bot related Commands");
                 }
-            } else if (message.getContent().startsWith(this.input.getPrefix())) {
-                message.getChannel().sendMessage("Use the bot channel for bot related Commands");
             }
         }
 
