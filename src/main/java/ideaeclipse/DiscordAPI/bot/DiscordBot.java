@@ -2,6 +2,7 @@ package ideaeclipse.DiscordAPI.bot;
 
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
+import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.CustomProperties.Properties;
 import ideaeclipse.DiscordAPI.bot.objects.channel.Field;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
@@ -47,10 +48,10 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * TODO: Load all channel types
- * TODO: fix random name issue with wss, and time thread names
  * <p>
  * This class is used to encapsulate all data surrounding the functionality of the discord bot
  * <p>
@@ -76,7 +77,7 @@ public final class DiscordBot implements IDiscordBot {
     private WebSocket socket;
 
     static {
-        properties = new Properties(new String[]{"LoadChannelMessages", "CommandPrefix", "UseInstances", "InstanceCommands", "GenericCommands", "CommandChannel", "debug"});
+        properties = new Properties(new String[]{"LoadChannelMessages", "CommandPrefix", "UseInstances", "InstanceCommands", "GenericCommands", "DmCommands", "CommandChannel", "debug"});
         try {
             properties.start();
         } catch (IOException e) {
@@ -109,13 +110,47 @@ public final class DiscordBot implements IDiscordBot {
             logger.debug("Registering user defined event with name: " + listener.getClass().getSimpleName());
             eventManager.registerListener(listener);
         }
+        logger.debug("Starting Console");
+        IDiscordBot bot = this;
+        Async.blankThread(new Runnable() {
+            @Override
+            public void run() {
+                Thread.currentThread().setName("AdminConsole");
+                CustomTerminal<IDiscordUser, IDiscordBot, IMessage> input = new CustomTerminal<>(properties.getProperty("CommandPrefix"), false, null, "ideaeclipse.DiscordAPI.bot.objects.serverCommands", bot, IMessage.class);
+                Scanner scanner = new Scanner(System.in);
+                while (true) {
+                    try {
+                        String r = String.valueOf(input.handleInput(scanner.nextLine(), null, null)).replace("`", "");
+                        if (!r.equals("null")) {
+                            List<Field> fields = Field.parser(r);
+                            if (fields.size() > 0) {
+                                StringBuilder builder = new StringBuilder("\n");
+                                for (Field field : fields) {
+                                    builder.append(field.getName()).append("\n");
+                                    builder.append("    ").append(field.getValue().replaceAll("\n", "\n    ")).append("\n");
+                                }
+                                if (builder.charAt(builder.length() - 1) == '\n')
+                                    builder.deleteCharAt(builder.length() - 1);
+
+                                logger.info(String.valueOf(builder));
+                            } else
+                                logger.info(r);
+                        } else
+                            logger.error("Server Message system issue");
+                    } catch (ImproperCommandFormat e) {
+                        logger.error(e.getMessage());
+                    }
+                }
+            }
+        });
+        logger.debug("Console Started");
         try {
             logger.info("Finding bots guild id");
             JsonArray array = new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "/users/@me/guilds"))));
             switch (array.length()) {
                 case 0:
                     logger.error("Your bot is not a member of any guild therefore can't load data. Please join a guild before launching the bot\n" +
-                            "Go to https://discordapp.com/developers/applications/ and select your application go to the oauth tab hit scope \"bot\" and adjust permission accordingly\"\n" +
+                            "Go to https://discordapp.com/developers/applications/ and select your application go to the oauth tab hit scope \"bot\" and adjust permission accordingly\n" +
                             "You can then use the link provided to make your bot join the desired server");
                     break;
                 case 1:
@@ -272,7 +307,7 @@ public final class DiscordBot implements IDiscordBot {
             this.bot = bot;
             this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
             this.input = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), Boolean.parseBoolean(this.bot.getProperties().getProperty("UseInstances")), this.bot.getProperties().getProperty("InstanceCommands"), this.bot.getProperties().getProperty("GenericCommands"), bot, IMessage.class);
-            this.dmInput = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), false, this.bot.getProperties().getProperty("InstanceCommands"), "DiscordBotNew.dm", bot, IMessage.class);
+            this.dmInput = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), false, null, this.bot.getProperties().getProperty("DmCommands"), bot, IMessage.class);
         }
 
         /**
