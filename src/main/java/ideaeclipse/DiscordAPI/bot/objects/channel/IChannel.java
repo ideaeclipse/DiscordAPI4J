@@ -6,7 +6,11 @@ import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
 import ideaeclipse.JsonUtilities.Json;
+import ideaeclipse.JsonUtilities.JsonArray;
+import org.json.JSONObject;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +48,27 @@ public abstract class IChannel {
             Json object = new Json();
             object.put("content", message);
             object.put("file", "file");
+            this.bot.getRateLimitRecorder().queue(new HttpEvent(this.bot, RequestTypes.SENDJSON, "channels/" + this.getId() + "/messages", object));
+        }
+    }
+
+    public void sendEmbed(final List<Field> fields) {
+        if (this.getType() == 0 || this.getType() == 1) {
+            Json embed = new Json();
+            JsonArray array = new JsonArray();
+            for (final Field field : fields) {
+                Json temp = new Json();
+                temp.put("name", field.getName());
+                temp.put("value", field.getValue());
+                array.put(temp);
+            }
+            embed.put("fields", array);
+            Json footer = new Json();
+            footer.put("icon_url", "https://i.imgur.com/J2l5tvk.png");
+            footer.put("text", "Contact the server's Admins if there is an issue");
+            embed.put("footer", footer);
+            Json object = new Json();
+            object.put("embed", embed);
             this.bot.getRateLimitRecorder().queue(new HttpEvent(this.bot, RequestTypes.SENDJSON, "channels/" + this.getId() + "/messages", object));
         }
     }

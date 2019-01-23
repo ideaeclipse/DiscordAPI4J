@@ -57,7 +57,7 @@ public final class CreateDiscordUser extends Event {
      *
      * @param json json from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
      */
-    private CreateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IDiscordBot bot) {
+    private CreateDiscordUser(@JsonValidity({"user", "roles"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         String str = String.valueOf(json.get("roles"));
         List<String> strings = Arrays.asList(str.substring(1, str.length() - 1).trim().split("\\s*,\\s*"));
@@ -67,7 +67,8 @@ public final class CreateDiscordUser extends Event {
             IRole role = this.bot.getRoles().getByK1(l);
             userRoles.put(l, role.getName(), role);
         }
-        this.nickname = String.valueOf(json.get("nick"));
+        if (json.getMap().keySet().contains("nick"))
+            this.nickname = String.valueOf(json.get("nick"));
         Util.check(this, "load", new Json(String.valueOf(json.get("user"))));
     }
 

@@ -63,7 +63,8 @@ public final class CreateChannel extends Event {
         if (bot.queryMessages()) {
             String response = String.valueOf(bot.getRateLimitRecorder().queue(new HttpEvent(bot, RequestTypes.GET, "channels/" + id + "/messages?limit=100")));
             if (response.startsWith("[") && response.endsWith("]"))
-                for (Json json1 : new JsonArray(response)) {
+                for (Object object : new JsonArray(response)) {
+                    Json json1 = new Json(String.valueOf(object));
                     MessageCreate message = Util.checkConstructor(MessageCreate.class, json1, bot).getObject();
                     messageHistory.put(message.getMessage().getId(), message.getMessage());
                 }

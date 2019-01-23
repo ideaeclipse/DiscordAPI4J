@@ -3,6 +3,7 @@ package ideaeclipse.DiscordAPI.bot;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 import ideaeclipse.CustomProperties.Properties;
+import ideaeclipse.DiscordAPI.bot.objects.channel.Field;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.channel.directMessage.CreateDMChannel;
 import ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels.CreateChannel;
@@ -45,6 +46,7 @@ import ideaeclipse.reflectionListener.annotations.EventHandler;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * TODO: Load all channel types
@@ -110,14 +112,14 @@ public final class DiscordBot implements IDiscordBot {
         try {
             logger.info("Finding bots guild id");
             JsonArray array = new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "/users/@me/guilds"))));
-            switch (array.size()) {
+            switch (array.length()) {
                 case 0:
                     logger.error("Your bot is not a member of any guild therefore can't load data. Please join a guild before launching the bot\n" +
                             "Go to https://discordapp.com/developers/applications/ and select your application go to the oauth tab hit scope \"bot\" and adjust permission accordingly\"\n" +
                             "You can then use the link provided to make your bot join the desired server");
                     break;
                 case 1:
-                    Json guild = array.get(0);
+                    Json guild = new Json(String.valueOf(array.get(0)));
                     this.guildId = Long.parseUnsignedLong(String.valueOf(guild.get("id")));
                     logger.info("Bot is connected to: " + guild.get("name") + " with id: " + this.guildId);
                     break;
@@ -129,7 +131,8 @@ public final class DiscordBot implements IDiscordBot {
 
             logger.info("Found bots guild id");
             logger.info("Loading roles");
-            for (Json json : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/roles"))))) {
+            for (Object object : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/roles"))))) {
+                Json json = new Json(String.valueOf(object));
                 CreateRole role = Util.checkConstructor(CreateRole.class, json, this).getObject();
                 logger.debug(String.valueOf(role.getRole()));
                 roles.put(role.getRole().getId(), role.getRole().getName(), role.getRole());
@@ -145,14 +148,16 @@ public final class DiscordBot implements IDiscordBot {
                 logger.info("Loaded Discord Bot User");
             }
             logger.info("Loading users");
-            for (Json json : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/members" + "?limit=1000"))))) {
+            for (Object object : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/members" + "?limit=1000"))))) {
+                Json json = new Json(String.valueOf(object));
                 CreateDiscordUser user = Util.checkConstructor(CreateDiscordUser.class, json, this).getObject();
                 logger.debug(String.valueOf(user.getUser()));
                 users.put(user.getUser().getId(), user.getUser().getUsername(), user.getUser());
             }
             logger.info("Users loaded");
             logger.info("Loading channels");
-            for (Json json : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/channels"))))) {
+            for (Object object : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/channels"))))) {
+                Json json = new Json(String.valueOf(object));
                 CreateChannel channel = Util.checkConstructor(CreateChannel.class, json, this).getObject();
                 if (channel.getChannel() != null) {
                     logger.debug(String.valueOf(channel.getChannel()));
@@ -256,6 +261,7 @@ public final class DiscordBot implements IDiscordBot {
         private final CustomLogger logger;
         private final IDiscordBot bot;
         private final CustomTerminal<IDiscordUser, IDiscordBot, IMessage> input;
+        private final CustomTerminal<IDiscordUser, IDiscordBot, IMessage> dmInput;
 
         /**
          * Starts logger, starts command handler
@@ -266,6 +272,7 @@ public final class DiscordBot implements IDiscordBot {
             this.bot = bot;
             this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
             this.input = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), Boolean.parseBoolean(this.bot.getProperties().getProperty("UseInstances")), this.bot.getProperties().getProperty("InstanceCommands"), this.bot.getProperties().getProperty("GenericCommands"), bot, IMessage.class);
+            this.dmInput = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), false, this.bot.getProperties().getProperty("InstanceCommands"), "DiscordBotNew.dm", bot, IMessage.class);
         }
 
         /**
@@ -278,15 +285,40 @@ public final class DiscordBot implements IDiscordBot {
         @EventHandler
         private void commandLogic(final MessageCreate create) {
             IMessage message = create.getMessage();
-            if(message.getContent().startsWith(this.input.getPrefix())) {
-                if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername()) && (message.getChannel().equals(bot.getChannels().getByK2(this.bot.getProperties().getProperty("CommandChannel"))) || message.getChannel().getType() == 1)) {
+            if (message.getChannel().getType() != 1) {
+                this.logger.info("ChannelMessageCreate: " + message);
+                if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername()) && (message.getChannel().equals(bot.getChannels().getByK2(this.bot.getProperties().getProperty("CommandChannel")))) && message.getContent().startsWith(this.input.getPrefix())) {
                     try {
-                        message.getChannel().sendMessage(String.valueOf(this.input.handleInput(message.getContent(), message.getUser(), message)));
+                        String r = String.valueOf(this.input.handleInput(message.getContent(), message.getUser(), message));
+                        if (!r.equals("null")) {
+                            List<Field> fieldList = Field.parser(r);
+                            if (fieldList.size() > 0)
+                                message.getChannel().sendEmbed(fieldList);
+                            else
+                                message.getChannel().sendMessage(r);
+                        }
                     } catch (ImproperCommandFormat e) {
                         message.getChannel().sendMessage(e.getMessage());
                     }
-                } else if (message.getContent().startsWith(this.input.getPrefix())) {
-                    message.getChannel().sendMessage("Use the bot channel for bot related Commands");
+                }
+            } else {
+                this.logger.info("DmMessageCreate: " + message);
+                if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername())) {
+                    if (message.getContent().startsWith(this.input.getPrefix())) {
+                        try {
+                            String r = String.valueOf(this.dmInput.handleInput(message.getContent(), message.getUser(), message));
+                            if (!r.equals("null")) {
+                                List<Field> fieldList = Field.parser(r);
+                                if (fieldList.size() > 0)
+                                    message.getChannel().sendEmbed(fieldList);
+                                else
+                                    message.getChannel().sendMessage(r);
+                            }
+                        } catch (ImproperCommandFormat e) {
+                            message.getChannel().sendMessage(e.getMessage());
+                        }
+                    } else
+                        message.getChannel().sendMessage("All messages sent through dm's are meant to be commands use " + this.dmInput.getPrefix() + "help for commands");
                 }
             }
         }

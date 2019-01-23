@@ -101,7 +101,8 @@ public final class MessageCreate extends Event {
      */
     private Map<String, Integer> getReactions(@JsonValidity("reactions") final Json json) {
         Map<String, Integer> map = new HashMap<>();
-        for (Json emoji : new JsonArray(String.valueOf(json.get("reactions")))) {
+        for (Object object : new JsonArray(String.valueOf(json.get("reactions")))) {
+            Json emoji = new Json(String.valueOf(object));
             Map.Entry<String, Integer> entry = (Map.Entry<String, Integer>) Util.check(this, "getIndividualReaction", emoji).getObject();
             map.put(entry.getKey(), entry.getValue());
         }

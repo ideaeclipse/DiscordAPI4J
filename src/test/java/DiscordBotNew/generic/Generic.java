@@ -20,30 +20,35 @@ public class Generic {
     @Executable
     public String listRoles() {
         StringBuilder builder = new StringBuilder();
-        builder.append("**Available Roles**").append("\n");
+        builder.append("<N>Available Roles</N>").append("<V>");
         for (String string : bot.getRoles().getK2VMap().keySet()) {
             if (!cantAdd.contains(string))
-                builder.append("    ").append(string).append("\n");
+                builder.append("`").append(string).append("`").append("\n");
         }
-        builder.append("**Examples**:").append("\n");
-        builder.append("    ").append("Role names are case sensitive").append("\n");
-        builder.append("    ").append("!addRole $roleName").append("\n");
-        builder.append("    ").append("!addRole computer-science").append("\n");
+        builder.append("</V>");
+        builder.append("<N>Examples</N>").append("<V>");
+        builder.append("Role names are case sensitive").append("\n");
+        builder.append("`!addRole $roleName`").append("\n");
+        builder.append("`!addRole Computer-Science`").append("</V>");
         return String.valueOf(builder);
     }
 
     @Executable
     public String myRoles(final IMessage message) {
         StringBuilder builder = new StringBuilder();
-        builder.append("You are a member of [");
+        builder.append("<N>Your Roles</N>");
+        builder.append("<V>You are a member of:\n");
+        int total = 0;
         for (Map.Entry<Long, IRole> entry : message.getUser().getRoles().getK1VMap().entrySet()) {
             IRole role = entry.getValue();
-            if (!cantAdd.contains(role.getName()))
-                builder.append(role.getMention()).append(", ");
+            if (!cantAdd.contains(role.getName())) {
+                builder.append('`').append(role.getMention()).append('`').append("\n");
+                total++;
+            }
         }
-        if (builder.charAt(builder.length() - 1) != '[')
-            builder.setLength(builder.length() - 2);
-        builder.append("]");
+        if (total == 0)
+            builder.append("You are not a member of any roles");
+        builder.append("</V>");
         return String.valueOf(builder);
     }
 

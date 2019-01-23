@@ -52,7 +52,8 @@ public final class CreateDMChannel extends Event {
     private CreateDMChannel(@JsonValidity({"recipients", "id", "type"}) final Json json, final IDiscordBot bot) {
         this.bot = bot;
         List<IDiscordUser> recipients = new LinkedList<>();
-        for (Json json1 : new JsonArray(String.valueOf(json.get("recipients")))) {
+        for (Object object : new JsonArray(String.valueOf(json.get("recipients")))) {
+            Json json1 = new Json(String.valueOf(object));
             Util.check(this, "getId", json1).ifPresent(o -> recipients.add(IDiscordUser.parse(o)));
         }
         this.channel = new DMChannel(bot, Long.parseUnsignedLong(String.valueOf(json.get("id")))

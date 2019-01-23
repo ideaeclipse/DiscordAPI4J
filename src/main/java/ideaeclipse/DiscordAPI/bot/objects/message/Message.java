@@ -26,7 +26,7 @@ public final class Message implements IMessage {
      * @param channel channel message was sent in
      * @param user    user who sent the message
      */
-    Message(final long id, final String content, final IChannel channel, final IDiscordUser user, final Map<String,Integer> reactionMap) {
+    Message(final long id, final String content, final IChannel channel, final IDiscordUser user, final Map<String, Integer> reactionMap) {
         this.id = id;
         this.content = content;
         this.channel = channel;
@@ -74,6 +74,6 @@ public final class Message implements IMessage {
 
     @Override
     public String toString() {
-        return (this.user != null ? "{Message} User: " + this.user.getUsername() : "") + (this.channel != null ? " Channel: " + this.channel.getName() : "") + " Content: " + this.content;
+        return (this.user != null ? "{Message} User: " + this.user.getUsername() : "") + (this.channel != null ? " Channel: " + this.channel.getName() : "") + " Content: " + this.content.replace("\n", "<br>");
     }
 }
