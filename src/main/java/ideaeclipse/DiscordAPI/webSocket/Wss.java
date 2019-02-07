@@ -48,6 +48,9 @@ public final class Wss extends WebSocketFactory {
     private static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
     private final IDiscordBot bot;
     private final WebSocket socket;
+    private static int sequence;
+    private static boolean gotACK;
+    private static boolean redemption;
 
     public Wss(final IDiscordBot bot, final String token) throws IOException, WebSocketException {
         this.bot = bot;
@@ -60,6 +63,8 @@ public final class Wss extends WebSocketFactory {
                         final CustomLogger logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
                         final TextOpCodes op = TextOpCodes.values()[Integer.parseInt(String.valueOf(message.get("op")))];
                         final String s = String.valueOf(message.get("s"));
+                        if (s != null && !s.equals("null"))
+                            sequence = Integer.parseInt(s);
                         final String t = String.valueOf(message.get("t"));
                         final Json d = new Json(!String.valueOf(message.get("d")).equals("null") ? String.valueOf(message.get("d")) : "{}");
                         switch (op) {
@@ -160,11 +165,9 @@ public final class Wss extends WebSocketFactory {
                                 break;
                             case Resume:
                                 logger.error("Resume: " + message);
-                                System.exit(-1);
                                 break;
                             case Reconnect:
                                 logger.error("Reconnect: " + message);
-                                System.exit(-1);
                                 break;
                             case Request_Guild_Members:
                                 break;
@@ -174,19 +177,44 @@ public final class Wss extends WebSocketFactory {
                                 final long hbi = Long.parseUnsignedLong(String.valueOf(d.get("heartbeat_interval")));
                                 String payload = "{\"op\":2,\"d\":{\"shards\":[0,1],\"compress\":true,\"presence\":{\"game\":{\"name\":\"!help for commands\",\"type\":0},\"afk\":false,\"status\":\"online\"},\"large_threshold\":250,\"properties\":{\"$device\":\"D4J\",\"$os\":\"Windows 10\",\"$browser\":\"D4J\"},\"token\":\"?token\"}}";
                                 Json welcomePayload = new Json(payload.replace("?token", token));
-                                sendText(welcomePayload);
+                                queueText(welcomePayload);
                                 logger.info("Starting heartbeat with an interval of: " + hbi);
+                                gotACK = true;
+                                /*
+                                 * gotAck starts at true, once a heatbeat is sent, set to false
+                                 * When a ACK is received set to true and set redemption to false
+                                 * If gotACK is false and redemption is false, wait one more ack to attempt reconnect
+                                 * set redemption to true, if gotAck is false again, reconnect
+                                 */
                                 Async.addJob(o -> {
-                                    CustomLogger logger1 = new CustomLogger(this.getClass(), bot.getLoggerManager());
-                                    logger1.debug("Sending HeartBeat Payload");
-                                    Json object = Builder.buildPayload(ideaeclipse.DiscordAPI.webSocket.TextOpCodes.Heartbeat.ordinal(), 251);
-                                    sendText(object);
+                                    if (gotACK) {
+                                        gotACK = false;
+                                        CustomLogger logger1 = new CustomLogger(this.getClass(), bot.getLoggerManager());
+                                        logger1.debug("Sending HeartBeat Payload");
+                                        Json object = Builder.buildPayload(ideaeclipse.DiscordAPI.webSocket.TextOpCodes.Heartbeat.ordinal(), 251);
+                                        queueText(object);
+                                    } else {
+                                        if (!redemption) {
+                                            redemption = true;
+                                            logger.error("Didn't get ACK in time waiting one more time");
+                                        } else {
+                                            logger.error("Didn't get ACK in time");
+                                            Json resume = new Json();
+                                            resume.put("token", token);
+                                            resume.put("seq", sequence);
+                                            Json resumePayload = Builder.buildPayload(TextOpCodes.Resume.ordinal(), resume);
+                                            logger.error("Trying to connect with payload: " + resumePayload);
+                                            queueText(resumePayload);
+                                        }
+                                    }
                                     return Optional.empty();
                                 }, hbi);
                                 logger.info("Hello event finished, bot online");
                                 break;
                             case HeartBeat_ACK:
                                 logger.debug("HeartBeat_ACK received");
+                                gotACK = true;
+                                redemption = false;
                                 break;
                         }
                     }
@@ -195,9 +223,10 @@ public final class Wss extends WebSocketFactory {
 
     /**
      * Send text over the websocket
+     *
      * @param json json to send
      */
-    private void sendText(final Json json) {
+    private void queueText(final Json json) {
         this.bot.getRateLimitRecorder().queue(new WebSocketEvent(socket, json));
     }
 
