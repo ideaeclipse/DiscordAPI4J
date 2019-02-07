@@ -1,9 +1,6 @@
 package ideaeclipse.DiscordAPI.webSocket;
 
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketAdapter;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
+import com.neovisionaries.ws.client.*;
 import ideaeclipse.AsyncUtility.Async;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
@@ -45,9 +42,9 @@ import java.util.stream.Collectors;
  * @author Ideaeclipse
  */
 public final class Wss extends WebSocketFactory {
+    private WebSocket socket;
     private static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
     private final IDiscordBot bot;
-    private final WebSocket socket;
     private static int sequence;
     private static boolean gotACK;
     private static boolean redemption;
@@ -59,6 +56,7 @@ public final class Wss extends WebSocketFactory {
                 .addListener(new WebSocketAdapter() {
                     @Override
                     public void onTextMessage(WebSocket websocket, String text) {
+                        System.out.println(text);
                         Json message = new Json(text);
                         final CustomLogger logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
                         final TextOpCodes op = TextOpCodes.values()[Integer.parseInt(String.valueOf(message.get("op")))];
@@ -202,9 +200,12 @@ public final class Wss extends WebSocketFactory {
                                             Json resume = new Json();
                                             resume.put("token", token);
                                             resume.put("seq", sequence);
-                                            Json resumePayload = Builder.buildPayload(TextOpCodes.Resume.ordinal(), resume);
-                                            logger.error("Trying to connect with payload: " + resumePayload);
-                                            queueText(resumePayload);
+                                            logger.error("Restarting connection");
+                                            try {
+                                                socket = socket.recreate().connect();
+                                            } catch (WebSocketException | IOException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                     }
                                     return Optional.empty();
@@ -217,6 +218,12 @@ public final class Wss extends WebSocketFactory {
                                 redemption = false;
                                 break;
                         }
+                    }
+
+                    @Override
+                    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+                        final CustomLogger logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
+                        logger.error("Disconnected");
                     }
                 }).connect();
     }
