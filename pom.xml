@@ -44,7 +44,7 @@
     <distributionManagement>
         <repository>
             <id>nexusServer</id>
-            <url>http://192.168.2.199:8081/repository/maven-releases/</url>
+            <url>http://thiessem.ca:8080/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
     <dependencies>
