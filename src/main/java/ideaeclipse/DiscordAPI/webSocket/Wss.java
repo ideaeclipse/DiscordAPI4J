@@ -45,7 +45,7 @@ public final class Wss extends WebSocketFactory {
     private WebSocket socket;
     private static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
     private final IDiscordBot bot;
-    private static int sequence;
+    private static int reconnectionCount = 0;
     private static boolean gotACK;
     private static boolean redemption;
 
@@ -56,13 +56,10 @@ public final class Wss extends WebSocketFactory {
                 .addListener(new WebSocketAdapter() {
                     @Override
                     public void onTextMessage(WebSocket websocket, String text) {
-                        System.out.println(text);
                         Json message = new Json(text);
                         final CustomLogger logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
                         final TextOpCodes op = TextOpCodes.values()[Integer.parseInt(String.valueOf(message.get("op")))];
                         final String s = String.valueOf(message.get("s"));
-                        if (s != null && !s.equals("null"))
-                            sequence = Integer.parseInt(s);
                         final String t = String.valueOf(message.get("t"));
                         final Json d = new Json(!String.valueOf(message.get("d")).equals("null") ? String.valueOf(message.get("d")) : "{}");
                         switch (op) {
@@ -177,7 +174,6 @@ public final class Wss extends WebSocketFactory {
                                 Json welcomePayload = new Json(payload.replace("?token", token));
                                 queueText(welcomePayload);
                                 logger.info("Starting heartbeat with an interval of: " + hbi);
-                                gotACK = true;
                                 /*
                                  * gotAck starts at true, once a heatbeat is sent, set to false
                                  * When a ACK is received set to true and set redemption to false
@@ -189,22 +185,28 @@ public final class Wss extends WebSocketFactory {
                                         gotACK = false;
                                         CustomLogger logger1 = new CustomLogger(this.getClass(), bot.getLoggerManager());
                                         logger1.debug("Sending HeartBeat Payload");
-                                        Json object = Builder.buildPayload(ideaeclipse.DiscordAPI.webSocket.TextOpCodes.Heartbeat.ordinal(), 251);
+                                        Json object = Builder.buildPayload(TextOpCodes.Heartbeat.ordinal(), 251);
                                         queueText(object);
                                     } else {
                                         if (!redemption) {
                                             redemption = true;
                                             logger.error("Didn't get ACK in time waiting one more time");
                                         } else {
-                                            logger.error("Didn't get ACK in time");
-                                            Json resume = new Json();
-                                            resume.put("token", token);
-                                            resume.put("seq", sequence);
-                                            logger.error("Restarting connection");
-                                            try {
-                                                socket = socket.recreate().connect();
-                                            } catch (WebSocketException | IOException e) {
-                                                e.printStackTrace();
+                                            redemption = false;
+                                            gotACK = true;
+                                            reconnectionCount++;
+                                            if(reconnectionCount < 5) {
+                                                logger.error("Didn't get ACK in time");
+                                                logger.error("Restarting connection");
+                                                try {
+                                                    socket = socket.disconnect();
+                                                    socket = socket.recreate().connect();
+                                                } catch (WebSocketException | IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }else{
+                                                logger.error("Tried to reconnect 5 times, could not connect, check your internet connection or discordapi status");
+                                                System.exit(-1);
                                             }
                                         }
                                     }
@@ -221,9 +223,17 @@ public final class Wss extends WebSocketFactory {
                     }
 
                     @Override
-                    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+                    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) {
                         final CustomLogger logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
-                        logger.error("Disconnected");
+                        logger.warn("Disconnected, closed by server: " + closedByServer);
+                    }
+
+                    @Override
+                    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) {
+                        final CustomLogger logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
+                        logger.warn("Connected");
+                        gotACK = true;
+                        redemption = false;
                     }
                 }).connect();
     }
