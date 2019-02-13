@@ -40,10 +40,9 @@ import ideaeclipse.customLogger.Level;
 import ideaeclipse.customLogger.LoggerManager;
 import ideaeclipse.customTerminal.CustomTerminal;
 import ideaeclipse.customTerminal.exceptions.ImproperCommandFormat;
-import ideaeclipse.reflectionListener.Event;
-import ideaeclipse.reflectionListener.EventManager;
-import ideaeclipse.reflectionListener.Listener;
-import ideaeclipse.reflectionListener.annotations.EventHandler;
+import ideaeclipse.reflectionListener.ListenerManager;
+import ideaeclipse.reflectionListener.annotations.CallableEvent;
+import ideaeclipse.reflectionListener.parents.Listener;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -65,7 +64,7 @@ import java.util.Scanner;
 public final class DiscordBot implements IDiscordBot {
     private static final Properties properties;
     private static final LoggerManager loggerManager;
-    private static final EventManager eventManager;
+    private static final ListenerManager eventManager;
     private static final boolean queryMessages;
     private final RateLimitRecorder rateLimitRecorder;
     private final IHttpRequests requests;
@@ -85,7 +84,7 @@ public final class DiscordBot implements IDiscordBot {
             System.exit(-1);
         }
         loggerManager = new LoggerManager("logs", Boolean.parseBoolean(properties.getProperty("debug")) ? Level.DEBUG : Level.INFO);
-        eventManager = new EventManager();
+        eventManager = new ListenerManager();
         queryMessages = Boolean.parseBoolean(properties.getProperty("LoadChannelMessages"));
     }
 
@@ -95,7 +94,7 @@ public final class DiscordBot implements IDiscordBot {
      * loads roles, bot user, users, channels, starts websocket connection
      *
      * @param token     login token
-     * @param listeners list of {@link ideaeclipse.reflectionListener.Event} to add to the {@link #eventManager}
+     * @param listeners list of {@link ideaeclipse.reflectionListener.parents.Event} to add to the {@link #eventManager}
      */
     public DiscordBot(final String token, final Listener... listeners) {
         CustomLogger logger = new CustomLogger(this.getClass(), loggerManager);
@@ -215,7 +214,7 @@ public final class DiscordBot implements IDiscordBot {
 
 
     @Override
-    public EventManager getEventManager() {
+    public ListenerManager getListenerManager() {
         return eventManager;
     }
 
@@ -317,7 +316,7 @@ public final class DiscordBot implements IDiscordBot {
          *
          * @param create {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          */
-        @EventHandler
+        @CallableEvent
         private void commandLogic(final MessageCreate create) {
             IMessage message = create.getMessage();
             if (message.getChannel().getType() != 1) {
@@ -364,7 +363,7 @@ public final class DiscordBot implements IDiscordBot {
          *
          * @param update {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          */
-        @EventHandler
+        @CallableEvent
         private void onPresenceUpadte(final PresenceUpdate update) {
             this.logger.info("Presence Update: " + update.getPresence());
         }
@@ -376,7 +375,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param role {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onRoleCreate(final CreateRole role) {
             this.logger.info("Role added: " + role.getRole().getName());
         }
@@ -388,7 +387,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param role {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onRoleUpdate(final UpdateRole role) {
             this.logger.info("Role Updated: " + role.getRole().getName());
         }
@@ -400,7 +399,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param role {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onDeleteRole(final DeleteRole role) {
             this.logger.info("Role delete: " + role.getRole().getName());
         }
@@ -412,7 +411,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param channel {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onChannelCreate(final CreateChannel channel) {
             this.logger.info("Channel added: " + channel.getChannel().getName());
         }
@@ -424,7 +423,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param channel {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onChannelUpdate(final UpdateChannel channel) {
             this.logger.info("Channel updated: " + channel.getChannel().getName());
         }
@@ -436,7 +435,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param channel {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onDeleteChannel(final DeleteChannel channel) {
             this.logger.info("Channel deleted: " + channel.getChannel().getName());
         }
@@ -448,7 +447,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onUserJoin(final CreateDiscordUser user) {
             this.logger.info("User added: " + user.getUser().getUsername());
         }
@@ -460,7 +459,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onUserUpdate(final UpdateDiscordUser user) {
             this.logger.info("User updated: " + user.getUser().getUsername());
         }
@@ -472,7 +471,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onDeleteUser(final DeleteDiscordUser user) {
             this.logger.info("User deleted: " + user.getUser().getUsername());
         }
@@ -484,7 +483,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onAddReaction(final AddReaction reaction) {
             this.logger.info("Reaction added: " + reaction.getReaction());
         }
@@ -496,7 +495,7 @@ public final class DiscordBot implements IDiscordBot {
          * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
          * @see Wss
          */
-        @EventHandler
+        @CallableEvent
         private void onRemoveReaction(final RemoveReaction reaction) {
             this.logger.info("Reaction removed: " + reaction.getReaction());
         }

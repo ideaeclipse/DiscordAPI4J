@@ -68,24 +68,25 @@ public final class Wss extends WebSocketFactory {
                                 if (!filtered.isEmpty()) {
                                     switch (filtered.get(0)) {
                                         case MESSAGE_CREATE:
-                                            Util.checkConstructor(bot.getEventManager(), MessageCreate.class, d, bot);
+                                            Util.checkConstructor(bot.getListenerManager(), MessageCreate.class, d, bot);
                                             break;
                                         case PRESENCE_UPDATE:
-                                            Util.checkConstructor(bot.getEventManager(), PresenceUpdate.class, d, bot);
+                                            Util.checkConstructor(bot.getListenerManager(), PresenceUpdate.class, d, bot);
                                             break;
                                         case CHANNEL_CREATE:
-                                            CheckResponse<CreateChannel> channelCheckResponse = Util.checkConstructor(bot.getEventManager(), CreateChannel.class, d, bot);
+                                            CheckResponse<CreateChannel> channelCheckResponse = Util.checkConstructor(bot.getListenerManager(), CreateChannel.class, d, bot);
                                             if (!channelCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
-                                                CreateDMChannel channel = Util.checkConstructor(bot.getEventManager(), CreateDMChannel.class, d, bot).getObject();
+                                                CreateDMChannel channel = Util.checkConstructor(bot.getListenerManager(), CreateDMChannel.class, d, bot).getObject();
                                                 IChannel channel1 = channel.getChannel();
                                                 bot.getChannels().put(channel1.getId(), channel1.getName(), channel1);
+
                                             } else {
                                                 IChannel channel = channelCheckResponse.getObject().getChannel();
                                                 bot.getChannels().put(channel.getId(), channel.getName(), channel);
                                             }
                                             break;
                                         case CHANNEL_UPDATE:
-                                            CheckResponse<UpdateChannel> updateChannelCheckResponse = Util.checkConstructor(bot.getEventManager(), UpdateChannel.class, d, bot);
+                                            CheckResponse<UpdateChannel> updateChannelCheckResponse = Util.checkConstructor(bot.getListenerManager(), UpdateChannel.class, d, bot);
                                             if (updateChannelCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
                                                 IChannel channel = updateChannelCheckResponse.getObject().getChannel();
                                                 bot.getChannels().removeByK1(channel.getId());
@@ -93,17 +94,17 @@ public final class Wss extends WebSocketFactory {
                                             }
                                             break;
                                         case CHANNEL_DELETE:
-                                            Util.checkConstructor(bot.getEventManager(), DeleteChannel.class, d, bot);
+                                            Util.checkConstructor(bot.getListenerManager(), DeleteChannel.class, d, bot);
                                             break;
                                         case GUILD_ROLE_CREATE:
-                                            CheckResponse<CreateRole> createRoleCheckResponse = Util.checkConstructor(bot.getEventManager(), CreateRole.class, d, bot);
+                                            CheckResponse<CreateRole> createRoleCheckResponse = Util.checkConstructor(bot.getListenerManager(), CreateRole.class, d, bot);
                                             if (createRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
                                                 IRole role = createRoleCheckResponse.getObject().getRole();
                                                 bot.getRoles().put(role.getId(), role.getName(), role);
                                             }
                                             break;
                                         case GUILD_ROLE_UPDATE:
-                                            CheckResponse<UpdateRole> updateRoleCheckResponse = Util.checkConstructor(bot.getEventManager(), UpdateRole.class, d, bot);
+                                            CheckResponse<UpdateRole> updateRoleCheckResponse = Util.checkConstructor(bot.getListenerManager(), UpdateRole.class, d, bot);
                                             if (updateRoleCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
                                                 IRole role = updateRoleCheckResponse.getObject().getRole();
                                                 bot.getRoles().removeByK1(role.getId());
@@ -118,32 +119,32 @@ public final class Wss extends WebSocketFactory {
                                             }
                                             break;
                                         case GUILD_ROLE_DELETE:
-                                            Util.checkConstructor(bot.getEventManager(), DeleteRole.class, d, bot);
+                                            Util.checkConstructor(bot.getListenerManager(), DeleteRole.class, d, bot);
                                             break;
                                         case GUILD_MEMBER_ADD:
-                                            CheckResponse<CreateDiscordUser> createDiscordUserCheckResponse = Util.checkConstructor(bot.getEventManager(), CreateDiscordUser.class, d, bot);
+                                            CheckResponse<CreateDiscordUser> createDiscordUserCheckResponse = Util.checkConstructor(bot.getListenerManager(), CreateDiscordUser.class, d, bot);
                                             if (createDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
                                                 IDiscordUser user = createDiscordUserCheckResponse.getObject().getUser();
                                                 bot.getUsers().put(user.getId(), user.getUsername(), user);
                                             }
                                             break;
                                         case GUILD_MEMBER_UPDATE:
-                                            CheckResponse<UpdateDiscordUser> updateDiscordUserCheckResponse = Util.checkConstructor(bot.getEventManager(), UpdateDiscordUser.class, d, bot);
+                                            CheckResponse<UpdateDiscordUser> updateDiscordUserCheckResponse = Util.checkConstructor(bot.getListenerManager(), UpdateDiscordUser.class, d, bot);
                                             if (updateDiscordUserCheckResponse.getType().equals(CheckResponeType.EXECUTED)) {
                                                 IDiscordUser user = updateDiscordUserCheckResponse.getObject().getUser();
                                                 bot.getUsers().put(user.getId(), user.getUsername(), user);
                                             }
                                             break;
                                         case GUILD_MEMBER_REMOVE:
-                                            Util.checkConstructor(bot.getEventManager(), DeleteDiscordUser.class, d, bot);
+                                            Util.checkConstructor(bot.getListenerManager(), DeleteDiscordUser.class, d, bot);
                                             break;
                                         case MESSAGE_REACTION_ADD:
-                                            AddReaction addReaction = Util.checkConstructor(bot.getEventManager(), AddReaction.class, d, bot).getObject();
+                                            AddReaction addReaction = Util.checkConstructor(bot.getListenerManager(), AddReaction.class, d, bot).getObject();
                                             IReaction reaction = addReaction.getReaction();
                                             reaction.getChannel().getMessageHistory().get(reaction.getMessage().getId()).addReaction(reaction.getCode());
                                             break;
                                         case MESSAGE_REACTION_REMOVE:
-                                            Util.checkConstructor(bot.getEventManager(), RemoveReaction.class, d, bot);
+                                            Util.checkConstructor(bot.getListenerManager(), RemoveReaction.class, d, bot);
                                             break;
                                     }
                                 }
@@ -195,7 +196,7 @@ public final class Wss extends WebSocketFactory {
                                             redemption = false;
                                             gotACK = true;
                                             reconnectionCount++;
-                                            if(reconnectionCount < 5) {
+                                            if (reconnectionCount < 5) {
                                                 logger.error("Didn't get ACK in time");
                                                 logger.error("Restarting connection");
                                                 try {
@@ -204,7 +205,7 @@ public final class Wss extends WebSocketFactory {
                                                 } catch (WebSocketException | IOException e) {
                                                     e.printStackTrace();
                                                 }
-                                            }else{
+                                            } else {
                                                 logger.error("Tried to reconnect 5 times, could not connect, check your internet connection or discordapi status");
                                                 System.exit(-1);
                                             }

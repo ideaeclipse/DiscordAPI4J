@@ -9,7 +9,7 @@ import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
-import ideaeclipse.reflectionListener.Event;
+import ideaeclipse.reflectionListener.parents.Event;
 
 import java.util.AbstractMap;
 import java.util.HashMap;

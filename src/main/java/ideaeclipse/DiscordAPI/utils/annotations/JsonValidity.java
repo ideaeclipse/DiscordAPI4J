@@ -1,7 +1,6 @@
 package ideaeclipse.DiscordAPI.utils.annotations;
 
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.reflectionListener.Event;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -10,7 +10,7 @@ import ideaeclipse.DiscordAPI.utils.MultiKeyMap;
 import ideaeclipse.DiscordAPI.utils.interfaces.IHttpRequests;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.RateLimitRecorder;
 import ideaeclipse.customLogger.LoggerManager;
-import ideaeclipse.reflectionListener.EventManager;
+import ideaeclipse.reflectionListener.ListenerManager;
 
 /**
  * Allows for encapsulation of {@link DiscordBot} object
@@ -66,9 +66,9 @@ public interface IDiscordBot {
     IChannel createDmChannel(final IDiscordUser user);
 
     /**
-     * @return returns eventManager
+     * @return returns listener manager
      */
-    EventManager getEventManager();
+    ListenerManager getListenerManager();
 
     /**
      * @return returns loggerManager

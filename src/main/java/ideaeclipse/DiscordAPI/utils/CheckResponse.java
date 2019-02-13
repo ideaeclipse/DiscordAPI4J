@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.utils;
 
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.reflectionListener.Event;
+import ideaeclipse.reflectionListener.parents.Event;
 
 import java.util.function.Consumer;
 
@@ -48,5 +48,4 @@ public class CheckResponse<T> {
         if (this.object != null)
             action.accept(object);
     }
-
 }

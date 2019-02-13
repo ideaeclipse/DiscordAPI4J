@@ -4,8 +4,8 @@ import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.DiscordAPI.utils.interfaces.IHttpRequests;
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.reflectionListener.Event;
-import ideaeclipse.reflectionListener.EventManager;
+import ideaeclipse.reflectionListener.ListenerManager;
+import ideaeclipse.reflectionListener.parents.Event;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -60,18 +60,17 @@ public final class Util {
     /**
      * Executes a constructor and callEvent with the return object {@link CheckResponse#getObject()}
      *
-     * @param manager event manager {@link IDiscordBot#getEventManager()}
+     * @param manager event manager {@link IDiscordBot#getListenerManager()}
      * @param object  class to execute
      * @param json    json to pass
      * @param bot     discord bot instance
      * @param <T>     class type ensures it extends event
      * @return new checkResponse
      */
-    public static <T extends Event> CheckResponse<T> checkConstructor(final EventManager manager, final Class<T> object, final Json json, final IDiscordBot bot) {
+    public static <T extends Event> CheckResponse<T> checkConstructor(final ListenerManager manager, final Class<T> object, final Json json, final IDiscordBot bot) {
         CheckResponse<T> r = checkConstructor(object, json, bot);
         if (r.getType().equals(CheckResponeType.EXECUTED))
-            manager.callEvent(r.getObject());
-
+            manager.callExecutables(r.getObject());
         return r;
     }
 

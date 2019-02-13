@@ -44,14 +44,14 @@
     <distributionManagement>
         <repository>
             <id>nexusServer</id>
-            <url>http://thiessem.ca:8080/repository/maven-releases/</url>
+            <url>https://repository.thiessem.ca/repository/maven-releases/</url>
         </repository>
     </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>com.ideaeclipse</groupId>
             <artifactId>customTerminal</artifactId>
-            <version>LATEST</version>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.ideaeclipse</groupId>
@@ -61,18 +61,18 @@
         <dependency>
             <groupId>com.ideaeclipse</groupId>
             <artifactId>Async</artifactId>
-            <version>LATEST</version>
+            <version>2.4</version>
         </dependency>
 
         <dependency>
             <groupId>com.ideaeclipse</groupId>
             <artifactId>CustomProperties</artifactId>
-            <version>LATEST</version>
+            <version>0.2</version>
         </dependency>
         <dependency>
             <groupId>com.ideaeclipse</groupId>
             <artifactId>reflectionListener</artifactId>
-            <version>RELEASE</version>
+            <version>3.3</version>
         </dependency>
         <dependency>
             <groupId>com.ideaeclipse</groupId>

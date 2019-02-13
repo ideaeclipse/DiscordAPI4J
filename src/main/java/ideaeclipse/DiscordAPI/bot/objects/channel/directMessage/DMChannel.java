@@ -65,4 +65,9 @@ public final class DMChannel extends IChannel {
     @Override
     public void addMessage(IMessage message) {
     }
+
+    @Override
+    public String toString() {
+        return "{DM Channel} " + " Id: " + this.id + " Type: " + this.type;
+    }
 }

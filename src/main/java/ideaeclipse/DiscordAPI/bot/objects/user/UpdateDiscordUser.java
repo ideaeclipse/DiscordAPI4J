@@ -5,7 +5,7 @@ import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.reflectionListener.Event;
+import ideaeclipse.reflectionListener.parents.Event;
 
 @JsonFormat
 /**

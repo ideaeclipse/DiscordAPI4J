@@ -1,7 +1,6 @@
 package ideaeclipse.DiscordAPI.utils;
 
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.reflectionListener.Event;
 
 /**
  * Types of response from {@link Util#check(Event, String, Json)}

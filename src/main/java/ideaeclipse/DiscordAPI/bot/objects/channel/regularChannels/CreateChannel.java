@@ -11,7 +11,7 @@ import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
-import ideaeclipse.reflectionListener.Event;
+import ideaeclipse.reflectionListener.parents.Event;
 
 import java.util.HashMap;
 import java.util.Map;
