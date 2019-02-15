@@ -1,156 +1,156 @@
 # DiscordAPI4J
-* This is for the older version of the utility a new one will be posted after development of the refreshed utility is finished
-* Custom discordapi interpreter
+* Custom command Discord bot library
 
-* Example of Creating the bot
+## Maven
+* Add Repository
+```xml
+<repository>
+    <id>ideaeclipse Repository Server</id>
+    <url>https://repository.thiessem.ca/repository/maven-releases/</url>
+</repository>
+```
+* Add dependency
+```xml
+<dependency>
+    <groupId>com.ideaeclipse</groupId>
+    <artifactId>DiscordAPI</artifactId>
+    <version>1.9</version>
+</dependency>
+```
+
+## Need to know
+* This bot uses two different utilities you have to interact with.
+* Custom Properties, and Custom Terminal
+
+### Custom Properties
+* There are 7 properties that need to be set in order for this bot to start
+    * LoadChannelMessages
+        * Boolean value
+        * true, loads all channels messages
+        * false, doesn't load channel message
+    * CommandPrefix
+        * String
+        * Used to start each command, i.e. \\! would be work like !help
+    * Debug
+        * Boolean value
+        * Whether to show debug messages in console
+    * DmCommands
+        * String
+        * Null = no dm specific commands
+        * Populated string means that is the package directory for where your class files are located for the dm commands. There should be a class titled Commands in this package
+    * InstanceCommands
+        * String
+        * Cannot be null
+        * Same as DmCommands
+    * EmbedFooterImage
+        * String
+        * Null = not footer
+        * String, url to image for embeded footer
+    * CommandChannel
+        * String
+        * Cannot be Null
+        * Says which channel bot channels are permissable in
+* An example file is
+```text
+#Thu Feb 14 16:32:37 EST 2019
+LoadChannelMessages=false
+CommandPrefix=\!
+debug=true
+DmCommands=DiscordBotNew.dm
+InstanceCommands=DiscordBotNew.generic
+embedFooterImage=null
+CommandChannel=bot
+```
+
+### Custom Terminal
+* There are two separate methods of commands. Through channel communication and through direct message
+* Make two separate packages for each like the image below
+* ![alt text](https://i.imgur.com/sRSIC5V.png)
+* Make sure these packages are documented in your properties file
+#### Making commands
+* All these commands are executable in the channel specified in the properties file
+* You can have the IDiscordBot parameter in the constructor. This is optional but no other parameter is allowed.
+* Command methods must be annotated with @Executable
+* All command methods must have 1 or 2 parameters, 1 being a primitive type and an option parameter of an IMessage object. This object will contain info on the message, like user, channel, etc.
+* This is an example of a channel commands class
 ```java
+package DiscordBotNew.generic;
 
-import DiscordAPI.IDiscordBot;
-import DiscordAPI.objects.DiscordBotBuilder;
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
+import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
+import ideaeclipse.customTerminal.Executable;
 
-public class Main {
-    public static IDiscordBot bot;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-    private Main(String token, Long guildId) {
-        bot = new DiscordBotBuilder(token, new EventClass(), guildId).login();
+public class Commands {
+    private final IDiscordBot bot;
+
+    public Commands(final IDiscordBot bot) {
+        this.bot = bot;
     }
-
-    public static void main(String[] args) {
-        new Main(args[0], Long.parseUnsignedLong(args[1]));
+    @Executable
+    public String ping(final String message) {
+        if (message.toLowerCase().equals("ping"))
+            return "pong";
+        return null;
+    }
+    @Executable
+    public String pong(final String message) {
+        if (message.toLowerCase().equals("pong"))
+            return "ping";
+        return null;
     }
 }
 ```
-* Message Listener example
-
+* for example if you say !ping, the bot will message back with pong, or if you message with !pong the bot will respond with ping
+* An example of sending an embedded messages is below
 ```java
-import DiscordAPI.listener.discordApiListener.listenerEvents.Message_Create;
-import ideaeclipse.reflectionListener.EventHandler;
-import ideaeclipse.reflectionListener.Listener;
+package DiscordBotNew.dm;
 
-public class EventClass implements Listener {
-    @EventHandler
-    public void event1(Message_Create create) {
-        System.out.println(create.getMessage().getContent());
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.objects.channel.Field;
+import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
+import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
+import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
+import ideaeclipse.customTerminal.Executable;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+public class Commands {
+    private final IDiscordBot bot;
+
+    public Commands(final IDiscordBot bot) {
+        this.bot = bot;
+    }
+
+    @Executable
+    public String DmMailCheck(final IMessage message, final String string) {
+        return "<N>Info</N>" + "<V>Name: " + message.getUser().getUsername() +
+                "\nNickName: " + message.getUser().getNickName() + "\nContent: " + string +
+                "</V>";
     }
 }
 ```
-
-* If you want to import this into your maven project use jitpack
-* This project doesn't currently have a stable releases and is not posted on the maven repo
-* If you would like to have direct access to the private maven repo this project is stored on please contact me or open a ticket with your intentions
-
-* Example of command cm proof Calculator
-* This file is in the commandsDirectory and its parent package is called 'proof'
+* When sending an embedded message you must have a \<N>\</N> followed by a \<V>\</V> these do not need to be separate by a \n. 
+* \<N>\</N> cases are used as names. or "Headers" You cannot put \n in these.
+* \<V>\</V> cases are used as values. You can put \n in these.
+## Hot to use
+* All you need to do to use this bot is to create the required commands in classes. Setup the properties file as you please and register a bot on the [discord apps webpage](https://discordapp.com/developers/applications/)
+* An example to start this is bot is
 ```java
-import DiscordAPI.Terminal.CustomTerminal;
+package DiscordBotNew;
 
-public class Calculator implements CustomTerminal {
-    public Calculator(){
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 
-    }
-    public float add(float a, float b){
-        return a + b;
-    }
-    public float subtract(float a,float b){
-        return a-b;
-    }
-    public float multiply(float a, float b){
-        return a*b;
-    }
-    public float divide(float a, float b){
-        return a/b;
-    }
-
-    @Override
-    public void done() {
-
+public class main {
+    public static void main(String[] arg) {
+        new DiscordBot(arg[0]);
     }
 }
 ```
-## Configuration
- * adminGroup: the group you want to give admin privilleges to
- * debug: if you want to log debug messages
- * adminUser: your user name
- * useTerminal: if you want to use the custom terminal
- * genericDirectory: where your code is stored for the generic terminal commands
- * adminFileDir: admin commands
- * commandsDirectory: where your code is stored for the custom terminal commands
- * defaultFileDirectory: default commands(anyone can use them)
-## Custom Terminal Generic command reference
-* To enter a function
-    * cm $SubDirecotry $FunctionName
-    * i.e. cm proof Calculator
-* To execute a generic/admin command
-    * cm $commandName
-    * cm getcurrentfunction
-* To see all possible functions
-    * cm help
-* To get commands from a function
-    * cm help $SubDirecotry $FunctionName
-    * i.e. cm help proof Calculator
-* Import info
-    * __You No longer need to use the prefix cm when inside a function__
-    * You can execute the following 2 commands regardless of function
-        * help, which displays the help menu
-        * done, exits the function
-    * help example
-        * cm help proof Calculator is equivalent to entering the calculator function and typing the help command
-## Custom Terminal
-* The custom terminal functionality allows you to write "functions" and "commands" for your created functions
-* A function is a collection of commands that are of the same type or relevance. For example my calculator example above is a function
-* Functions are stored in subdriectorys of your specified commandsDirectory for example if your commands directory is DiscordBot.Data.Methods then you must create a folder where you want to place one or more function class files
-* In my example the calculator class is stored in the proof directory
-* Commands are the methods inside the function class. For example if you were inside the example Calculator function you could execute the add command
-    * From the help menu we know that the add command requires two float parameters
-    * example:
-    ```text
-    add 10 10
-    
-    Result: 20.0 (.0 due to the return type of float)
-    ```
-    * For example you inputted any other number of params that isn't 2 the return would look like this
-    ```text
-    add 10  
-  
-    Wrong Number of Args, you need to enter the following 
-    [float, float]
-    ```
-* Once you have entered a function you can only execute commands that are specified inside the function file or generic/admin commands
-* Generic/admin Commands
-    * The direcotry needs to specified in the config.properties, genericDirectory
-    * The admin commands are stored in a file titled "adminCommands"
-    * The default "generic" commands are stored in a file titled "defaultCommands"
-    * These commands can be called using cm $commandName when not connected to a function and $commandName when inside a function
-* Extra function information
-    * When you connect to a function, for example my Dog example, "cm proof Dog"
-    * If you use the command setName, to dug
-    * Then if you use the command getName
-    ```text
-    setName dug
-
-    Result: void
-
-    getName
-
-    Result: dug
-    ```
-    * All data that you set is saved from command to command until you exit the function
-* How to develop functions
-    * Your function class must be public, and implement CustomTerminal
-        * Private classes won't be added to the command directory
-    * Your commands can have any primitive input type (int,float,double,character) and string
-    * Your commands can also return any primitive type + strings
-
-    
-## Api Logic(If you plan on forking this project)
- * Once the user runs the code with a valid token and guild id all the users/roles/channels get loaded in for the server
- * Then a websocket connection is started where an identity token is sent over the websocket, after this point the bot while show up in the server
- * Next all events will go through the 'Dispatch' case in the switch statement in the textWss file.
- * From here everything is event driven and in order to write code for each event use the IDiscordBot method (getDispatcher)
-## Async
- * See the [async project](https://github.com/ideaeclipse/AsyncUtility) 
-## Json utilities
- * See the [Json utilities project](https://github.com/ideaeclipse/JsonUtilities)
-## Custom Properties
-* See the [Custom properties project](https://github.com/ideaeclipse/CustomProperties)
- 
+* Arg[0] being a passed parameter, this is the token for your bot

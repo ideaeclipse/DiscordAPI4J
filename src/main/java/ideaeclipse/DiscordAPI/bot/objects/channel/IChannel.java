@@ -52,7 +52,7 @@ public abstract class IChannel {
         }
     }
 
-    public void sendEmbed(final List<Field> fields) {
+    public void sendEmbed(final List<Field> fields, final String image) {
         if (this.getType() == 0 || this.getType() == 1) {
             Json embed = new Json();
             JsonArray array = new JsonArray();
@@ -64,7 +64,8 @@ public abstract class IChannel {
             }
             embed.put("fields", array);
             Json footer = new Json();
-            footer.put("icon_url", "https://i.imgur.com/J2l5tvk.png");
+            if (image != null && !image.equals("null"))
+                footer.put("icon_url", image);
             footer.put("text", "Contact the server's Admins if there is an issue");
             embed.put("footer", footer);
             Json object = new Json();

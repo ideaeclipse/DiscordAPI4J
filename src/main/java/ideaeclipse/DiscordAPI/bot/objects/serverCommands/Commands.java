@@ -11,10 +11,10 @@ import ideaeclipse.customTerminal.Executable;
  * @author Ideaeclipse
  * @see ideaeclipse.DiscordAPI.bot.DiscordBot
  */
-public class Generic {
+public class Commands {
     private final IDiscordBot bot;
 
-    public Generic(final IDiscordBot bot) {
+    public Commands(final IDiscordBot bot) {
         this.bot = bot;
     }
 

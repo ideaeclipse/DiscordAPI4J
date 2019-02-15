@@ -6,37 +6,15 @@
 
     <groupId>com.ideaeclipse</groupId>
     <artifactId>DiscordAPI</artifactId>
-    <version>1.8</version>
+    <version>1.9</version>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>run.Data.Main</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>10</source>
+                    <target>10</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -48,11 +26,6 @@
         </repository>
     </distributionManagement>
     <dependencies>
-        <dependency>
-            <groupId>com.ideaeclipse</groupId>
-            <artifactId>customTerminal</artifactId>
-            <version>1.0</version>
-        </dependency>
         <dependency>
             <groupId>com.ideaeclipse</groupId>
             <artifactId>JsonUtilities</artifactId>

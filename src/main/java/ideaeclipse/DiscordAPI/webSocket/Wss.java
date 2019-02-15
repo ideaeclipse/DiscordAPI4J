@@ -207,6 +207,7 @@ public final class Wss extends WebSocketFactory {
                                                 }
                                             } else {
                                                 logger.error("Tried to reconnect 5 times, could not connect, check your internet connection or discordapi status");
+                                                bot.getLoggerManager().dump();
                                                 System.exit(-1);
                                             }
                                         }

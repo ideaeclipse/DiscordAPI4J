@@ -66,6 +66,7 @@ public final class DiscordBot implements IDiscordBot {
     private static final LoggerManager loggerManager;
     private static final ListenerManager eventManager;
     private static final boolean queryMessages;
+    private static final String embedFooterImage;
     private final RateLimitRecorder rateLimitRecorder;
     private final IHttpRequests requests;
     private final MultiKeyMap<Long, String, IRole> roles = new MultiKeyMap<>();
@@ -76,16 +77,17 @@ public final class DiscordBot implements IDiscordBot {
     private WebSocket socket;
 
     static {
-        properties = new Properties(new String[]{"LoadChannelMessages", "CommandPrefix", "UseInstances", "InstanceCommands", "GenericCommands", "DmCommands", "CommandChannel", "debug"});
+        properties = new Properties(new String[]{"LoadChannelMessages", "CommandPrefix", "InstanceCommands", "DmCommands", "CommandChannel", "debug", "embedFooterImage"});
         try {
             properties.start();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
         }
-        loggerManager = new LoggerManager("logs", Boolean.parseBoolean(properties.getProperty("debug")) ? Level.DEBUG : Level.INFO);
+        loggerManager = new LoggerManager("customLogger", Boolean.parseBoolean(properties.getProperty("debug")) ? Level.DEBUG : Level.INFO);
         eventManager = new ListenerManager();
         queryMessages = Boolean.parseBoolean(properties.getProperty("LoadChannelMessages"));
+        embedFooterImage = properties.getProperty("embedFooterImage");
     }
 
     /**
@@ -115,11 +117,11 @@ public final class DiscordBot implements IDiscordBot {
             @Override
             public void run() {
                 Thread.currentThread().setName("AdminConsole");
-                CustomTerminal<IDiscordUser, IDiscordBot, IMessage> input = new CustomTerminal<>(properties.getProperty("CommandPrefix"), false, null, "ideaeclipse.DiscordAPI.bot.objects.serverCommands", bot, IMessage.class);
+                CustomTerminal<IDiscordBot, IMessage> input = new CustomTerminal<>(properties.getProperty("CommandPrefix"), "ideaeclipse.DiscordAPI.bot.objects.serverCommands", bot, IMessage.class);
                 Scanner scanner = new Scanner(System.in);
                 while (true) {
                     try {
-                        String r = String.valueOf(input.handleInput(scanner.nextLine(), null, null)).replace("`", "");
+                        String r = String.valueOf(input.handleInput(scanner.nextLine(), null)).replace("`", "");
                         if (!r.equals("null")) {
                             List<Field> fields = Field.parser(r);
                             if (fields.size() > 0) {
@@ -294,8 +296,8 @@ public final class DiscordBot implements IDiscordBot {
     private static class EventListener implements Listener {
         private final CustomLogger logger;
         private final IDiscordBot bot;
-        private final CustomTerminal<IDiscordUser, IDiscordBot, IMessage> input;
-        private final CustomTerminal<IDiscordUser, IDiscordBot, IMessage> dmInput;
+        private final CustomTerminal<IDiscordBot, IMessage> input;
+        private final CustomTerminal<IDiscordBot, IMessage> dmInput;
 
         /**
          * Starts logger, starts command handler
@@ -305,8 +307,8 @@ public final class DiscordBot implements IDiscordBot {
         private EventListener(final IDiscordBot bot) {
             this.bot = bot;
             this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
-            this.input = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), Boolean.parseBoolean(this.bot.getProperties().getProperty("UseInstances")), this.bot.getProperties().getProperty("InstanceCommands"), this.bot.getProperties().getProperty("GenericCommands"), bot, IMessage.class);
-            this.dmInput = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), false, null, this.bot.getProperties().getProperty("DmCommands"), bot, IMessage.class);
+            this.input = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), this.bot.getProperties().getProperty("InstanceCommands"), bot, IMessage.class);
+            this.dmInput = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), this.bot.getProperties().getProperty("DmCommands"), bot, IMessage.class);
         }
 
         /**
@@ -323,11 +325,11 @@ public final class DiscordBot implements IDiscordBot {
                 this.logger.info("ChannelMessageCreate: " + message);
                 if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername()) && (message.getChannel().equals(bot.getChannels().getByK2(this.bot.getProperties().getProperty("CommandChannel")))) && message.getContent().startsWith(this.input.getPrefix())) {
                     try {
-                        String r = String.valueOf(this.input.handleInput(message.getContent(), message.getUser(), message));
+                        String r = String.valueOf(this.input.handleInput(message.getContent(), message));
                         if (!r.equals("null")) {
                             List<Field> fieldList = Field.parser(r);
                             if (fieldList.size() > 0)
-                                message.getChannel().sendEmbed(fieldList);
+                                message.getChannel().sendEmbed(fieldList, embedFooterImage);
                             else
                                 message.getChannel().sendMessage(r);
                         }
@@ -340,11 +342,11 @@ public final class DiscordBot implements IDiscordBot {
                 if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername())) {
                     if (message.getContent().startsWith(this.input.getPrefix())) {
                         try {
-                            String r = String.valueOf(this.dmInput.handleInput(message.getContent(), message.getUser(), message));
+                            String r = String.valueOf(this.dmInput.handleInput(message.getContent(), message));
                             if (!r.equals("null")) {
                                 List<Field> fieldList = Field.parser(r);
                                 if (fieldList.size() > 0)
-                                    message.getChannel().sendEmbed(fieldList);
+                                    message.getChannel().sendEmbed(fieldList, embedFooterImage);
                                 else
                                     message.getChannel().sendMessage(r);
                             }
