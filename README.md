@@ -139,7 +139,7 @@ public class Commands {
 * When sending an embedded message you must have a \<N>\</N> followed by a \<V>\</V> these do not need to be separate by a \n. 
 * \<N>\</N> cases are used as names. or "Headers" You cannot put \n in these.
 * \<V>\</V> cases are used as values. You can put \n in these.
-## Hot to use
+## How to use
 * All you need to do to use this bot is to create the required commands in classes. Setup the properties file as you please and register a bot on the [discord apps webpage](https://discordapp.com/developers/applications/)
 * An example to start this is bot is
 ```java
