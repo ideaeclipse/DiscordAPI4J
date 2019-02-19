@@ -2,6 +2,7 @@ package ideaeclipse.DiscordAPI.bot.objects.reaction;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import emoji4j.EmojiUtils;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.utils.Util;
@@ -32,7 +33,7 @@ import ideaeclipse.reflectionListener.parents.Event;
  * @author Ideaeclipse
  * @see Reaction
  * @see IReaction
- * @see ideaeclipse.DiscordAPI.bot.DiscordBot
+ * @see DiscordBot
  */
 public final class AddReaction extends Event {
     private final IReaction reaction;
@@ -47,7 +48,7 @@ public final class AddReaction extends Event {
      * @param json json payload
      * @param bot  bot
      */
-    private AddReaction(@JsonValidity({"emoji", "channel_id", "message_id"}) final Json json, final IDiscordBot bot) {
+    private AddReaction(@JsonValidity({"emoji", "channel_id", "message_id"}) final Json json, final DiscordBot bot) {
         String s = String.valueOf(Util.check(this, "getEmojiName", new Json(String.valueOf(json.get("emoji")))).getObject());
         IChannel channel = bot.getChannels().getByK1(Long.parseUnsignedLong(String.valueOf(json.get("channel_id"))));
         this.reaction = new Reaction(EmojiUtils.shortCodify(s)

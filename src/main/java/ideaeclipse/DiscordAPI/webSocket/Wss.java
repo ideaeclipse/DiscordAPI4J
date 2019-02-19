@@ -2,7 +2,7 @@ package ideaeclipse.DiscordAPI.webSocket;
 
 import com.neovisionaries.ws.client.*;
 import ideaeclipse.AsyncUtility.Async;
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.channel.directMessage.CreateDMChannel;
 import ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels.CreateChannel;
@@ -17,13 +17,15 @@ import ideaeclipse.DiscordAPI.bot.objects.role.CreateRole;
 import ideaeclipse.DiscordAPI.bot.objects.role.DeleteRole;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPI.bot.objects.role.UpdateRole;
-import ideaeclipse.DiscordAPI.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPI.bot.objects.user.CreateDiscordUser;
+import ideaeclipse.DiscordAPI.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPI.bot.objects.user.UpdateDiscordUser;
 import ideaeclipse.DiscordAPI.utils.CheckResponeType;
 import ideaeclipse.DiscordAPI.utils.CheckResponse;
 import ideaeclipse.DiscordAPI.utils.Util;
+import ideaeclipse.DiscordAPI.webSocket.DispatchType;
+import ideaeclipse.DiscordAPI.webSocket.TextOpCodes;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.WebSocketEvent;
 import ideaeclipse.JsonUtilities.Builder;
 import ideaeclipse.JsonUtilities.Json;
@@ -44,12 +46,12 @@ import java.util.stream.Collectors;
 public final class Wss extends WebSocketFactory {
     private WebSocket socket;
     private static final String WEBSOCKET = "wss://gateway.discord.gg/?v=6&encoding=json";
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private static int reconnectionCount = 0;
     private static boolean gotACK;
     private static boolean redemption;
 
-    public Wss(final IDiscordBot bot, final String token) throws IOException, WebSocketException {
+    public Wss(final DiscordBot bot, final String token) throws IOException, WebSocketException {
         this.bot = bot;
         socket = this.setConnectionTimeout(5000)
                 .createSocket(WEBSOCKET)

@@ -1,7 +1,9 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel.directMessage;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPI.utils.Util;
@@ -40,16 +42,16 @@ import java.util.List;
  * @author Ideaeclipse
  * @see IChannel
  * @see DMChannel
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
+ * @see Wss#Wss(IDiscordBot, String)
  */
 public final class CreateDMChannel extends Event {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final IChannel channel;
 
     /**
-     * @param json json string from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
+     * @param json json string from {@link Wss}
      */
-    private CreateDMChannel(@JsonValidity({"recipients", "id", "type"}) final Json json, final IDiscordBot bot) {
+    private CreateDMChannel(@JsonValidity({"recipients", "id", "type"}) final Json json, final DiscordBot bot) {
         this.bot = bot;
         List<IDiscordUser> recipients = new LinkedList<>();
         for (Object object : new JsonArray(String.valueOf(json.get("recipients")))) {

@@ -7,6 +7,6 @@ import java.io.IOException;
  *
  * @author Ideaeclipse
  */
-interface IQueueHandler {
+public interface IQueueHandler {
     Object event() throws IOException;
 }

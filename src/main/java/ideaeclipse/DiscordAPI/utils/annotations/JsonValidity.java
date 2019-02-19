@@ -1,5 +1,6 @@
 package ideaeclipse.DiscordAPI.utils.annotations;
 
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.JsonUtilities.Json;
 
 import java.lang.annotation.ElementType;
@@ -12,7 +13,7 @@ import java.lang.annotation.Target;
  * If it doesn't contain those values it wont be executed
  *
  * @author Ideaeclipse
- * @see ideaeclipse.DiscordAPI.webSocket.Wss
+ * @see Wss
  * @see ideaeclipse.DiscordAPI.utils.Util#check(Event, String, Json)
  */
 @Retention(value = RetentionPolicy.RUNTIME)

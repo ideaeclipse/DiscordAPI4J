@@ -1,7 +1,9 @@
 package ideaeclipse.DiscordAPI.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
@@ -9,7 +11,7 @@ import ideaeclipse.reflectionListener.parents.Event;
 
 @JsonFormat
 /**
- * This class is called when a guild member update payload is sent to {@link ideaeclipse.DiscordAPI.webSocket.Wss}
+ * This class is called when a guild member update payload is sent to {@link Wss}
  * It returns an a {@link IDiscordUser} object that replaces its original object
  *
  * Json Example
@@ -35,19 +37,19 @@ import ideaeclipse.reflectionListener.parents.Event;
  * @see CreateDiscordUser
  * @see DeleteDiscordUser
  * @see IDiscordUser
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
+ * @see Wss#Wss(IDiscordBot, String)
  */
 public final class UpdateDiscordUser extends Event {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final IDiscordUser user;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IDiscordBot)} validates that the json object has proper components
+     * {@link Util#checkConstructor(Class, Json, DiscordBot)} validates that the json object has proper components
      * Uses {@link CreateDiscordUser} to parse the json string
      *
-     * @param json json from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
+     * @param json json from {@link Wss}
      */
-    private UpdateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final IDiscordBot bot) {
+    private UpdateDiscordUser(@JsonValidity({"nick", "user", "roles"}) final Json json, final DiscordBot bot) {
         this.bot = bot;
         CreateDiscordUser user = Util.checkConstructor(CreateDiscordUser.class, json, bot).getObject();
         this.user = user.getUser();

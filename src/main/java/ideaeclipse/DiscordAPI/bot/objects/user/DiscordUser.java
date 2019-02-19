@@ -1,7 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.user;
 
 
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPI.utils.MultiKeyMap;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
@@ -17,7 +17,7 @@ import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
  * @see IDiscordUser
  */
 public final class DiscordUser implements IDiscordUser {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final String nickname;
     private final String username;
     private final int discriminator;
@@ -31,7 +31,7 @@ public final class DiscordUser implements IDiscordUser {
      * @param id            unique identifier
      * @param roles         list of roles the user has
      */
-    DiscordUser(final IDiscordBot bot, final String nickname, final String username, final int discriminator, final long id, final MultiKeyMap<Long, String, IRole> roles) {
+    DiscordUser(final DiscordBot bot, final String nickname, final String username, final int discriminator, final long id, final MultiKeyMap<Long, String, IRole> roles) {
         this.bot = bot;
         this.nickname = nickname;
         this.username = username;

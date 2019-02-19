@@ -1,6 +1,6 @@
 package ideaeclipse.DiscordAPI.webSocket.rateLimit;
 
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.customLogger.CustomLogger;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ class QueueCaller implements Callable<Object> {
      * @param bot   discord bot
      * @param event event to execute
      */
-    QueueCaller(final IDiscordBot bot, final IQueueHandler event) {
+    QueueCaller(final DiscordBot bot, final IQueueHandler event) {
         this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         this.event = event;
     }

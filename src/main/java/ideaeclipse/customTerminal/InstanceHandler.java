@@ -8,24 +8,19 @@ import java.util.Map;
 /**
  * Instance handler, will print generic help commands, instance help commands, and create new instances
  *
- * @param <K> Optional method param
+ * @param <T> Optional method param
  * @author Ideaeclipse
  */
-class InstanceHandler<T, K> {
-    private final CustomTerminal<T, K> terminal;
-    private final ideaeclipse.customTerminal.CommandList list;
-    private final ideaeclipse.customTerminal.Util<?, K> util;
+class InstanceHandler<T> {
+    private final CustomTerminal<T> terminal;
+    private final Util<T> util;
 
     /**
-     * @param commands         instance commands package
-     * @param constructorParam constructor param
      * @param methodParamClass method param class
      */
-    InstanceHandler(final CustomTerminal<T, K> terminal, final String commands, final T constructorParam, final Class<K> methodParamClass) {
+    InstanceHandler(final CustomTerminal<T> terminal, final Class<T> methodParamClass) {
         this.terminal = terminal;
-        this.list = new ideaeclipse.customTerminal.CommandList(commands);
-        Class<?>[] interfaces = constructorParam.getClass().getInterfaces();
-        this.util = new ideaeclipse.customTerminal.Util<>(interfaces.length > 0 ? interfaces[0] : null, methodParamClass);
+        this.util = new Util<>(methodParamClass);
     }
 
     /**
@@ -36,12 +31,12 @@ class InstanceHandler<T, K> {
      * @return printable help menu
      * @throws InvalidHelpFormat     When the help format is invalid
      */
-    String help(final List<String> input, final Map<String, ideaeclipse.customTerminal.Command<?, K>> genericCommands) throws InvalidHelpFormat {
+    String help(final List<String> input, final Map<String, Command<T>> genericCommands) throws InvalidHelpFormat {
         switch (input.size()) {
             case 1:
                 StringBuilder builder = new StringBuilder();
-                builder.append("<N>Commands</N><V>");
-                for (Map.Entry<String, ideaeclipse.customTerminal.Command<?, K>> entry : genericCommands.entrySet()) {
+                builder.append("<N>ConsoleCommands</N><V>");
+                for (Map.Entry<String, Command<T>> entry : genericCommands.entrySet()) {
                     builder.append("`").append(this.terminal.getPrefix()).append(this.util.beautifyConstructor(entry.getValue().getMethod())).append("`").append("\n");
                 }
                 builder.append("</V>");
@@ -53,13 +48,6 @@ class InstanceHandler<T, K> {
             default:
                 throw new InvalidHelpFormat();
         }
-    }
-
-    /**
-     * @return command list
-     */
-    ideaeclipse.customTerminal.CommandList getList() {
-        return list;
     }
 
 }

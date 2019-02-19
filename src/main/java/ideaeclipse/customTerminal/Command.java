@@ -13,23 +13,22 @@ import java.util.stream.Collectors;
 /**
  * Command object
  *
- * @param <T> Comparator and instance map key
  * @param <K> Method param type
  * @author Ideaeclipse
  */
-class Command<T, K> {
-    private final T object;
+class Command<K> {
+    private final CommandsClass commandsClass;
     private final Method method;
     private final boolean needsParam;
 
     /**
-     * @param object     Comparator object
+     * @param commandsClass commandsClass object
      * @param methodName methodName, will search for the method object
      * @param needsParam if the method needs the method param to be passed
      */
-    Command(final T object, final String methodName, final boolean needsParam) {
-        this.object = object;
-        this.method = Arrays.stream(object.getClass().getDeclaredMethods()).filter(o -> o.getName().toLowerCase().equals(methodName.toLowerCase())).collect(Collectors.toList()).get(0);
+    Command(final CommandsClass commandsClass, final String methodName, final boolean needsParam) {
+        this.commandsClass = commandsClass;
+        this.method = Arrays.stream(commandsClass.getClass().getDeclaredMethods()).filter(o -> o.getName().toLowerCase().equals(methodName.toLowerCase())).collect(Collectors.toList()).get(0);
         this.method.setAccessible(true);
         this.needsParam = needsParam;
     }
@@ -49,7 +48,7 @@ class Command<T, K> {
             objects.add(0, methodParam);
         if (method.getParameterCount() == objects.size()) {
             try {
-                return this.method.invoke(this.object, objects.toArray());
+                return this.method.invoke(this.commandsClass, objects.toArray());
             } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
                 e.printStackTrace();
                 List<Class<?>> classList = new LinkedList<>();

@@ -10,7 +10,7 @@ import java.util.List;
  * <V>Field Value</V>
  *
  * @author Ideaeclipse
- * @see IChannel#sendEmbed(List)
+ * @see IChannel#sendEmbed(List, String)
  */
 public class Field {
     private final String name;

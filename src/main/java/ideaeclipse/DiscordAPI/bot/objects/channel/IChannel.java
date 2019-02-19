@@ -1,16 +1,13 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel;
 
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
-import org.json.JSONObject;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +27,9 @@ import java.util.Map;
  * @see ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels.UpdateChannel
  */
 public abstract class IChannel {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
 
-    public IChannel(final IDiscordBot bot) {
+    public IChannel(final DiscordBot bot) {
         this.bot = bot;
     }
 

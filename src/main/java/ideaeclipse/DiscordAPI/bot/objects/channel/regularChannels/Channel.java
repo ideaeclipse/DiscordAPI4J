@@ -1,15 +1,16 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels;
 
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Channel data mapped to an object from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
+ * Channel data mapped to an object from {@link Wss}
  *
  * @author Ideaeclipse
  * @see CreateChannel
@@ -29,7 +30,7 @@ public final class Channel extends IChannel {
      * @param id   channel unique identifier
      * @param type channel type 0: text 2: voice 4: group
      */
-    Channel(final IDiscordBot bot, final boolean nsfw, final String name, final long id, final int type, final Map<Long, IMessage> messageHistory) {
+    Channel(final DiscordBot bot, final boolean nsfw, final String name, final long id, final int type, final Map<Long, IMessage> messageHistory) {
         super(bot);
         this.nsfw = nsfw;
         this.name = name;

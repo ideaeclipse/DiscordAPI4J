@@ -1,5 +1,6 @@
 package ideaeclipse.DiscordAPI.bot.objects.message;
 
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  *
  * @author Ideaeclipse
  * @see MessageCreate
- * @see ideaeclipse.DiscordAPI.webSocket.Wss
+ * @see Wss
  */
 public interface IMessage {
     /**

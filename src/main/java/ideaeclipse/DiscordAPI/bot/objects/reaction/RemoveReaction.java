@@ -1,6 +1,7 @@
 package ideaeclipse.DiscordAPI.bot.objects.reaction;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.utils.Util;
@@ -30,7 +31,7 @@ import ideaeclipse.reflectionListener.parents.Event;
  * @author Ideaeclipse
  * @see Reaction
  * @see IReaction
- * @see ideaeclipse.DiscordAPI.bot.DiscordBot
+ * @see DiscordBot
  */
 public final class RemoveReaction extends Event {
     private final IReaction reaction;
@@ -42,7 +43,7 @@ public final class RemoveReaction extends Event {
      * @param json json payload
      * @param bot  bot
      */
-    private RemoveReaction(@JsonValidity({"emoji", "channel_id", "message_id"}) final Json json, final IDiscordBot bot) {
+    private RemoveReaction(@JsonValidity({"emoji", "channel_id", "message_id"}) final Json json, final DiscordBot bot) {
         this.reaction = Util.checkConstructor(AddReaction.class, json, bot).getObject().getReaction();
         this.reaction.getChannel().getMessageHistory().get(this.reaction.getMessage().getId()).removeReaction(this.reaction.getCode());
     }

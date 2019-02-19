@@ -1,10 +1,13 @@
 package ideaeclipse.DiscordAPI.webSocket.rateLimit;
 
 import ideaeclipse.AsyncUtility.Async;
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * TODO: separate rate limits per directory not overall
@@ -15,14 +18,14 @@ import java.util.concurrent.*;
  */
 public final class RateLimitRecorder {
     private final Object lock = new Object();
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final ExecutorService service;
     private Integer count;
 
     /**
      * @param bot discord bot
      */
-    public RateLimitRecorder(final IDiscordBot bot) {
+    public RateLimitRecorder(final DiscordBot bot) {
         this.bot = bot;
         service = Executors.newSingleThreadExecutor();
         count = 0;

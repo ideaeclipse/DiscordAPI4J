@@ -1,7 +1,9 @@
 package ideaeclipse.DiscordAPI.bot.objects.role;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.reflectionListener.parents.Event;
@@ -48,19 +50,19 @@ import ideaeclipse.reflectionListener.parents.Event;
  * @author Ideaeclipse
  * @see Role
  * @see IRole
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
+ * @see Wss#Wss(IDiscordBot, String)
  */
 public final class CreateRole extends Event {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final IRole role;
 
     /**
-     * {@link ideaeclipse.DiscordAPI.utils.Util#checkConstructor(Class, Json, IDiscordBot)}  validates json string
+     * {@link ideaeclipse.DiscordAPI.utils.Util#checkConstructor(Class, Json, DiscordBot)}  validates json string
      * Then parses all data into an {@link IRole} object
      *
-     * @param json json from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
+     * @param json json from {@link Wss}
      */
-    private CreateRole(@JsonValidity({"color", "managed", "permissions", "name", "mentionable", "position", "id", "hoist"}) final Json json, final IDiscordBot bot) {
+    private CreateRole(@JsonValidity({"color", "managed", "permissions", "name", "mentionable", "position", "id", "hoist"}) final Json json, final DiscordBot bot) {
         this.bot = bot;
         this.role = new Role(Integer.parseInt(String.valueOf(json.get("color")))
                 , Boolean.parseBoolean(String.valueOf(json.get("managed")))

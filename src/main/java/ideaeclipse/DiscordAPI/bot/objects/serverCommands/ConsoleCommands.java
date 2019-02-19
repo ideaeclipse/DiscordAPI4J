@@ -1,20 +1,22 @@
 package ideaeclipse.DiscordAPI.bot.objects.serverCommands;
 
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.objects.presence.UserStatus;
 import ideaeclipse.DiscordAPI.bot.objects.presence.game.GameType;
+import ideaeclipse.customTerminal.CommandsClass;
 import ideaeclipse.customTerminal.Executable;
 
 /**
- * Commands that can only be executed from the console.
+ * ConsoleCommands that can only be executed from the console.
  *
  * @author Ideaeclipse
- * @see ideaeclipse.DiscordAPI.bot.DiscordBot
+ * @see DiscordBot
  */
-public class Commands {
+public class ConsoleCommands implements CommandsClass {
     private final IDiscordBot bot;
 
-    public Commands(final IDiscordBot bot) {
+    public ConsoleCommands(final IDiscordBot bot) {
         this.bot = bot;
     }
 

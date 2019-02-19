@@ -1,6 +1,6 @@
 package ideaeclipse.DiscordAPI.utils;
 
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
 import ideaeclipse.DiscordAPI.utils.interfaces.IHttpRequests;
 import ideaeclipse.JsonUtilities.Json;
@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
  */
 public final class Util {
     /**
-     * TODO: fix return type
      * <p>
      * Executes a method and returns a checkResponse
      *
@@ -60,14 +59,14 @@ public final class Util {
     /**
      * Executes a constructor and callEvent with the return object {@link CheckResponse#getObject()}
      *
-     * @param manager event manager {@link IDiscordBot#getListenerManager()}
+     * @param manager event manager {@link DiscordBot#getListenerManager()}
      * @param object  class to execute
      * @param json    json to pass
      * @param bot     discord bot instance
      * @param <T>     class type ensures it extends event
      * @return new checkResponse
      */
-    public static <T extends Event> CheckResponse<T> checkConstructor(final ListenerManager manager, final Class<T> object, final Json json, final IDiscordBot bot) {
+    public static <T extends Event> CheckResponse<T> checkConstructor(final ListenerManager manager, final Class<T> object, final Json json, final DiscordBot bot) {
         CheckResponse<T> r = checkConstructor(object, json, bot);
         if (r.getType().equals(CheckResponeType.EXECUTED))
             manager.callExecutables(r.getObject());
@@ -83,9 +82,9 @@ public final class Util {
      * @param <T>    class type ensures it extends event
      * @return new checkResponse
      */
-    public static <T extends Event> CheckResponse<T> checkConstructor(final Class<T> object, final Json json, final IDiscordBot bot) {
+    public static <T extends Event> CheckResponse<T> checkConstructor(final Class<T> object, final Json json, final DiscordBot bot) {
         try {
-            Constructor<T> constructor = object.getDeclaredConstructor(Json.class, IDiscordBot.class);
+            Constructor<T> constructor = object.getDeclaredConstructor(Json.class, DiscordBot.class);
             if (constructor != null) {
                 constructor.setAccessible(true);
                 List<Annotation> validityList = Arrays.stream(constructor.getParameterAnnotations()[0]).filter(o -> o.annotationType().equals(JsonValidity.class)).collect(Collectors.toList());

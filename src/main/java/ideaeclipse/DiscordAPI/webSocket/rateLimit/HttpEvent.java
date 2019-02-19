@@ -1,6 +1,6 @@
 package ideaeclipse.DiscordAPI.webSocket.rateLimit;
 
-import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.JsonUtilities.Json;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author Ideaeclipse
  */
 public class HttpEvent implements IQueueHandler {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final RequestTypes type;
     private final String url;
     private final Json object;
@@ -25,7 +25,7 @@ public class HttpEvent implements IQueueHandler {
      * @param url      where to send file
      * @param filePath file path of the file
      */
-    public HttpEvent(final IDiscordBot bot, final RequestTypes type, final String url, final String filePath) {
+    public HttpEvent(final DiscordBot bot, final RequestTypes type, final String url, final String filePath) {
         this.bot = bot;
         this.type = type;
         this.url = url;
@@ -41,7 +41,7 @@ public class HttpEvent implements IQueueHandler {
      * @param url    where to send json string
      * @param object json object
      */
-    public HttpEvent(final IDiscordBot bot, final RequestTypes type, final String url, final Json object) {
+    public HttpEvent(final DiscordBot bot, final RequestTypes type, final String url, final Json object) {
         this.bot = bot;
         this.type = type;
         this.url = url;
@@ -56,7 +56,7 @@ public class HttpEvent implements IQueueHandler {
      * @param type get,put,post,delete
      * @param url  where to go
      */
-    public HttpEvent(final IDiscordBot bot, final RequestTypes type, final String url) {
+    public HttpEvent(final DiscordBot bot, final RequestTypes type, final String url) {
         this.bot = bot;
         this.type = type;
         this.url = url;

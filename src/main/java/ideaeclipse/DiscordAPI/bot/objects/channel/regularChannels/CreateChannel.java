@@ -1,16 +1,13 @@
 package ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
-import ideaeclipse.DiscordAPI.bot.objects.message.MessageCreate;
-import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
-import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
-import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
 import ideaeclipse.JsonUtilities.Json;
-import ideaeclipse.JsonUtilities.JsonArray;
 import ideaeclipse.reflectionListener.parents.Event;
 
 import java.util.HashMap;
@@ -42,24 +39,25 @@ import java.util.Map;
  * @see UpdateChannel
  * @see DeleteChannel
  * @see IChannel
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
+ * @see Wss#Wss(IDiscordBot, String)
  */
 public final class CreateChannel extends Event {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final IChannel channel;
 
     /**
-     * Does a validity check {@link ideaeclipse.DiscordAPI.utils.Util#checkConstructor(Class, Json, IDiscordBot)}
+     * Does a validity check {@link ideaeclipse.DiscordAPI.utils.Util#checkConstructor(Class, Json, DiscordBot)}
      * and parses that data into a channel object
      *
      * @param json json object received from the websocket
      * @param bot  bot from util
      * @see ideaeclipse.DiscordAPI.utils.Util
      */
-    private CreateChannel(@JsonValidity({"nsfw", "name", "id", "type"}) Json json, final IDiscordBot bot) {
+    private CreateChannel(@JsonValidity({"nsfw", "name", "id", "type"}) Json json, final DiscordBot bot) {
         this.bot = bot;
         Map<Long, IMessage> messageHistory = new HashMap<>();
         long id = Long.parseUnsignedLong(String.valueOf(json.get("id")));
+        /*
         if (bot.queryMessages()) {
             String response = String.valueOf(bot.getRateLimitRecorder().queue(new HttpEvent(bot, RequestTypes.GET, "channels/" + id + "/messages?limit=100")));
             if (response.startsWith("[") && response.endsWith("]"))
@@ -69,6 +67,7 @@ public final class CreateChannel extends Event {
                     messageHistory.put(message.getMessage().getId(), message.getMessage());
                 }
         }
+        */
         this.channel = new Channel(bot, Boolean.parseBoolean(String.valueOf(json.get("nsfw")))
                 , String.valueOf(json.get("name"))
                 , id
@@ -77,7 +76,7 @@ public final class CreateChannel extends Event {
     }
 
     /**
-     * @return created channel object from {@link #CreateChannel(Json, IDiscordBot)} )}
+     * @return created channel object from {@link #CreateChannel(Json, DiscordBot)} )}
      */
     public IChannel getChannel() {
         return channel;

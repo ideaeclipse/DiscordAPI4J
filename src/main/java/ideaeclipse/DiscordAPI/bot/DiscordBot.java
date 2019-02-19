@@ -3,46 +3,34 @@ package ideaeclipse.DiscordAPI.bot;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketException;
 import ideaeclipse.AsyncUtility.Async;
-import ideaeclipse.CustomProperties.Properties;
 import ideaeclipse.DiscordAPI.bot.objects.channel.Field;
 import ideaeclipse.DiscordAPI.bot.objects.channel.IChannel;
 import ideaeclipse.DiscordAPI.bot.objects.channel.directMessage.CreateDMChannel;
 import ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels.CreateChannel;
-import ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels.DeleteChannel;
-import ideaeclipse.DiscordAPI.bot.objects.channel.regularChannels.UpdateChannel;
 import ideaeclipse.DiscordAPI.bot.objects.message.IMessage;
-import ideaeclipse.DiscordAPI.bot.objects.message.MessageCreate;
-import ideaeclipse.DiscordAPI.bot.objects.presence.PresenceUpdate;
 import ideaeclipse.DiscordAPI.bot.objects.presence.UserStatus;
 import ideaeclipse.DiscordAPI.bot.objects.presence.game.GameType;
-import ideaeclipse.DiscordAPI.bot.objects.reaction.AddReaction;
-import ideaeclipse.DiscordAPI.bot.objects.reaction.RemoveReaction;
 import ideaeclipse.DiscordAPI.bot.objects.role.CreateRole;
-import ideaeclipse.DiscordAPI.bot.objects.role.DeleteRole;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
-import ideaeclipse.DiscordAPI.bot.objects.role.UpdateRole;
+import ideaeclipse.DiscordAPI.bot.objects.serverCommands.ConsoleCommands;
 import ideaeclipse.DiscordAPI.bot.objects.user.CreateDiscordUser;
-import ideaeclipse.DiscordAPI.bot.objects.user.DeleteDiscordUser;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
-import ideaeclipse.DiscordAPI.bot.objects.user.UpdateDiscordUser;
 import ideaeclipse.DiscordAPI.utils.MultiKeyMap;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.interfaces.IHttpRequests;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.HttpEvent;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.RateLimitRecorder;
-import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.RequestTypes;
 import ideaeclipse.DiscordAPI.webSocket.rateLimit.WebSocketEvent;
 import ideaeclipse.JsonUtilities.Json;
 import ideaeclipse.JsonUtilities.JsonArray;
 import ideaeclipse.customLogger.CustomLogger;
-import ideaeclipse.customLogger.Level;
 import ideaeclipse.customLogger.LoggerManager;
+import ideaeclipse.customTerminal.CommandsClass;
 import ideaeclipse.customTerminal.CustomTerminal;
 import ideaeclipse.customTerminal.exceptions.ImproperCommandFormat;
 import ideaeclipse.reflectionListener.ListenerManager;
-import ideaeclipse.reflectionListener.annotations.CallableEvent;
-import ideaeclipse.reflectionListener.parents.Listener;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -59,95 +47,75 @@ import java.util.Scanner;
  *
  * @author Idaeclipse
  * @see IDiscordBot
- * @see IDiscordBot
  */
-public final class DiscordBot implements IDiscordBot {
-    private static final Properties properties;
-    private static final LoggerManager loggerManager;
-    private static final ListenerManager eventManager;
-    private static final boolean queryMessages;
-    private static final String embedFooterImage;
+public class DiscordBot extends IDiscordBot {
+    //Imported
     private final RateLimitRecorder rateLimitRecorder;
+    private final LoggerManager loggerManager;
+    private final ListenerManager listenerManager;
     private final IHttpRequests requests;
+    private final String commandPrefix;
+
+    //Generated
     private final MultiKeyMap<Long, String, IRole> roles = new MultiKeyMap<>();
     private final MultiKeyMap<Long, String, IDiscordUser> users = new MultiKeyMap<>();
     private final MultiKeyMap<Long, String, IChannel> channels = new MultiKeyMap<>();
+    private final CustomLogger logger;
     private Long guildId;
     private IDiscordUser user;
     private WebSocket socket;
-
-    static {
-        properties = new Properties(new String[]{"LoadChannelMessages", "CommandPrefix", "InstanceCommands", "DmCommands", "CommandChannel", "debug", "embedFooterImage"});
-        try {
-            properties.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-        loggerManager = new LoggerManager("customLogger", Boolean.parseBoolean(properties.getProperty("debug")) ? Level.DEBUG : Level.INFO);
-        eventManager = new ListenerManager();
-        queryMessages = Boolean.parseBoolean(properties.getProperty("LoadChannelMessages"));
-        embedFooterImage = properties.getProperty("embedFooterImage");
-    }
 
     /**
      * Starts all necessary processes,
      * loads bots guild(s)
      * loads roles, bot user, users, channels, starts websocket connection
-     *
-     * @param token     login token
-     * @param listeners list of {@link ideaeclipse.reflectionListener.parents.Event} to add to the {@link #eventManager}
      */
-    public DiscordBot(final String token, final Listener... listeners) {
-        CustomLogger logger = new CustomLogger(this.getClass(), loggerManager);
-        logger.debug("Starting Rate Limit manager");
+    DiscordBot(final String token, final LoggerManager loggerManager, final ListenerManager listenerManager, final IHttpRequests requests, final String commandPrefix, final CommandsClass commandsClass, final CommandsClass dmClass, final String commandChannel, final String embedFooter) {
         this.rateLimitRecorder = new RateLimitRecorder(this);
-        logger.debug("Starting Requests manager");
-        this.requests = new Util.HttpRequests(token);
+        this.loggerManager = loggerManager;
+        this.listenerManager = listenerManager;
+        this.requests = requests;
+        this.commandPrefix = commandPrefix;
+        this.logger = new CustomLogger(this.getClass(), this.loggerManager);
         logger.debug("Registering default event listener");
-        eventManager.registerListener(new EventListener(this));
-        logger.debug("Registering user defined event listeners if any");
-        for (Listener listener : listeners) {
-            logger.debug("Registering user defined event with name: " + listener.getClass().getSimpleName());
-            eventManager.registerListener(listener);
-        }
+        this.listenerManager.registerListener(new EventListener(this, commandPrefix, commandsClass, dmClass, embedFooter, commandChannel));
         logger.debug("Starting Console");
-        IDiscordBot bot = this;
-        Async.blankThread(new Runnable() {
-            @Override
-            public void run() {
-                Thread.currentThread().setName("AdminConsole");
-                CustomTerminal<IDiscordBot, IMessage> input = new CustomTerminal<>(properties.getProperty("CommandPrefix"), "ideaeclipse.DiscordAPI.bot.objects.serverCommands", bot, IMessage.class);
-                Scanner scanner = new Scanner(System.in);
-                while (true) {
-                    try {
-                        String r = String.valueOf(input.handleInput(scanner.nextLine(), null)).replace("`", "");
-                        if (!r.equals("null")) {
-                            List<Field> fields = Field.parser(r);
-                            if (fields.size() > 0) {
-                                StringBuilder builder = new StringBuilder("\n");
-                                for (Field field : fields) {
-                                    builder.append(field.getName()).append("\n");
-                                    builder.append("    ").append(field.getValue().replaceAll("\n", "\n    ")).append("\n");
-                                }
-                                if (builder.charAt(builder.length() - 1) == '\n')
-                                    builder.deleteCharAt(builder.length() - 1);
 
-                                logger.info(String.valueOf(builder));
-                            } else
-                                logger.info(r);
+        //Console instance
+        Async.blankThread(() -> {
+            Thread.currentThread().setName("AdminConsole");
+            CustomTerminal<IMessage> input = new CustomTerminal<>(this.commandPrefix, new ConsoleCommands(this), IMessage.class);
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                try {
+                    String r = String.valueOf(input.handleInput(scanner.nextLine(), null)).replace("`", "");
+                    if (!r.equals("null")) {
+                        List<Field> fields = Field.parser(r);
+                        if (fields.size() > 0) {
+                            StringBuilder builder = new StringBuilder("\n");
+                            for (Field field : fields) {
+                                builder.append(field.getName()).append("\n");
+                                builder.append("    ").append(field.getValue().replaceAll("\n", "\n    ")).append("\n");
+                            }
+                            if (builder.charAt(builder.length() - 1) == '\n')
+                                builder.deleteCharAt(builder.length() - 1);
+
+                            logger.info(String.valueOf(builder));
                         } else
-                            logger.error("Server Message system issue");
-                    } catch (ImproperCommandFormat e) {
-                        logger.error(e.getMessage());
-                    }
+                            logger.info(r);
+                    } else
+                        logger.error("Server Message system issue");
+                } catch (ImproperCommandFormat e) {
+                    logger.error(e.getMessage());
                 }
             }
         });
         logger.debug("Console Started");
+
+        //Loading all proprietary data
         try {
             logger.info("Finding bots guild id");
-            JsonArray array = new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "/users/@me/guilds"))));
+            JsonArray array = new JsonArray(String.valueOf(this.rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "/users/@me/guilds"))));
             switch (array.length()) {
                 case 0:
                     logger.error("Your bot is not a member of any guild therefore can't load data. Please join a guild before launching the bot\n" +
@@ -167,7 +135,7 @@ public final class DiscordBot implements IDiscordBot {
 
             logger.info("Found bots guild id");
             logger.info("Loading roles");
-            for (Object object : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/roles"))))) {
+            for (Object object : new JsonArray(String.valueOf(this.rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/roles"))))) {
                 Json json = new Json(String.valueOf(object));
                 CreateRole role = Util.checkConstructor(CreateRole.class, json, this).getObject();
                 logger.debug(String.valueOf(role.getRole()));
@@ -175,16 +143,16 @@ public final class DiscordBot implements IDiscordBot {
             }
             logger.info("Roles loaded");
             logger.info("Loading Discord Bot User");
-            Json discordBotJson = new Json(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "users/@me"))));
+            Json discordBotJson = new Json(String.valueOf(this.rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "users/@me"))));
             if (discordBotJson.keySet().contains("id")) {
-                discordBotJson = new Json(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/members/" + discordBotJson.get("id")))));
+                discordBotJson = new Json(String.valueOf(this.rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/members/" + discordBotJson.get("id")))));
                 CreateDiscordUser discordBotUser = Util.checkConstructor(CreateDiscordUser.class, discordBotJson, this).getObject();
                 this.user = discordBotUser.getUser();
                 logger.debug(String.valueOf(this.user));
                 logger.info("Loaded Discord Bot User");
             }
             logger.info("Loading users");
-            for (Object object : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/members" + "?limit=1000"))))) {
+            for (Object object : new JsonArray(String.valueOf(this.rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/members" + "?limit=1000"))))) {
                 Json json = new Json(String.valueOf(object));
                 CreateDiscordUser user = Util.checkConstructor(CreateDiscordUser.class, json, this).getObject();
                 logger.debug(String.valueOf(user.getUser()));
@@ -192,7 +160,7 @@ public final class DiscordBot implements IDiscordBot {
             }
             logger.info("Users loaded");
             logger.info("Loading channels");
-            for (Object object : new JsonArray(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/channels"))))) {
+            for (Object object : new JsonArray(String.valueOf(this.rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.GET, "guilds/" + this.guildId + "/channels"))))) {
                 Json json = new Json(String.valueOf(object));
                 CreateChannel channel = Util.checkConstructor(CreateChannel.class, json, this).getObject();
                 if (channel.getChannel() != null) {
@@ -214,15 +182,32 @@ public final class DiscordBot implements IDiscordBot {
         }
     }
 
-
-    @Override
-    public ListenerManager getListenerManager() {
-        return eventManager;
+    /**
+     * @return Logger Manager
+     */
+    public LoggerManager getLoggerManager() {
+        return this.loggerManager;
     }
 
-    @Override
-    public LoggerManager getLoggerManager() {
-        return loggerManager;
+    /**
+     * @return Event Listener Manager
+     */
+    public ListenerManager getListenerManager() {
+        return this.listenerManager;
+    }
+
+    /**
+     * @return rate limit recorder
+     */
+    public RateLimitRecorder getRateLimitRecorder() {
+        return this.rateLimitRecorder;
+    }
+
+    /**
+     * @return http requests
+     */
+    public IHttpRequests getRequests() {
+        return this.requests;
     }
 
     @Override
@@ -233,26 +218,6 @@ public final class DiscordBot implements IDiscordBot {
     @Override
     public Long getGuildId() {
         return this.guildId;
-    }
-
-    @Override
-    public Properties getProperties() {
-        return properties;
-    }
-
-    @Override
-    public boolean queryMessages() {
-        return queryMessages;
-    }
-
-    @Override
-    public RateLimitRecorder getRateLimitRecorder() {
-        return this.rateLimitRecorder;
-    }
-
-    @Override
-    public IHttpRequests getRequests() {
-        return this.requests;
     }
 
     @Override
@@ -274,232 +239,15 @@ public final class DiscordBot implements IDiscordBot {
     public void setStatus(final GameType type, final String message, final UserStatus status) {
         String payload = "{\"op\":3,\"d\":{\"since\":0,\"game\":{\"name\":\"?name\",\"type\":?type},\"afk\":false,\"status\":\"?status\"}}";
         payload = payload.replace("?name", message).replace("?type", String.valueOf(type.ordinal())).replace("?status", status.name());
-        rateLimitRecorder.queue(new WebSocketEvent(this.socket, new Json(payload)));
+        this.rateLimitRecorder.queue(new WebSocketEvent(this.socket, new Json(payload)));
     }
 
     @Override
     public IChannel createDmChannel(final IDiscordUser user) {
         String info = "{\"recipient_id\":?id}";
         info = info.replace("?id", String.valueOf(user.getId()));
-        CreateDMChannel channel = Util.checkConstructor(CreateDMChannel.class, new Json(String.valueOf(rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.SENDJSON, "/users/@me/channels", new Json(info))))), this).getObject();
+        CreateDMChannel channel = Util.checkConstructor(CreateDMChannel.class, new Json(String.valueOf(this.rateLimitRecorder.queue(new HttpEvent(this, RequestTypes.SENDJSON, "/users/@me/channels", new Json(info))))), this).getObject();
         this.getChannels().put(channel.getChannel().getId(), channel.getChannel().getName(), channel.getChannel());
         return channel.getChannel();
-    }
-
-    /**
-     * This class is an extension of {@link Listener} and is used to output/log all possible events sent from the websocket
-     * it is also used to handle message input for commands {@link #commandLogic(MessageCreate)}
-     *
-     * @author Ideaeclipse
-     */
-    @SuppressWarnings("All")
-    private static class EventListener implements Listener {
-        private final CustomLogger logger;
-        private final IDiscordBot bot;
-        private final CustomTerminal<IDiscordBot, IMessage> input;
-        private final CustomTerminal<IDiscordBot, IMessage> dmInput;
-
-        /**
-         * Starts logger, starts command handler
-         *
-         * @param bot bot instance
-         */
-        private EventListener(final IDiscordBot bot) {
-            this.bot = bot;
-            this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
-            this.input = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), this.bot.getProperties().getProperty("InstanceCommands"), bot, IMessage.class);
-            this.dmInput = new CustomTerminal<>(this.bot.getProperties().getProperty("CommandPrefix"), this.bot.getProperties().getProperty("DmCommands"), bot, IMessage.class);
-        }
-
-        /**
-         * Called when {@link MessageCreate} payload is sent
-         * Handles all command input
-         * {@link CustomTerminal#handleInput(String, Object, Object)}
-         *
-         * @param create {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         */
-        @CallableEvent
-        private void commandLogic(final MessageCreate create) {
-            IMessage message = create.getMessage();
-            if (message.getChannel().getType() != 1) {
-                this.logger.info("ChannelMessageCreate: " + message);
-                if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername()) && (message.getChannel().equals(bot.getChannels().getByK2(this.bot.getProperties().getProperty("CommandChannel")))) && message.getContent().startsWith(this.input.getPrefix())) {
-                    try {
-                        String r = String.valueOf(this.input.handleInput(message.getContent(), message));
-                        if (!r.equals("null")) {
-                            List<Field> fieldList = Field.parser(r);
-                            if (fieldList.size() > 0)
-                                message.getChannel().sendEmbed(fieldList, embedFooterImage);
-                            else
-                                message.getChannel().sendMessage(r);
-                        }
-                    } catch (ImproperCommandFormat e) {
-                        message.getChannel().sendMessage(e.getMessage());
-                    }
-                }
-            } else {
-                this.logger.info("DmMessageCreate: " + message);
-                if (!message.getUser().getUsername().equals(this.bot.getBot().getUsername())) {
-                    if (message.getContent().startsWith(this.input.getPrefix())) {
-                        try {
-                            String r = String.valueOf(this.dmInput.handleInput(message.getContent(), message));
-                            if (!r.equals("null")) {
-                                List<Field> fieldList = Field.parser(r);
-                                if (fieldList.size() > 0)
-                                    message.getChannel().sendEmbed(fieldList, embedFooterImage);
-                                else
-                                    message.getChannel().sendMessage(r);
-                            }
-                        } catch (ImproperCommandFormat e) {
-                            message.getChannel().sendMessage(e.getMessage());
-                        }
-                    } else
-                        message.getChannel().sendMessage("All messages sent through dm's are meant to be commands use " + this.dmInput.getPrefix() + "help for commands");
-                }
-            }
-        }
-
-        /**
-         * Called when {@link PresenceUpdate} payload is sent
-         * Prints the updated presence object
-         *
-         * @param update {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         */
-        @CallableEvent
-        private void onPresenceUpadte(final PresenceUpdate update) {
-            this.logger.info("Presence Update: " + update.getPresence());
-        }
-
-        /**
-         * Called when {@link CreateRole} payload is sent
-         * Prints the role name that was created
-         *
-         * @param role {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onRoleCreate(final CreateRole role) {
-            this.logger.info("Role added: " + role.getRole().getName());
-        }
-
-        /**
-         * Called when {@link UpdateRole} payload is sent
-         * Prints the role name that was updated
-         *
-         * @param role {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onRoleUpdate(final UpdateRole role) {
-            this.logger.info("Role Updated: " + role.getRole().getName());
-        }
-
-        /**
-         * Called when {@link DeleteRole} payload is sent
-         * Prints the role name that was deleted
-         *
-         * @param role {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onDeleteRole(final DeleteRole role) {
-            this.logger.info("Role delete: " + role.getRole().getName());
-        }
-
-        /**
-         * Called when {@link CreateChannel} payload is sent
-         * Prints the channel name that was created
-         *
-         * @param channel {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onChannelCreate(final CreateChannel channel) {
-            this.logger.info("Channel added: " + channel.getChannel().getName());
-        }
-
-        /**
-         * Called when {@link UpdateChannel} payload is sent
-         * Prints the channel name that was updated
-         *
-         * @param channel {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onChannelUpdate(final UpdateChannel channel) {
-            this.logger.info("Channel updated: " + channel.getChannel().getName());
-        }
-
-        /**
-         * Called when {@link DeleteChannel} payload is sent
-         * Prints the channel name that was deleted
-         *
-         * @param channel {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onDeleteChannel(final DeleteChannel channel) {
-            this.logger.info("Channel deleted: " + channel.getChannel().getName());
-        }
-
-        /**
-         * Called when {@link CreateDiscordUser} payload is sent
-         * Prints the user name that was added
-         *
-         * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onUserJoin(final CreateDiscordUser user) {
-            this.logger.info("User added: " + user.getUser().getUsername());
-        }
-
-        /**
-         * Called when {@link UpdateDiscordUser} payload is sent
-         * Prints the user name that was updated
-         *
-         * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onUserUpdate(final UpdateDiscordUser user) {
-            this.logger.info("User updated: " + user.getUser().getUsername());
-        }
-
-        /**
-         * Called when {@link DeleteDiscordUser} payload is sent
-         * Prints the user name that was deleted
-         *
-         * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onDeleteUser(final DeleteDiscordUser user) {
-            this.logger.info("User deleted: " + user.getUser().getUsername());
-        }
-
-        /**
-         * Called when {@link AddReaction} payload is sent
-         * Prints the reaction object that was added
-         *
-         * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onAddReaction(final AddReaction reaction) {
-            this.logger.info("Reaction added: " + reaction.getReaction());
-        }
-
-        /**
-         * Called when {@link RemoveReaction} payload is sent
-         * Prints the reaction object that was removed
-         *
-         * @param user {@link ideaeclipse.reflectionListener.Event} all methods with this event type are called when {@link EventManager#callEvent(Event)} is called with that event type
-         * @see Wss
-         */
-        @CallableEvent
-        private void onRemoveReaction(final RemoveReaction reaction) {
-            this.logger.info("Reaction removed: " + reaction.getReaction());
-        }
     }
 }

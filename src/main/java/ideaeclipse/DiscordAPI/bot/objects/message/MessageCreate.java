@@ -3,7 +3,9 @@ package ideaeclipse.DiscordAPI.bot.objects.message;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import emoji4j.EmojiUtils;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.bot.objects.user.IDiscordUser;
 import ideaeclipse.DiscordAPI.utils.Util;
 import ideaeclipse.DiscordAPI.utils.annotations.JsonValidity;
@@ -54,11 +56,11 @@ import java.util.Map;
  * @author Ideaeclipse
  * @see IMessage
  * @see Message
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
+ * @see Wss#Wss(IDiscordBot, String)
  */
 @SuppressWarnings("ALl")
 public final class MessageCreate extends Event {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final IMessage message;
 
     /**
@@ -66,7 +68,7 @@ public final class MessageCreate extends Event {
      *
      * @param json json string delivered from the websocket
      */
-    private MessageCreate(@JsonValidity({"author", "content", "id", "pinned", "channel_id"}) Json json, final IDiscordBot bot) {
+    private MessageCreate(@JsonValidity({"author", "content", "id", "pinned", "channel_id"}) Json json, final DiscordBot bot) {
         this.bot = bot;
         Object o = Util.check(this, "getReactions", json).getObject();
         Map<String, Integer> reactionMap;

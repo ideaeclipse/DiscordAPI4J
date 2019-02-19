@@ -1,7 +1,9 @@
 package ideaeclipse.DiscordAPI.bot.objects.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ideaeclipse.DiscordAPI.bot.DiscordBot;
 import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+import ideaeclipse.DiscordAPI.webSocket.Wss;
 import ideaeclipse.DiscordAPI.bot.objects.role.IRole;
 import ideaeclipse.DiscordAPI.utils.MultiKeyMap;
 import ideaeclipse.DiscordAPI.utils.Util;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 @JsonFormat
 /**
  * TODO: remove user and nickname variables. Make methods that parse them and return them.
- * This class is called when a guild member add payload is sent to {@link ideaeclipse.DiscordAPI.webSocket.Wss}
+ * This class is called when a guild member add payload is sent to {@link Wss}
  *
  * Json Example
  *
@@ -43,21 +45,21 @@ import java.util.stream.Collectors;
  * @see UpdateDiscordUser
  * @see DeleteDiscordUser
  * @see IDiscordUser
- * @see ideaeclipse.DiscordAPI.webSocket.Wss#Wss(IDiscordBot, String)
+ * @see Wss#Wss(IDiscordBot, String)
  */
 public final class CreateDiscordUser extends Event {
-    private final IDiscordBot bot;
+    private final DiscordBot bot;
     private final MultiKeyMap<Long, String, IRole> userRoles = new MultiKeyMap<>();
     private IDiscordUser user;
     private String nickname;
 
     /**
-     * {@link Util#checkConstructor(Class, Json, IDiscordBot)} validates json components
+     * {@link Util#checkConstructor(Class, Json, DiscordBot)} validates json components
      * parses roles from the map of roles, and parses nickname
      *
-     * @param json json from {@link ideaeclipse.DiscordAPI.webSocket.Wss}
+     * @param json json from {@link Wss}
      */
-    private CreateDiscordUser(@JsonValidity({"user", "roles"}) final Json json, final IDiscordBot bot) {
+    private CreateDiscordUser(@JsonValidity({"user", "roles"}) final Json json, final DiscordBot bot) {
         this.bot = bot;
         String str = String.valueOf(json.get("roles"));
         List<String> strings = Arrays.asList(str.substring(1, str.length() - 1).trim().split("\\s*,\\s*"));
