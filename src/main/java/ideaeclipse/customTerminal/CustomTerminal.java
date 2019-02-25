@@ -1,5 +1,6 @@
 package ideaeclipse.customTerminal;
 
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.customTerminal.exceptions.ImproperCommandFormat;
 import ideaeclipse.customTerminal.exceptions.InvalidHelpFormat;
 import ideaeclipse.customTerminal.exceptions.WrongNumberOfParams;
@@ -24,12 +25,12 @@ public class CustomTerminal<T> {
      * @param prefix           command prefix
      * @param methodParamClass method param class
      */
-    public CustomTerminal(final String prefix, final CommandsClass commandsClass, final Class<T> methodParamClass) {
+    public CustomTerminal(final IDiscordBot bot, final String prefix, final CommandsClass commandsClass, final Class<T> methodParamClass) {
         this.prefix = prefix;
         this.terminal = new InstanceHandler<>(this, methodParamClass);
         for (Method method : commandsClass.getClass().getDeclaredMethods()) {
             if (method.getAnnotation(Executable.class) != null) {
-                this.commands.put(method.getName().toLowerCase(), new Command<>(commandsClass, method.getName(), Arrays.asList(method.getParameterTypes()).contains(methodParamClass)));
+                this.commands.put(method.getName().toLowerCase(), new Command<>(bot, commandsClass, method.getName(), Arrays.asList(method.getParameterTypes()).contains(IDiscordBot.class), Arrays.asList(method.getParameterTypes()).contains(methodParamClass)));
             }
         }
     }

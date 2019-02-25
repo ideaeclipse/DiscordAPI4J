@@ -84,7 +84,7 @@ public class DiscordBot extends IDiscordBot {
         //Console instance
         Async.blankThread(() -> {
             Thread.currentThread().setName("AdminConsole");
-            CustomTerminal<IMessage> input = new CustomTerminal<>(this.commandPrefix, new ConsoleCommands(this), IMessage.class);
+            CustomTerminal<IMessage> input = new CustomTerminal<>(this,this.commandPrefix, new ConsoleCommands(this), IMessage.class);
             Scanner scanner = new Scanner(System.in);
             while (true) {
                 try {

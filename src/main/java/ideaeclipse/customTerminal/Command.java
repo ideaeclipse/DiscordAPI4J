@@ -1,5 +1,6 @@
 package ideaeclipse.customTerminal;
 
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
 import ideaeclipse.customTerminal.exceptions.WrongNumberOfParams;
 import ideaeclipse.customTerminal.exceptions.WrongParams;
 
@@ -17,19 +18,24 @@ import java.util.stream.Collectors;
  * @author Ideaeclipse
  */
 class Command<K> {
+    private final IDiscordBot bot;
     private final CommandsClass commandsClass;
     private final Method method;
+    private final boolean needsBot;
     private final boolean needsParam;
 
     /**
+     * @param bot           to pass to method if required
      * @param commandsClass commandsClass object
-     * @param methodName methodName, will search for the method object
-     * @param needsParam if the method needs the method param to be passed
+     * @param methodName    methodName, will search for the method object
+     * @param needsParam    if the method needs the method param to be passed
      */
-    Command(final CommandsClass commandsClass, final String methodName, final boolean needsParam) {
+    Command(final IDiscordBot bot, final CommandsClass commandsClass, final String methodName, final boolean needsBot, final boolean needsParam) {
+        this.bot = bot;
         this.commandsClass = commandsClass;
         this.method = Arrays.stream(commandsClass.getClass().getDeclaredMethods()).filter(o -> o.getName().toLowerCase().equals(methodName.toLowerCase())).collect(Collectors.toList()).get(0);
         this.method.setAccessible(true);
+        this.needsBot = needsBot;
         this.needsParam = needsParam;
     }
 
@@ -43,9 +49,12 @@ class Command<K> {
      * @throws WrongParams         when you passed a string but they want an int for example.
      */
     Object invoke(final K methodParam, final Object... params) throws WrongNumberOfParams, WrongParams {
-        List<Object> objects = new LinkedList<>(Arrays.asList(params));
+        List<Object> objects = new LinkedList<>();
+        if (needsBot)
+            objects.add(0, this.bot);
         if (needsParam)
-            objects.add(0, methodParam);
+            objects.add(getParamIndex(methodParam), methodParam);
+        objects.addAll(Arrays.asList(params));
         if (method.getParameterCount() == objects.size()) {
             try {
                 return this.method.invoke(this.commandsClass, objects.toArray());
@@ -56,7 +65,12 @@ class Command<K> {
                 throw new WrongParams(classList, Arrays.asList(method.getParameterTypes()));
             }
         } else {
-            throw new WrongNumberOfParams(Arrays.asList(params).size(), needsParam ? method.getParameterCount() - 1 : method.getParameterCount());
+            int size = method.getParameterCount();
+            if (needsBot)
+                size -= 1;
+            if (needsParam)
+                size -= 1;
+            throw new WrongNumberOfParams(Arrays.asList(params).size(), size);
         }
     }
 
@@ -65,5 +79,28 @@ class Command<K> {
      */
     Method getMethod() {
         return this.method;
+    }
+
+    /**
+     * Checks to see where the methodParam should be placed, before or after the bot object if present
+     *
+     * @param methodParam method param object
+     * @return index to place
+     */
+    private int getParamIndex(final K methodParam) {
+        List<Class<?>> paramTypes = Arrays.asList(this.method.getParameterTypes());
+        int initial = paramTypes.indexOf(methodParam.getClass());
+        if (initial == -1) {
+            for (Class<?> c : methodParam.getClass().getInterfaces()) {
+                if (paramTypes.contains(c)) {
+                    initial = paramTypes.indexOf(c);
+                }
+            }
+            if (initial == -1)
+                if (paramTypes.contains(methodParam.getClass().getSuperclass())) {
+                    initial = paramTypes.indexOf(methodParam.getClass().getSuperclass());
+                }
+        }
+        return initial;
     }
 }

@@ -51,11 +51,11 @@ class EventListener implements Listener {
         this.commandChannel = commandChannel;
         this.logger = new CustomLogger(this.getClass(), bot.getLoggerManager());
         if (commandsClass != null)
-            this.input = new CustomTerminal<>(commandPrefix, commandsClass, IMessage.class);
+            this.input = new CustomTerminal<>(bot,commandPrefix, commandsClass, IMessage.class);
         else
             this.input = null;
         if (dmClass != null)
-            this.dmInput = new CustomTerminal<>(commandPrefix, dmClass, IMessage.class);
+            this.dmInput = new CustomTerminal<>(bot,commandPrefix, dmClass, IMessage.class);
         else
             dmInput = null;
     }

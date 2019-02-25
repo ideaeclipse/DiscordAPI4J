@@ -1,5 +1,7 @@
 package ideaeclipse.customTerminal;
 
+import ideaeclipse.DiscordAPI.bot.IDiscordBot;
+
 import java.lang.reflect.Executable;
 
 /**
@@ -28,7 +30,7 @@ final class Util<K> {
             builder.append(executable.getName());
         builder.append(" <");
         for (Class<?> c : executable.getParameterTypes()) {
-            if (!c.equals(methodClass))
+            if (!c.equals(methodClass) && !c.equals(IDiscordBot.class))
                 builder.append(c.getSimpleName()).append(",");
         }
         if (builder.charAt(builder.length() - 1) == ',')
