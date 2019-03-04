@@ -40,7 +40,7 @@ import java.util.Map;
  *   ],
  *   "type": 0,
  *   "edited_timestamp": "2018-08-31T01:37:52.828000+00:00",
- *   "content": "rule #1: We only talk about mcdonald",
+ *   "content": "rule #1: We only talk about McDonald's",
  *   "tts": false,
  *   "mentions": [
  *
