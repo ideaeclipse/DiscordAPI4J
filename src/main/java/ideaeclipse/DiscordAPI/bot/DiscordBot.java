@@ -38,7 +38,10 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * TODO: Load all channel types
+ * TODO: Custom terminal, Ensure optional params are 1 and 2 or don't load.
+ * TODO: Custom terminal, Ensure return type is string
+ * TODO: user params must be String or primitive
+ * TODO: Embed footer validation
  * <p>
  * This class is used to encapsulate all data surrounding the functionality of the discord bot
  * <p>
