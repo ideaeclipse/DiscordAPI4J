@@ -42,6 +42,8 @@ import java.util.Scanner;
  * TODO: Custom terminal, Ensure return type is string
  * TODO: user params must be String or primitive
  * TODO: Embed footer validation
+ * TODO: Scheduler that updates all data every hour, reset scheduler time on reconnection
+ * TODO: Redo ratelimit recorder to work per end point, not just in general
  * <p>
  * This class is used to encapsulate all data surrounding the functionality of the discord bot
  * <p>
