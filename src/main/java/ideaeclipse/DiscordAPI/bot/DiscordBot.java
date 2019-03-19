@@ -44,6 +44,7 @@ import java.util.Scanner;
  * TODO: Embed footer validation
  * TODO: Scheduler that updates all data every hour, reset scheduler time on reconnection
  * TODO: Redo ratelimit recorder to work per end point, not just in general
+ * TODO: More interfaces.
  * <p>
  * This class is used to encapsulate all data surrounding the functionality of the discord bot
  * <p>
